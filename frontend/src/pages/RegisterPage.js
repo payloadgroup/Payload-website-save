@@ -118,7 +118,7 @@ const RegisterPage = () => {
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label className="font-mono text-xs uppercase tracking-widest text-payload-muted block mb-2">
-                FULL NAME
+                FULL NAME (FIRST & LAST)
               </label>
               <input
                 data-testid="register-name-input"
@@ -126,9 +126,12 @@ const RegisterPage = () => {
                 required
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="w-full bg-black border-b border-white/20 focus:border-payload-neon focus:outline-none py-3 px-0 font-mono text-payload-text placeholder:text-white/30 transition-colors"
+                className={`w-full bg-black border-b ${errors.name ? 'border-red-500' : 'border-white/20'} focus:border-payload-neon focus:outline-none py-3 px-0 font-mono text-payload-text placeholder:text-white/30 transition-colors`}
                 placeholder="John Commander"
               />
+              {errors.name && (
+                <p className="text-red-500 text-xs font-mono mt-1">{errors.name}</p>
+              )}
             </div>
 
             <div>
