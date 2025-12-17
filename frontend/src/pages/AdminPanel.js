@@ -115,42 +115,42 @@ const AdminPanel = () => {
         </div>
       </nav>
 
-      <div className="max-w-7xl mx-auto px-6 py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <div className="mb-8">
-            <h1 className="font-rajdhani font-bold text-4xl uppercase tracking-wide mb-2">
+          <div className="mb-6 sm:mb-8">
+            <h1 className="font-rajdhani font-bold text-2xl sm:text-4xl uppercase tracking-wide mb-2">
               ADMIN CONTROL
             </h1>
-            <p className="font-mono text-sm text-payload-alert uppercase tracking-widest">
-              MEMBERSHIP MANAGEMENT SYSTEM
+            <p className="font-mono text-xs sm:text-sm text-payload-alert uppercase tracking-widest">
+              MEMBERSHIP MANAGEMENT
             </p>
           </div>
 
           {/* Tabs */}
-          <div className="flex gap-4 mb-8 border-b border-white/10">
+          <div className="flex gap-2 sm:gap-4 mb-6 sm:mb-8 border-b border-white/10 overflow-x-auto">
             <button
               onClick={() => setActiveTab('pending')}
-              className={`font-mono text-sm uppercase tracking-widest pb-4 px-6 transition-all ${
+              className={`font-mono text-xs sm:text-sm uppercase tracking-widest pb-3 sm:pb-4 px-3 sm:px-6 transition-all whitespace-nowrap ${
                 activeTab === 'pending'
                   ? 'text-payload-alert border-b-2 border-payload-alert'
                   : 'text-payload-muted hover:text-payload-text'
               }`}
             >
-              PENDING APPROVALS ({pendingUsers.length})
+              PENDING ({pendingUsers.length})
             </button>
             <button
               onClick={() => setActiveTab('members')}
-              className={`font-mono text-sm uppercase tracking-widest pb-4 px-6 transition-all ${
+              className={`font-mono text-xs sm:text-sm uppercase tracking-widest pb-3 sm:pb-4 px-3 sm:px-6 transition-all whitespace-nowrap ${
                 activeTab === 'members'
                   ? 'text-payload-neon border-b-2 border-payload-neon'
                   : 'text-payload-muted hover:text-payload-text'
               }`}
             >
-              ALL MEMBERS ({allMembers.length})
+              MEMBERS ({allMembers.length})
             </button>
           </div>
 
