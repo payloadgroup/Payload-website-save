@@ -93,7 +93,8 @@ class User(BaseModel):
     role: UserRole
     status: UserStatus
     tier: Optional[MemberTier] = MemberTier.CADET
-    referral_code: Optional[str] = None
+    referral_code: Optional[str] = None  # Code they used to sign up
+    own_referral_code: Optional[str] = None  # Their code to share
     referred_by: Optional[str] = None
     referral_count: int = 0
     last_login: Optional[str] = None
