@@ -73,22 +73,22 @@ const Analytics = () => {
         </div>
       </nav>
 
-      <div className="max-w-7xl mx-auto px-6 py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <div className="mb-12">
-            <h1 className="font-rajdhani font-bold text-4xl uppercase tracking-wide mb-2">
-              ANALYTICS DASHBOARD
+          <div className="mb-8 sm:mb-12">
+            <h1 className="font-rajdhani font-bold text-2xl sm:text-4xl uppercase tracking-wide mb-2">
+              ANALYTICS
             </h1>
-            <p className="font-mono text-sm text-payload-alert uppercase tracking-widest">
-              SYSTEM METRICS & INSIGHTS
+            <p className="font-mono text-xs sm:text-sm text-payload-alert uppercase tracking-widest">
+              SYSTEM METRICS
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-8 sm:mb-12">
             <motion.div
               data-testid="total-members-card"
               initial={{ opacity: 0 }}

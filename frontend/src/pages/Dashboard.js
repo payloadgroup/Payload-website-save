@@ -218,18 +218,18 @@ const Dashboard = () => {
             </motion.div>
           </div>
 
-          <div className="mt-12 bg-payload-surface border border-white/10 p-6 rounded-sm">
-            <h3 className="font-mono text-xs uppercase tracking-widest text-payload-muted mb-4">SYSTEM STATUS</h3>
+          <div className="mt-8 sm:mt-12 bg-payload-surface border border-white/10 p-4 sm:p-6 rounded-sm">
+            <h3 className="font-mono text-[10px] sm:text-xs uppercase tracking-widest text-payload-muted mb-3 sm:mb-4">SYSTEM STATUS</h3>
             <div className="space-y-2">
-              <div className="flex items-center justify-between font-mono text-sm">
+              <div className="flex items-center justify-between font-mono text-xs sm:text-sm">
                 <span className="text-payload-text">Member Since</span>
                 <span className="text-payload-neon">{new Date(user?.created_at).toLocaleDateString()}</span>
               </div>
-              <div className="flex items-center justify-between font-mono text-sm">
+              <div className="flex items-center justify-between font-mono text-xs sm:text-sm">
                 <span className="text-payload-text">Access Level</span>
                 <span className="text-payload-cyan uppercase">{user?.role}</span>
               </div>
-              <div className="flex items-center justify-between font-mono text-sm">
+              <div className="flex items-center justify-between font-mono text-xs sm:text-sm">
                 <span className="text-payload-text">Status</span>
                 <span className="text-payload-neon uppercase">{user?.status}</span>
               </div>
