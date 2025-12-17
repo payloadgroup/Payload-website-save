@@ -154,14 +154,14 @@ const PayloadsModal = ({ onClose, onUpdate }) => {
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
-        className="bg-payload-surface border border-white/20 rounded-sm w-full max-w-4xl max-h-[90vh] overflow-hidden"
+        className="bg-payload-surface border border-white/20 rounded-sm w-full max-w-4xl max-h-[90vh] overflow-hidden mx-2 sm:mx-4"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="border-b border-white/10 p-6 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Rocket className="w-6 h-6 text-payload-neon" />
-            <h2 className="font-rajdhani font-bold text-2xl uppercase tracking-wide">
-              {isAdmin ? 'PAYLOADS MANAGEMENT' : 'MY PAYLOADS'}
+        <div className="border-b border-white/10 p-4 sm:p-6 flex items-center justify-between">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <Rocket className="w-5 h-5 sm:w-6 sm:h-6 text-payload-neon flex-shrink-0" />
+            <h2 className="font-rajdhani font-bold text-lg sm:text-2xl uppercase tracking-wide">
+              {isAdmin ? 'PAYLOADS' : 'MY PAYLOADS'}
             </h2>
           </div>
           <button
@@ -173,7 +173,7 @@ const PayloadsModal = ({ onClose, onUpdate }) => {
           </button>
         </div>
 
-        <div className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+        <div className="p-4 sm:p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
           {isAdmin && !showForm && !editingId && (
             <button
               data-testid="add-payload-btn"
