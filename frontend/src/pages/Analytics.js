@@ -94,15 +94,15 @@ const Analytics = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.1 }}
-              className="bg-payload-surface border border-white/10 p-6 rounded-sm"
+              className="bg-payload-surface border border-white/10 p-3 sm:p-6 rounded-sm"
             >
-              <div className="flex items-start justify-between mb-4">
-                <Users className="w-8 h-8 text-payload-neon" />
-                <TrendingUp className="w-5 h-5 text-payload-muted" />
+              <div className="flex items-start justify-between mb-2 sm:mb-4">
+                <Users className="w-5 h-5 sm:w-8 sm:h-8 text-payload-neon" />
+                <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-payload-muted" />
               </div>
-              <h3 className="font-mono text-xs uppercase tracking-widest text-payload-muted mb-2">TOTAL MEMBERS</h3>
-              <div className="font-mono text-3xl text-payload-neon">{analytics?.total_members || 0}</div>
-              <div className="font-mono text-xs text-payload-muted mt-2">
+              <h3 className="font-mono text-[10px] sm:text-xs uppercase tracking-widest text-payload-muted mb-1 sm:mb-2">MEMBERS</h3>
+              <div className="font-mono text-xl sm:text-3xl text-payload-neon">{analytics?.total_members || 0}</div>
+              <div className="font-mono text-[10px] sm:text-xs text-payload-muted mt-1 sm:mt-2">
                 {analytics?.approved_members || 0} approved
               </div>
             </motion.div>
@@ -112,14 +112,14 @@ const Analytics = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.2 }}
-              className="bg-payload-surface border border-white/10 p-6 rounded-sm"
+              className="bg-payload-surface border border-white/10 p-3 sm:p-6 rounded-sm"
             >
-              <div className="flex items-start justify-between mb-4">
-                <Clock className="w-8 h-8 text-payload-alert" />
+              <div className="flex items-start justify-between mb-2 sm:mb-4">
+                <Clock className="w-5 h-5 sm:w-8 sm:h-8 text-payload-alert" />
               </div>
-              <h3 className="font-mono text-xs uppercase tracking-widest text-payload-muted mb-2">PENDING APPROVAL</h3>
-              <div className="font-mono text-3xl text-payload-alert">{analytics?.pending_members || 0}</div>
-              <div className="font-mono text-xs text-payload-muted mt-2">
+              <h3 className="font-mono text-[10px] sm:text-xs uppercase tracking-widest text-payload-muted mb-1 sm:mb-2">PENDING</h3>
+              <div className="font-mono text-xl sm:text-3xl text-payload-alert">{analytics?.pending_members || 0}</div>
+              <div className="font-mono text-[10px] sm:text-xs text-payload-muted mt-1 sm:mt-2">
                 awaiting review
               </div>
             </motion.div>
@@ -129,14 +129,14 @@ const Analytics = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.3 }}
-              className="bg-payload-surface border border-white/10 p-6 rounded-sm"
+              className="bg-payload-surface border border-white/10 p-3 sm:p-6 rounded-sm"
             >
-              <div className="flex items-start justify-between mb-4">
-                <Rocket className="w-8 h-8 text-payload-cyan" />
+              <div className="flex items-start justify-between mb-2 sm:mb-4">
+                <Rocket className="w-5 h-5 sm:w-8 sm:h-8 text-payload-cyan" />
               </div>
-              <h3 className="font-mono text-xs uppercase tracking-widest text-payload-muted mb-2">TOTAL PAYLOADS</h3>
-              <div className="font-mono text-3xl text-payload-cyan">{analytics?.total_payloads || 0}</div>
-              <div className="font-mono text-xs text-payload-muted mt-2">
+              <h3 className="font-mono text-[10px] sm:text-xs uppercase tracking-widest text-payload-muted mb-1 sm:mb-2">PAYLOADS</h3>
+              <div className="font-mono text-xl sm:text-3xl text-payload-cyan">{analytics?.total_payloads || 0}</div>
+              <div className="font-mono text-[10px] sm:text-xs text-payload-muted mt-1 sm:mt-2">
                 {analytics?.active_payloads || 0} active
               </div>
             </motion.div>
@@ -146,37 +146,37 @@ const Analytics = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.4 }}
-              className="bg-payload-surface border border-white/10 p-6 rounded-sm"
+              className="bg-payload-surface border border-white/10 p-3 sm:p-6 rounded-sm"
             >
-              <div className="flex items-start justify-between mb-4">
-                <Target className="w-8 h-8 text-white" />
+              <div className="flex items-start justify-between mb-2 sm:mb-4">
+                <Target className="w-5 h-5 sm:w-8 sm:h-8 text-white" />
               </div>
-              <h3 className="font-mono text-xs uppercase tracking-widest text-payload-muted mb-2">TOTAL MISSIONS</h3>
-              <div className="font-mono text-3xl text-white">{analytics?.total_missions || 0}</div>
-              <div className="font-mono text-xs text-payload-muted mt-2">
+              <h3 className="font-mono text-[10px] sm:text-xs uppercase tracking-widest text-payload-muted mb-1 sm:mb-2">MISSIONS</h3>
+              <div className="font-mono text-xl sm:text-3xl text-white">{analytics?.total_missions || 0}</div>
+              <div className="font-mono text-[10px] sm:text-xs text-payload-muted mt-1 sm:mt-2">
                 {analytics?.completed_missions || 0} completed
               </div>
             </motion.div>
           </div>
 
-          <div className="bg-payload-surface border border-white/10 p-6 rounded-sm mb-8">
-            <h3 className="font-rajdhani font-bold text-xl uppercase tracking-wide mb-6">PLATFORM ACTIVITY</h3>
-            <div className="grid md:grid-cols-3 gap-6">
-              <div className="border-l-2 border-payload-neon pl-4">
-                <div className="font-mono text-xs uppercase tracking-widest text-payload-muted mb-1">TRANSACTIONS</div>
-                <div className="font-mono text-2xl text-payload-neon">{analytics?.total_transactions || 0}</div>
+          <div className="bg-payload-surface border border-white/10 p-4 sm:p-6 rounded-sm mb-6 sm:mb-8">
+            <h3 className="font-rajdhani font-bold text-base sm:text-xl uppercase tracking-wide mb-4 sm:mb-6">PLATFORM ACTIVITY</h3>
+            <div className="grid grid-cols-1 xs:grid-cols-3 gap-4 sm:gap-6">
+              <div className="border-l-2 border-payload-neon pl-3 sm:pl-4">
+                <div className="font-mono text-[10px] sm:text-xs uppercase tracking-widest text-payload-muted mb-1">TRANSACTIONS</div>
+                <div className="font-mono text-lg sm:text-2xl text-payload-neon">{analytics?.total_transactions || 0}</div>
               </div>
-              <div className="border-l-2 border-payload-cyan pl-4">
-                <div className="font-mono text-xs uppercase tracking-widest text-payload-muted mb-1">COMPLETION RATE</div>
-                <div className="font-mono text-2xl text-payload-cyan">
+              <div className="border-l-2 border-payload-cyan pl-3 sm:pl-4">
+                <div className="font-mono text-[10px] sm:text-xs uppercase tracking-widest text-payload-muted mb-1">COMPLETION</div>
+                <div className="font-mono text-lg sm:text-2xl text-payload-cyan">
                   {analytics?.total_missions > 0 
                     ? Math.round((analytics?.completed_missions / analytics?.total_missions) * 100)
                     : 0}%
                 </div>
               </div>
-              <div className="border-l-2 border-payload-alert pl-4">
-                <div className="font-mono text-xs uppercase tracking-widest text-payload-muted mb-1">ACTIVE RATE</div>
-                <div className="font-mono text-2xl text-payload-alert">
+              <div className="border-l-2 border-payload-alert pl-3 sm:pl-4">
+                <div className="font-mono text-[10px] sm:text-xs uppercase tracking-widest text-payload-muted mb-1">ACTIVE RATE</div>
+                <div className="font-mono text-lg sm:text-2xl text-payload-alert">
                   {analytics?.total_payloads > 0 
                     ? Math.round((analytics?.active_payloads / analytics?.total_payloads) * 100)
                     : 0}%
