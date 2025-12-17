@@ -425,13 +425,13 @@ async def create_payload(payload_data: PayloadCreate, admin_user: User = Depends
 async def update_payload(
     payload_id: str,
     payload_data: PayloadUpdate,
-    current_user: User = Depends(get_current_user)
+    admin_user: User = Depends(get_admin_user)
 ):
     update_data = {k: v for k, v in payload_data.model_dump().items() if v is not None}
     update_data["updated_at"] = datetime.now(timezone.utc).isoformat()
     
     result = await db.payloads.update_one(
-        {"id": payload_id, "user_id": current_user.id},
+        {"id": payload_id},
         {"$set": update_data}
     )
     
@@ -441,9 +441,22 @@ async def update_payload(
     payload = await db.payloads.find_one({"id": payload_id}, {"_id": 0})
     return PayloadResponse(**payload)
 
+@api_router.post("/payloads/{payload_id}/toggle-active")
+async def toggle_payload_active(payload_id: str, current_user: User = Depends(get_current_user)):
+    payload = await db.payloads.find_one({"id": payload_id, "assigned_to": current_user.id}, {"_id": 0})
+    if not payload:
+        raise HTTPException(status_code=404, detail="Payload not found")
+    
+    new_active_state = not payload.get("is_active", False)
+    await db.payloads.update_one(
+        {"id": payload_id},
+        {"$set": {"is_active": new_active_state}}
+    )
+    return {"message": "Payload activation toggled", "is_active": new_active_state}
+
 @api_router.delete("/payloads/{payload_id}")
-async def delete_payload(payload_id: str, current_user: User = Depends(get_current_user)):
-    result = await db.payloads.delete_one({"id": payload_id, "user_id": current_user.id})
+async def delete_payload(payload_id: str, admin_user: User = Depends(get_admin_user)):
+    result = await db.payloads.delete_one({"id": payload_id})
     if result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Payload not found")
     return {"message": "Payload deleted"}
