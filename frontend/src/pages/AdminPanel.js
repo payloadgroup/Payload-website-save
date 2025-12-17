@@ -231,17 +231,17 @@ const AdminPanel = () => {
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: index * 0.05 }}
-                  className="bg-payload-surface border border-white/10 p-6 rounded-sm hover:border-white/20 transition-all"
+                  className="bg-payload-surface border border-white/10 p-4 sm:p-6 rounded-sm hover:border-white/20 transition-all"
                 >
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <h3 className="font-rajdhani font-bold text-xl uppercase tracking-wide mb-2 text-payload-neon">
+                  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 sm:gap-0">
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-rajdhani font-bold text-lg sm:text-xl uppercase tracking-wide mb-2 text-payload-neon truncate">
                         {member.name}
                       </h3>
-                      <div className="space-y-1 font-mono text-sm">
-                        <div className="flex items-center gap-2">
+                      <div className="space-y-1 font-mono text-xs sm:text-sm">
+                        <div className="flex flex-col xs:flex-row xs:items-center gap-1 xs:gap-2">
                           <span className="text-payload-muted uppercase tracking-widest">EMAIL:</span>
-                          <span className="text-payload-text">{member.email}</span>
+                          <span className="text-payload-text break-all">{member.email}</span>
                         </div>
                         {member.referral_code && (
                           <div className="flex items-center gap-2">
@@ -249,13 +249,15 @@ const AdminPanel = () => {
                             <span className="text-payload-neon">{member.referral_code}</span>
                           </div>
                         )}
-                        <div className="flex items-center gap-2">
-                          <span className="text-payload-muted uppercase tracking-widest">JOINED:</span>
-                          <span className="text-payload-text">{new Date(member.created_at).toLocaleDateString()}</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <span className="text-payload-muted uppercase tracking-widest">STATUS:</span>
-                          <span className="text-payload-neon uppercase">{member.status}</span>
+                        <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+                          <div className="flex items-center gap-2">
+                            <span className="text-payload-muted uppercase tracking-widest">JOINED:</span>
+                            <span className="text-payload-text">{new Date(member.created_at).toLocaleDateString()}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-payload-muted uppercase tracking-widest">STATUS:</span>
+                            <span className="text-payload-neon uppercase">{member.status}</span>
+                          </div>
                         </div>
                       </div>
                     </div>
