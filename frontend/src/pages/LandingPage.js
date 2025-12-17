@@ -76,13 +76,17 @@ const LandingPage = () => {
             className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mt-20"
           >
             <div className="bg-payload-surface border border-white/10 p-8 rounded-sm hover:border-payload-neon/50 transition-all duration-300">
-              <Rocket className="w-12 h-12 text-payload-neon mb-4" />
+              <div className="mb-4">
+                <PayloadIcon variant="box" className="w-12 h-12 text-payload-neon" />
+              </div>
               <h3 className="font-rajdhani font-bold text-xl uppercase tracking-wide mb-3">PAYLOADS</h3>
               <p className="font-inter text-sm text-payload-muted">Launch and manage your business ventures with precision</p>
             </div>
             
             <div className="bg-payload-surface border border-white/10 p-8 rounded-sm hover:border-payload-neon/50 transition-all duration-300">
-              <Target className="w-12 h-12 text-payload-cyan mb-4" />
+              <div className="mb-4">
+                <PayloadIcon variant="airdrop" className="w-12 h-12 text-payload-cyan" />
+              </div>
               <h3 className="font-rajdhani font-bold text-xl uppercase tracking-wide mb-3">MISSIONS</h3>
               <p className="font-inter text-sm text-payload-muted">Execute strategic objectives and track your progress</p>
             </div>
@@ -94,7 +98,9 @@ const LandingPage = () => {
             </div>
             
             <div className="bg-payload-surface border border-white/10 p-8 rounded-sm hover:border-payload-neon/50 transition-all duration-300">
-              <Zap className="w-12 h-12 text-payload-neon mb-4" />
+              <div className="mb-4">
+                <PayloadIcon variant="parachute" className="w-12 h-12 text-payload-neon" />
+              </div>
               <h3 className="font-rajdhani font-bold text-xl uppercase tracking-wide mb-3">COMMAND</h3>
               <p className="font-inter text-sm text-payload-muted">Take control from your personal mission control center</p>
             </div>
