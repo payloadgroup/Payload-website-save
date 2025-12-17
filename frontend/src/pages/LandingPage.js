@@ -44,30 +44,30 @@ const LandingPage = () => {
           </div>
         </nav>
 
-        <section className="max-w-6xl mx-auto px-6 pt-32 pb-20">
+        <section className="max-w-6xl mx-auto px-4 sm:px-6 pt-16 sm:pt-32 pb-12 sm:pb-20">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
-            className="text-center mb-20"
+            className="text-center mb-12 sm:mb-20"
           >
-            <div className="flex justify-center mb-8">
+            <div className="flex justify-center mb-6 sm:mb-8">
               <PayloadLogo size="hero" className="animate-pulse" />
             </div>
-            <h1 className="font-rajdhani font-bold text-5xl sm:text-6xl lg:text-7xl uppercase tracking-wide mb-6">
+            <h1 className="font-rajdhani font-bold text-4xl sm:text-5xl lg:text-7xl uppercase tracking-wide mb-4 sm:mb-6">
               PAYLOAD
             </h1>
-            <p className="font-rajdhani text-3xl sm:text-4xl lg:text-5xl uppercase tracking-wider text-payload-neon mb-8">
+            <p className="font-rajdhani text-xl sm:text-3xl lg:text-5xl uppercase tracking-wider text-payload-neon mb-6 sm:mb-8 px-2">
               Command Your Business Universe
             </p>
-            <p className="font-inter text-lg text-payload-muted max-w-2xl mx-auto mb-12">
+            <p className="font-inter text-sm sm:text-lg text-payload-muted max-w-2xl mx-auto mb-8 sm:mb-12 px-4">
               An exclusive private members club for entrepreneurs, investors, and innovators. 
               Join the mission control center where business leaders orchestrate their ventures.
             </p>
             <button
               data-testid="hero-apply-btn"
               onClick={() => navigate('/register')}
-              className="font-rajdhani font-bold text-lg uppercase tracking-widest border-2 border-payload-neon text-payload-neon px-12 py-4 rounded-none hover:bg-payload-neon hover:text-black transition-all duration-300 glow-effect"
+              className="font-rajdhani font-bold text-sm sm:text-lg uppercase tracking-widest border-2 border-payload-neon text-payload-neon px-8 sm:px-12 py-3 sm:py-4 rounded-none hover:bg-payload-neon hover:text-black transition-all duration-300 glow-effect"
             >
               Apply for Membership
             </button>
@@ -77,36 +77,36 @@ const LandingPage = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3, duration: 0.8 }}
-            className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mt-20"
+            className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mt-12 sm:mt-20"
           >
-            <div className="bg-payload-surface border border-white/10 p-8 rounded-sm hover:border-payload-neon/50 transition-all duration-300">
-              <div className="mb-4">
-                <PayloadIcon variant="box" className="w-12 h-12 text-payload-neon" />
+            <div className="bg-payload-surface border border-white/10 p-4 sm:p-8 rounded-sm hover:border-payload-neon/50 transition-all duration-300">
+              <div className="mb-3 sm:mb-4">
+                <PayloadIcon variant="box" className="w-8 h-8 sm:w-12 sm:h-12 text-payload-neon" />
               </div>
-              <h3 className="font-rajdhani font-bold text-xl uppercase tracking-wide mb-3">PAYLOADS</h3>
-              <p className="font-inter text-sm text-payload-muted">Launch and manage your business ventures with precision</p>
+              <h3 className="font-rajdhani font-bold text-base sm:text-xl uppercase tracking-wide mb-2 sm:mb-3">PAYLOADS</h3>
+              <p className="font-inter text-xs sm:text-sm text-payload-muted">Launch and manage business ventures</p>
             </div>
             
-            <div className="bg-payload-surface border border-white/10 p-8 rounded-sm hover:border-payload-neon/50 transition-all duration-300">
-              <div className="mb-4">
-                <PayloadIcon variant="airdrop" className="w-12 h-12 text-payload-cyan" />
+            <div className="bg-payload-surface border border-white/10 p-4 sm:p-8 rounded-sm hover:border-payload-neon/50 transition-all duration-300">
+              <div className="mb-3 sm:mb-4">
+                <PayloadIcon variant="airdrop" className="w-8 h-8 sm:w-12 sm:h-12 text-payload-cyan" />
               </div>
-              <h3 className="font-rajdhani font-bold text-xl uppercase tracking-wide mb-3">MISSIONS</h3>
-              <p className="font-inter text-sm text-payload-muted">Execute strategic objectives and track your progress</p>
+              <h3 className="font-rajdhani font-bold text-base sm:text-xl uppercase tracking-wide mb-2 sm:mb-3">MISSIONS</h3>
+              <p className="font-inter text-xs sm:text-sm text-payload-muted">Execute objectives and track progress</p>
             </div>
             
-            <div className="bg-payload-surface border border-white/10 p-8 rounded-sm hover:border-payload-neon/50 transition-all duration-300">
-              <Users className="w-12 h-12 text-payload-alert mb-4" />
-              <h3 className="font-rajdhani font-bold text-xl uppercase tracking-wide mb-3">NETWORK</h3>
-              <p className="font-inter text-sm text-payload-muted">Connect with elite entrepreneurs and investors</p>
+            <div className="bg-payload-surface border border-white/10 p-4 sm:p-8 rounded-sm hover:border-payload-neon/50 transition-all duration-300">
+              <Users className="w-8 h-8 sm:w-12 sm:h-12 text-payload-alert mb-3 sm:mb-4" />
+              <h3 className="font-rajdhani font-bold text-base sm:text-xl uppercase tracking-wide mb-2 sm:mb-3">NETWORK</h3>
+              <p className="font-inter text-xs sm:text-sm text-payload-muted">Connect with elite entrepreneurs</p>
             </div>
             
-            <div className="bg-payload-surface border border-white/10 p-8 rounded-sm hover:border-payload-neon/50 transition-all duration-300">
-              <div className="mb-4">
-                <PayloadIcon variant="parachute" className="w-12 h-12 text-payload-neon" />
+            <div className="bg-payload-surface border border-white/10 p-4 sm:p-8 rounded-sm hover:border-payload-neon/50 transition-all duration-300">
+              <div className="mb-3 sm:mb-4">
+                <PayloadIcon variant="parachute" className="w-8 h-8 sm:w-12 sm:h-12 text-payload-neon" />
               </div>
-              <h3 className="font-rajdhani font-bold text-xl uppercase tracking-wide mb-3">COMMAND</h3>
-              <p className="font-inter text-sm text-payload-muted">Take control from your personal mission control center</p>
+              <h3 className="font-rajdhani font-bold text-base sm:text-xl uppercase tracking-wide mb-2 sm:mb-3">COMMAND</h3>
+              <p className="font-inter text-xs sm:text-sm text-payload-muted">Take control from your mission center</p>
             </div>
           </motion.div>
         </section>
