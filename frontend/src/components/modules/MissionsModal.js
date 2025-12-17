@@ -183,7 +183,7 @@ const MissionsModal = ({ onClose, onUpdate }) => {
         </div>
 
         <div className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
-          {isAdmin && !showForm && (
+          {isAdmin && !showForm && !editingId && (
             <button
               data-testid="add-mission-btn"
               onClick={() => setShowForm(true)}
