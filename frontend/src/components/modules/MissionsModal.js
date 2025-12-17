@@ -369,6 +369,99 @@ const MissionsModal = ({ onClose, onUpdate }) => {
                       )}
                     </div>
                   </div>
+                  </div>
+
+                  {/* Inline Edit Form */}
+                  {editingId === mission.id && isAdmin && (
+                    <motion.form 
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      onSubmit={handleSubmit} 
+                      className="bg-payload-cyan/10 border border-payload-cyan/30 p-6 rounded-sm mt-2"
+                    >
+                      <h3 className="font-mono text-xs uppercase tracking-widest text-payload-cyan mb-4 flex items-center gap-2">
+                        <Edit className="w-4 h-4" />
+                        EDIT MISSION
+                      </h3>
+                      <div className="space-y-4">
+                        <div>
+                          <label className="font-mono text-xs uppercase tracking-widest text-payload-muted mb-2 block">ASSIGN TO MEMBER</label>
+                          <select
+                            required
+                            value={formData.assigned_to}
+                            onChange={(e) => setFormData({ ...formData, assigned_to: e.target.value })}
+                            className="w-full bg-black border border-white/20 text-payload-text py-2 px-2 rounded-none font-mono text-sm"
+                          >
+                            <option value="">Select Member</option>
+                            {members.map(member => (
+                              <option key={member.id} value={member.id}>{member.name} ({member.email})</option>
+                            ))}
+                          </select>
+                        </div>
+                        <div>
+                          <label className="font-mono text-xs uppercase tracking-widest text-payload-muted mb-2 block">TITLE</label>
+                          <input
+                            type="text"
+                            required
+                            value={formData.title}
+                            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                            className="w-full bg-black border-b border-white/20 focus:border-payload-cyan focus:outline-none py-2 px-0 font-mono text-payload-text"
+                          />
+                        </div>
+                        <div>
+                          <label className="font-mono text-xs uppercase tracking-widest text-payload-muted mb-2 block">OBJECTIVE</label>
+                          <textarea
+                            required
+                            value={formData.objective}
+                            onChange={(e) => setFormData({ ...formData, objective: e.target.value })}
+                            className="w-full bg-black border border-white/20 focus:border-payload-cyan focus:outline-none py-2 px-3 font-mono text-payload-text resize-none"
+                            rows="3"
+                          />
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <label className="font-mono text-xs uppercase tracking-widest text-payload-muted mb-2 block">PRIORITY</label>
+                            <select
+                              value={formData.priority}
+                              onChange={(e) => setFormData({ ...formData, priority: e.target.value })}
+                              className="w-full bg-black border border-white/20 text-payload-text py-2 px-2 rounded-none font-mono text-sm"
+                            >
+                              <option value="low">LOW</option>
+                              <option value="medium">MEDIUM</option>
+                              <option value="high">HIGH</option>
+                            </select>
+                          </div>
+                          <div>
+                            <label className="font-mono text-xs uppercase tracking-widest text-payload-muted mb-2 block">DUE DATE</label>
+                            <input
+                              type="date"
+                              value={formData.due_date}
+                              onChange={(e) => setFormData({ ...formData, due_date: e.target.value })}
+                              className="w-full bg-black border border-white/20 text-payload-text py-2 px-2 rounded-none font-mono text-sm"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex gap-3 mt-6">
+                        <button
+                          type="submit"
+                          className="flex items-center gap-2 flex-1 font-mono text-sm border border-payload-cyan text-payload-cyan py-2 rounded-none hover:bg-payload-cyan hover:text-black transition-all"
+                        >
+                          <Check className="w-4 h-4" />
+                          UPDATE
+                        </button>
+                        <button
+                          type="button"
+                          onClick={handleCancelEdit}
+                          className="flex items-center gap-2 flex-1 font-mono text-sm border border-white/20 text-white py-2 rounded-none hover:bg-white/10 transition-all"
+                        >
+                          <XCircle className="w-4 h-4" />
+                          CANCEL
+                        </button>
+                      </div>
+                    </motion.form>
+                  )}
                 </div>
               ))
             )}
