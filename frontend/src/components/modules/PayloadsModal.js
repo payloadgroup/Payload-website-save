@@ -311,14 +311,14 @@ const PayloadsModal = ({ onClose, onUpdate }) => {
                           </p>
                         )}
                         <p className="font-inter text-sm text-payload-text mb-4">{payload.description}</p>
-                        <div className="grid grid-cols-3 gap-4 font-mono text-xs">
+                        <div className={`grid ${isAdmin ? 'grid-cols-1 xs:grid-cols-3' : 'grid-cols-2'} gap-3 sm:gap-4 font-mono text-xs`}>
                           {isAdmin && (
-                            <div>
+                            <div className="col-span-1 xs:col-span-1">
                               <div className="text-payload-muted uppercase tracking-widest mb-1">STATUS</div>
                               <select
                                 value={payload.status}
                                 onChange={(e) => handleStatusChange(payload.id, e.target.value)}
-                                className="bg-black border border-white/20 text-payload-neon py-1 px-2 rounded-none uppercase text-xs"
+                                className="bg-black border border-white/20 text-payload-neon py-1 px-2 rounded-none uppercase text-xs w-full max-w-[120px]"
                               >
                                 <option value="active">ACTIVE</option>
                                 <option value="paused">PAUSED</option>
@@ -328,11 +328,11 @@ const PayloadsModal = ({ onClose, onUpdate }) => {
                           )}
                           <div>
                             <div className="text-payload-muted uppercase tracking-widest mb-1">GOAL</div>
-                            <div className="text-payload-alert">${payload.funding_goal.toFixed(2)}</div>
+                            <div className="text-payload-alert text-sm sm:text-xs">${payload.funding_goal.toFixed(2)}</div>
                           </div>
                           <div>
                             <div className="text-payload-muted uppercase tracking-widest mb-1">FUNDED</div>
-                            <div className="text-payload-neon">${payload.current_funding.toFixed(2)}</div>
+                            <div className="text-payload-neon text-sm sm:text-xs">${payload.current_funding.toFixed(2)}</div>
                           </div>
                         </div>
                       </div>
