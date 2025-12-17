@@ -13,6 +13,11 @@ class PayloadAPITester:
         self.tests_run = 0
         self.tests_passed = 0
         self.failed_tests = []
+        # Store created IDs for cleanup and testing
+        self.created_payload_id = None
+        self.created_mission_id = None
+        self.created_station_id = None
+        self.created_resource_id = None
 
     def run_test(self, name, method, endpoint, expected_status, data=None, headers=None):
         """Run a single API test"""
