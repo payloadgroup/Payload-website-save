@@ -129,6 +129,7 @@ class MissionUpdate(BaseModel):
     status: Optional[MissionStatus] = None
     due_date: Optional[str] = None
     priority: Optional[str] = None
+    assigned_to: Optional[str] = None
 
 class MissionResponse(BaseModel):
     model_config = ConfigDict(extra="ignore")
