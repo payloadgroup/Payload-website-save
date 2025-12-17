@@ -150,11 +150,11 @@ const AdminPanel = () => {
             <div className="text-center font-mono text-payload-muted">LOADING...</div>
           ) : activeTab === 'pending' ? (
             pendingUsers.length === 0 ? (
-            <div className="bg-payload-surface border border-white/10 p-12 rounded-sm text-center">
-              <Clock className="w-16 h-16 text-payload-muted mx-auto mb-4" />
-              <p className="font-mono text-payload-muted">NO PENDING APPLICATIONS</p>
-            </div>
-          ) : (
+              <div className="bg-payload-surface border border-white/10 p-12 rounded-sm text-center">
+                <Clock className="w-16 h-16 text-payload-muted mx-auto mb-4" />
+                <p className="font-mono text-payload-muted">NO PENDING APPLICATIONS</p>
+              </div>
+            ) : (
             <div className="space-y-4">
               {pendingUsers.map((user, index) => (
                 <motion.div
