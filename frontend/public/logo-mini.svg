@@ -1,0 +1,10 @@
+<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Mini parachute -->
+  <path d="M20 5 C 12 5, 8 12, 8 17 L 12 17 L 12 15 L 15 15 L 15 17 L 18 17 L 18 15 L 22 15 L 22 17 L 25 17 L 25 15 L 28 15 L 28 17 L 32 17 C 32 12, 28 5, 20 5 Z" fill="#00FF94"/>
+  <!-- Lines -->
+  <line x1="10" y1="17" x2="16" y2="27" stroke="#00FF94" stroke-width="1"/>
+  <line x1="20" y1="17" x2="20" y2="27" stroke="#00FF94" stroke-width="1"/>
+  <line x1="30" y1="17" x2="24" y2="27" stroke="#00FF94" stroke-width="1"/>
+  <!-- Box -->
+  <rect x="16" y="27" width="8" height="7" fill="#FFB000"/>
+</svg>
