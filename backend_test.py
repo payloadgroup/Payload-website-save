@@ -2,6 +2,7 @@ import requests
 import sys
 import json
 from datetime import datetime
+import uuid
 
 class PayloadAPITester:
     def __init__(self, base_url="https://space-mission-5.preview.emergentagent.com"):
