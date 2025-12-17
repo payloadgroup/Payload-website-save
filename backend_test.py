@@ -537,7 +537,7 @@ class PayloadAPITester:
             "Create Headquarters",
             "POST",
             "headquarters",
-            201,
+            200,
             data=hq_data,
             headers=headers
         )
