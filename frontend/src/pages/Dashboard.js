@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import axios from 'axios';
 import { LogOut, Settings, Rocket, Target, DollarSign, Building, MapPin, BookOpen, Shield, Plus } from 'lucide-react';
+import PayloadLogo from '@/components/PayloadLogo';
 import PayloadsModal from '@/components/modules/PayloadsModal';
 import MissionsModal from '@/components/modules/MissionsModal';
 import BankModal from '@/components/modules/BankModal';
