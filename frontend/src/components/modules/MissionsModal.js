@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
 import axios from 'axios';
 import { toast } from 'sonner';
-import { X, Plus, Edit, Trash2, Target, Power, PowerOff } from 'lucide-react';
+import { X, Plus, Edit, Trash2, Target, Power, PowerOff, Check, XCircle } from 'lucide-react';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
