@@ -1,0 +1,134 @@
+{
+  "identity": {
+    "name": "Payload",
+    "mission": "The Command Center for Business Universe",
+    "aesthetic": "Military Space Command / Sci-Fi HUD / High-Tech Exclusive",
+    "emotional_tone": "Authoritative, Precision, Infinite, Exclusive",
+    "archetype": "Electric & Neon (Future, Speed, Disruption)"
+  },
+  "typography": {
+    "font_family": {
+      "headings": "Rajdhani, sans-serif",
+      "body": "Inter, sans-serif",
+      "mono": "JetBrains Mono, monospace"
+    },
+    "import_instructions": "Add this to index.html or CSS: @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&family=Rajdhani:wght@500;600;700&display=swap');",
+    "usage_rules": {
+      "headings": "Uppercase, tracking-wide, font-bold. Use for Page Titles and Section Headers.",
+      "subheadings": "JetBrains Mono, uppercase, tracking-widest, text-xs, text-muted-foreground. Use for labels like 'MISSION STATUS' or 'USER ID'.",
+      "body": "Inter for readability in long paragraphs. JetBrains Mono for data values, tables, and dashboard metrics."
+    }
+  },
+  "colors": {
+    "palette": {
+      "background": "#030303",
+      "surface": "#0A0A0A",
+      "surface_highlight": "#121212",
+      "primary": "#00FF94",
+      "primary_foreground": "#000000",
+      "secondary": "#00F0FF",
+      "accent": "#FFB000",
+      "muted": "#1F1F1F",
+      "border": "#2A2A2A",
+      "text_main": "#EDEDED",
+      "text_muted": "#888888"
+    },
+    "tailwind_config_extension": {
+      "colors": {
+        "payload-bg": "#030303",
+        "payload-surface": "#0A0A0A",
+        "payload-neon": "#00FF94",
+        "payload-cyan": "#00F0FF",
+        "payload-alert": "#FFB000"
+      }
+    },
+    "gradients": {
+      "hero_glow": "radial-gradient(circle at center, rgba(0, 255, 148, 0.15) 0%, rgba(0,0,0,0) 70%)",
+      "scanline": "linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.2))"
+    }
+  },
+  "visual_enhancers": {
+    "surface_strategy": "RETRO-FUTURISM (The 'Terminal' Look)",
+    "borders": "1px solid rgba(255, 255, 255, 0.1). Active elements get 'payload-neon' border.",
+    "corners": "Sharp (rounded-none) or Micro (rounded-sm). NO large rounded corners.",
+    "shadows": "Glow effects instead of drop shadows. box-shadow: 0 0 10px rgba(0, 255, 148, 0.3)",
+    "textures": "Subtle grid background (20px x 20px) with 5% opacity lines.",
+    "decorations": [
+      "Corner brackets (SVG) on cards",
+      "Scanlines overlay on images",
+      "Blinking cursor on inputs"
+    ]
+  },
+  "layout_strategy": {
+    "landing_page": "MODE A: THE 'TETRIS' GRID. Asymmetrical, overlapping elements. Use 'lenis' for smooth scroll.",
+    "dashboard": "MODE B: THE 'CONTROL ROOM' GRID. Dense, data-heavy, 100% width/height utilization. No gaps between panels (or very small 1px gaps).",
+    "spacing": "Generous on Landing Page (p-24), Compact on Dashboard (p-4).",
+    "container": "Max-width 1400px for Landing. Full-width (100%) for Dashboard."
+  },
+  "components": {
+    "buttons": {
+      "style": "Rectangular, uppercase text, tracking-widest. Hover: Fill with Neon, Text becomes Black.",
+      "variants": {
+        "primary": "border border-payload-neon text-payload-neon hover:bg-payload-neon hover:text-black transition-all duration-300",
+        "secondary": "border border-white/20 text-white hover:border-white hover:bg-white/5"
+      }
+    },
+    "cards": {
+      "style": "bg-payload-surface border border-white/10 relative overflow-hidden",
+      "decoration": "Add a 1px 'tech line' or corner marker in SVG absolute positioned."
+    },
+    "inputs": {
+      "style": "bg-black border-b border-white/20 focus:border-payload-neon focus:ring-0 rounded-none px-0 placeholder:text-white/30 font-mono"
+    }
+  },
+  "image_urls": {
+    "hero_background": {
+      "url": "https://images.unsplash.com/photo-1581986358940-80f75484cf09?crop=entropy&cs=srgb&fm=jpg&q=85",
+      "description": "Cyberpunk door to unknown - use for Hero Section background with heavy overlay",
+      "category": "background"
+    },
+    "auth_background": {
+      "url": "https://images.unsplash.com/photo-1711560707076-d50fbf8a3a26?crop=entropy&cs=srgb&fm=jpg&q=85",
+      "description": "Deep space nebula - use for Login/Register page background",
+      "category": "background"
+    },
+    "dashboard_abstract": {
+      "url": "https://images.unsplash.com/photo-1728632286888-04c64f48e506?crop=entropy&cs=srgb&fm=jpg&q=85",
+      "description": "Abstract purple lights - use for 'Mission' or 'Payload' card backgrounds",
+      "category": "abstract"
+    },
+    "testimonials": [
+      {
+        "url": "https://images.unsplash.com/photo-1737574821698-862e77f044c1?crop=entropy&cs=srgb&fm=jpg&q=85",
+        "description": "Confident businessman in suit",
+        "category": "people"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1758518727592-706e80ebc354?crop=entropy&cs=srgb&fm=jpg&q=85",
+        "description": "Professional businesswoman",
+        "category": "people"
+      }
+    ]
+  },
+  "motion": {
+    "library": "framer-motion",
+    "entrance": "Staggered fade-in with slight y-axis shift.",
+    "hover": "Scale 1.02, Border Glow.",
+    "page_transition": "Fade out, then Fade in."
+  },
+  "instructions_to_main_agent": [
+    "1. INSTALL FONTS FIRST: Add the Google Fonts import to index.css.",
+    "2. CONFIGURE TAILWIND: Update tailwind.config.js to include the custom colors (payload-bg, payload-neon, etc) and font families.",
+    "3. OVERRIDE SHADCN: Go into src/components/ui and remove 'rounded-md' from buttons, inputs, and cards. Force 'rounded-none' or 'rounded-sm'.",
+    "4. DARK MODE DEFAULT: Ensure the app forces dark mode. Do not implement a light mode toggle.",
+    "5. USE GRID LINES: In the dashboard, use borders to separate sections instead of whitespace (The 'Grid Borders' surface strategy).",
+    "6. DATA-TESTID: Add data-testid to all interactive elements (buttons, inputs, links)."
+  ],
+  "universal_guidelines": [
+    "Do not use gradients for backgrounds, use solid deep black.",
+    "Use 'JetBrains Mono' for all numbers and data.",
+    "Always add a 'glow' effect to the primary CTA button.",
+    "Use 2-3x more padding in the Landing Page sections.",
+    "Never use 'Inter' for Headings. Use 'Rajdhani'."
+  ]
+}
