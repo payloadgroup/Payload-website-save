@@ -3,7 +3,13 @@ import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import axios from 'axios';
-import { LogOut, Settings, Rocket, Target, DollarSign, Building, MapPin, BookOpen, Shield } from 'lucide-react';
+import { LogOut, Settings, Rocket, Target, DollarSign, Building, MapPin, BookOpen, Shield, Plus } from 'lucide-react';
+import PayloadsModal from '@/components/modules/PayloadsModal';
+import MissionsModal from '@/components/modules/MissionsModal';
+import BankModal from '@/components/modules/BankModal';
+import HeadquartersModal from '@/components/modules/HeadquartersModal';
+import StationsModal from '@/components/modules/StationsModal';
+import BasecampModal from '@/components/modules/BasecampModal';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
@@ -12,6 +18,7 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const { user, logout, token } = useAuth();
   const [dashboardData, setDashboardData] = useState(null);
+  const [activeModal, setActiveModal] = useState(null);
 
   useEffect(() => {
     fetchDashboardData();
@@ -33,6 +40,10 @@ const Dashboard = () => {
   const handleLogout = () => {
     logout();
     navigate('/login');
+  };
+
+  const refreshData = () => {
+    fetchDashboardData();
   };
 
   return (
@@ -96,6 +107,7 @@ const Dashboard = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.1 }}
+              onClick={() => setActiveModal('payloads')}
               className="bg-payload-surface border border-white/10 p-6 rounded-sm hover:border-payload-neon/50 transition-all duration-300 cursor-pointer"
             >
               <div className="flex items-start justify-between mb-4">
@@ -104,7 +116,7 @@ const Dashboard = () => {
               </div>
               <h3 className="font-rajdhani font-bold text-2xl uppercase tracking-wide mb-2">PAYLOADS</h3>
               <p className="font-inter text-sm text-payload-muted mb-4">Active business ventures and projects</p>
-              <div className="font-mono text-3xl text-payload-neon">0</div>
+              <div className="font-mono text-3xl text-payload-neon">{dashboardData?.payloads_count || 0}</div>
             </motion.div>
 
             <motion.div
@@ -112,6 +124,7 @@ const Dashboard = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.2 }}
+              onClick={() => setActiveModal('missions')}
               className="bg-payload-surface border border-white/10 p-6 rounded-sm hover:border-payload-cyan/50 transition-all duration-300 cursor-pointer"
             >
               <div className="flex items-start justify-between mb-4">
@@ -120,7 +133,7 @@ const Dashboard = () => {
               </div>
               <h3 className="font-rajdhani font-bold text-2xl uppercase tracking-wide mb-2">MISSIONS</h3>
               <p className="font-inter text-sm text-payload-muted mb-4">Current tasks and objectives</p>
-              <div className="font-mono text-3xl text-payload-cyan">0</div>
+              <div className="font-mono text-3xl text-payload-cyan">{dashboardData?.missions_count || 0}</div>
             </motion.div>
 
             <motion.div
@@ -128,6 +141,7 @@ const Dashboard = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.3 }}
+              onClick={() => setActiveModal('bank')}
               className="bg-payload-surface border border-white/10 p-6 rounded-sm hover:border-payload-alert/50 transition-all duration-300 cursor-pointer"
             >
               <div className="flex items-start justify-between mb-4">
@@ -136,7 +150,7 @@ const Dashboard = () => {
               </div>
               <h3 className="font-rajdhani font-bold text-2xl uppercase tracking-wide mb-2">BUSINESS BANK</h3>
               <p className="font-inter text-sm text-payload-muted mb-4">Financial resources</p>
-              <div className="font-mono text-3xl text-payload-alert">$0.00</div>
+              <div className="font-mono text-3xl text-payload-alert">${(dashboardData?.balance || 0).toFixed(2)}</div>
             </motion.div>
 
             <motion.div
@@ -144,6 +158,7 @@ const Dashboard = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.4 }}
+              onClick={() => setActiveModal('headquarters')}
               className="bg-payload-surface border border-white/10 p-6 rounded-sm hover:border-white/30 transition-all duration-300 cursor-pointer"
             >
               <div className="flex items-start justify-between mb-4">
@@ -152,7 +167,7 @@ const Dashboard = () => {
               </div>
               <h3 className="font-rajdhani font-bold text-2xl uppercase tracking-wide mb-2">HEADQUARTERS</h3>
               <p className="font-inter text-sm text-payload-muted mb-4">Main operations base</p>
-              <div className="font-mono text-sm text-white">NOT SET</div>
+              <div className="font-mono text-sm text-white">{dashboardData?.headquarters ? 'SET' : 'NOT SET'}</div>
             </motion.div>
 
             <motion.div
@@ -160,6 +175,7 @@ const Dashboard = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.5 }}
+              onClick={() => setActiveModal('stations')}
               className="bg-payload-surface border border-white/10 p-6 rounded-sm hover:border-white/30 transition-all duration-300 cursor-pointer"
             >
               <div className="flex items-start justify-between mb-4">
@@ -168,7 +184,7 @@ const Dashboard = () => {
               </div>
               <h3 className="font-rajdhani font-bold text-2xl uppercase tracking-wide mb-2">STATIONS</h3>
               <p className="font-inter text-sm text-payload-muted mb-4">Active locations and partnerships</p>
-              <div className="font-mono text-3xl text-white">0</div>
+              <div className="font-mono text-3xl text-white">{dashboardData?.stations_count || 0}</div>
             </motion.div>
 
             <motion.div
@@ -176,6 +192,7 @@ const Dashboard = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.6 }}
+              onClick={() => setActiveModal('basecamp')}
               className="bg-payload-surface border border-white/10 p-6 rounded-sm hover:border-white/30 transition-all duration-300 cursor-pointer"
             >
               <div className="flex items-start justify-between mb-4">
@@ -207,6 +224,13 @@ const Dashboard = () => {
           </div>
         </motion.div>
       </div>
+
+      {activeModal === 'payloads' && <PayloadsModal onClose={() => setActiveModal(null)} onUpdate={refreshData} />}
+      {activeModal === 'missions' && <MissionsModal onClose={() => setActiveModal(null)} onUpdate={refreshData} />}
+      {activeModal === 'bank' && <BankModal onClose={() => setActiveModal(null)} onUpdate={refreshData} />}
+      {activeModal === 'headquarters' && <HeadquartersModal onClose={() => setActiveModal(null)} onUpdate={refreshData} />}
+      {activeModal === 'stations' && <StationsModal onClose={() => setActiveModal(null)} onUpdate={refreshData} />}
+      {activeModal === 'basecamp' && <BasecampModal onClose={() => setActiveModal(null)} />}
     </div>
   );
 };
