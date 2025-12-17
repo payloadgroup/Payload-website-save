@@ -121,6 +121,7 @@ class MissionCreate(BaseModel):
     payload_id: Optional[str] = None
     due_date: Optional[str] = None
     priority: str = "medium"
+    assigned_to: str
 
 class MissionUpdate(BaseModel):
     title: Optional[str] = None
@@ -132,13 +133,15 @@ class MissionUpdate(BaseModel):
 class MissionResponse(BaseModel):
     model_config = ConfigDict(extra="ignore")
     id: str
-    user_id: str
+    assigned_to: str
+    created_by: str
     payload_id: Optional[str] = None
     title: str
     objective: str
     status: MissionStatus
     due_date: Optional[str] = None
     priority: str
+    is_active: bool
     created_at: str
 
 class TransactionCreate(BaseModel):
