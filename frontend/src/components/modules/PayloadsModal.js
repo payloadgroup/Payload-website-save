@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
 import axios from 'axios';
 import { toast } from 'sonner';
-import { X, Plus, Edit, Trash2, Rocket, Power, PowerOff } from 'lucide-react';
+import { X, Plus, Edit, Trash2, Rocket, Power, PowerOff, Check, XCircle } from 'lucide-react';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
@@ -86,12 +86,12 @@ const PayloadsModal = ({ onClose, onUpdate }) => {
       assigned_to: payload.assigned_to
     });
     setEditingId(payload.id);
-    setShowForm(true);
-    // Scroll to top to show the form
-    setTimeout(() => {
-      const modal = document.querySelector('.overflow-y-auto');
-      if (modal) modal.scrollTop = 0;
-    }, 100);
+    setShowForm(false);
+  };
+
+  const handleCancelEdit = () => {
+    setEditingId(null);
+    setFormData({ title: '', description: '', funding_goal: 0, current_funding: 0, assigned_to: '' });
   };
 
   const handleDelete = async (id) => {
@@ -139,13 +139,23 @@ const PayloadsModal = ({ onClose, onUpdate }) => {
     return member ? member.name : 'Unknown';
   };
 
+  const handleBackdropClick = (e) => {
+    if (e.target === e.currentTarget) {
+      onClose();
+    }
+  };
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
+    <div 
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm"
+      onClick={handleBackdropClick}
+    >
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
         className="bg-payload-surface border border-white/20 rounded-sm w-full max-w-4xl max-h-[90vh] overflow-hidden"
+        onClick={(e) => e.stopPropagation()}
       >
         <div className="border-b border-white/10 p-6 flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -164,7 +174,7 @@ const PayloadsModal = ({ onClose, onUpdate }) => {
         </div>
 
         <div className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
-          {isAdmin && !showForm && (
+          {isAdmin && !showForm && !editingId && (
             <button
               data-testid="add-payload-btn"
               onClick={() => setShowForm(true)}
@@ -175,10 +185,10 @@ const PayloadsModal = ({ onClose, onUpdate }) => {
             </button>
           )}
 
-          {showForm && isAdmin && (
+          {showForm && isAdmin && !editingId && (
             <form onSubmit={handleSubmit} className="bg-black/30 border border-white/10 p-6 rounded-sm mb-6">
               <h3 className="font-mono text-xs uppercase tracking-widest text-payload-muted mb-4">
-                {editingId ? 'EDIT PAYLOAD' : 'ASSIGN NEW PAYLOAD'}
+                ASSIGN NEW PAYLOAD
               </h3>
               <div className="space-y-4">
                 <div>
@@ -195,43 +205,55 @@ const PayloadsModal = ({ onClose, onUpdate }) => {
                     ))}
                   </select>
                 </div>
-                <input
-                  data-testid="payload-title-input"
-                  type="text"
-                  required
-                  placeholder="Title"
-                  value={formData.title}
-                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  className="w-full bg-black border-b border-white/20 focus:border-payload-neon focus:outline-none py-2 px-0 font-mono text-payload-text"
-                />
-                <textarea
-                  data-testid="payload-description-input"
-                  required
-                  placeholder="Description"
-                  value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  className="w-full bg-black border border-white/20 focus:border-payload-neon focus:outline-none py-2 px-3 font-mono text-payload-text resize-none"
-                  rows="3"
-                />
+                <div>
+                  <label className="font-mono text-xs uppercase tracking-widest text-payload-muted mb-2 block">TITLE</label>
+                  <input
+                    data-testid="payload-title-input"
+                    type="text"
+                    required
+                    placeholder="Title"
+                    value={formData.title}
+                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                    className="w-full bg-black border-b border-white/20 focus:border-payload-neon focus:outline-none py-2 px-0 font-mono text-payload-text"
+                  />
+                </div>
+                <div>
+                  <label className="font-mono text-xs uppercase tracking-widest text-payload-muted mb-2 block">DESCRIPTION</label>
+                  <textarea
+                    data-testid="payload-description-input"
+                    required
+                    placeholder="Description"
+                    value={formData.description}
+                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                    className="w-full bg-black border border-white/20 focus:border-payload-neon focus:outline-none py-2 px-3 font-mono text-payload-text resize-none"
+                    rows="3"
+                  />
+                </div>
                 <div className="grid grid-cols-2 gap-4">
-                  <input
-                    data-testid="payload-goal-input"
-                    type="number"
-                    step="0.01"
-                    placeholder="Funding Goal"
-                    value={formData.funding_goal}
-                    onChange={(e) => setFormData({ ...formData, funding_goal: parseFloat(e.target.value) })}
-                    className="w-full bg-black border-b border-white/20 focus:border-payload-neon focus:outline-none py-2 px-0 font-mono text-payload-text"
-                  />
-                  <input
-                    data-testid="payload-funding-input"
-                    type="number"
-                    step="0.01"
-                    placeholder="Current Funding"
-                    value={formData.current_funding}
-                    onChange={(e) => setFormData({ ...formData, current_funding: parseFloat(e.target.value) })}
-                    className="w-full bg-black border-b border-white/20 focus:border-payload-neon focus:outline-none py-2 px-0 font-mono text-payload-text"
-                  />
+                  <div>
+                    <label className="font-mono text-xs uppercase tracking-widest text-payload-muted mb-2 block">FUNDING GOAL</label>
+                    <input
+                      data-testid="payload-goal-input"
+                      type="number"
+                      step="0.01"
+                      placeholder="0.00"
+                      value={formData.funding_goal}
+                      onChange={(e) => setFormData({ ...formData, funding_goal: parseFloat(e.target.value) || 0 })}
+                      className="w-full bg-black border-b border-white/20 focus:border-payload-neon focus:outline-none py-2 px-0 font-mono text-payload-text"
+                    />
+                  </div>
+                  <div>
+                    <label className="font-mono text-xs uppercase tracking-widest text-payload-muted mb-2 block">CURRENT FUNDING</label>
+                    <input
+                      data-testid="payload-funding-input"
+                      type="number"
+                      step="0.01"
+                      placeholder="0.00"
+                      value={formData.current_funding}
+                      onChange={(e) => setFormData({ ...formData, current_funding: parseFloat(e.target.value) || 0 })}
+                      className="w-full bg-black border-b border-white/20 focus:border-payload-neon focus:outline-none py-2 px-0 font-mono text-payload-text"
+                    />
+                  </div>
                 </div>
               </div>
               <div className="flex gap-3 mt-6">
@@ -240,11 +262,11 @@ const PayloadsModal = ({ onClose, onUpdate }) => {
                   type="submit"
                   className="flex-1 font-mono text-sm border border-payload-neon text-payload-neon py-2 rounded-none hover:bg-payload-neon hover:text-black transition-all"
                 >
-                  {editingId ? 'UPDATE' : 'ASSIGN'}
+                  ASSIGN
                 </button>
                 <button
                   type="button"
-                  onClick={() => { setShowForm(false); setEditingId(null); setFormData({ title: '', description: '', funding_goal: 0, current_funding: 0, assigned_to: '' }); }}
+                  onClick={() => { setShowForm(false); setFormData({ title: '', description: '', funding_goal: 0, current_funding: 0, assigned_to: '' }); }}
                   className="flex-1 font-mono text-sm border border-white/20 text-white py-2 rounded-none hover:bg-white/10 transition-all"
                 >
                   CANCEL
@@ -262,90 +284,182 @@ const PayloadsModal = ({ onClose, onUpdate }) => {
           )}
 
           <div className="space-y-4">
-            {payloads.length === 0 && isAdmin ? (
+            {payloads.length === 0 && isAdmin && !showForm ? (
               <div className="text-center py-12 text-payload-muted font-mono text-sm">
                 NO PAYLOADS CREATED YET
               </div>
             ) : (
               payloads.map((payload, index) => (
-                <div
-                  key={payload.id}
-                  data-testid={`payload-item-${index}`}
-                  className={`bg-black/30 border ${payload.is_active ? 'border-payload-neon/30' : 'border-white/10'} p-6 rounded-sm hover:border-white/20 transition-all`}
-                >
-                  <div className="flex items-start justify-between mb-3">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-2">
-                        <h3 className="font-rajdhani font-bold text-xl uppercase tracking-wide text-payload-neon">
-                          {payload.title}
-                        </h3>
-                        {payload.is_active && (
-                          <span className="font-mono text-xs bg-payload-neon/20 text-payload-neon px-2 py-1 rounded-sm">ACTIVE</span>
-                        )}
-                      </div>
-                      {isAdmin && (
-                        <p className="font-mono text-xs text-payload-muted mb-2">
-                          ASSIGNED TO: {getMemberName(payload.assigned_to)}
-                        </p>
-                      )}
-                      <p className="font-inter text-sm text-payload-text mb-4">{payload.description}</p>
-                      <div className="grid grid-cols-3 gap-4 font-mono text-xs">
+                <div key={payload.id}>
+                  <div
+                    data-testid={`payload-item-${index}`}
+                    className={`bg-black/30 border ${payload.is_active ? 'border-payload-neon/30' : 'border-white/10'} p-6 rounded-sm hover:border-white/20 transition-all`}
+                  >
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-3 mb-2">
+                          <h3 className="font-rajdhani font-bold text-xl uppercase tracking-wide text-payload-neon">
+                            {payload.title}
+                          </h3>
+                          {payload.is_active && (
+                            <span className="font-mono text-xs bg-payload-neon/20 text-payload-neon px-2 py-1 rounded-sm">ACTIVE</span>
+                          )}
+                        </div>
                         {isAdmin && (
-                          <div>
-                            <div className="text-payload-muted uppercase tracking-widest mb-1">STATUS</div>
-                            <select
-                              value={payload.status}
-                              onChange={(e) => handleStatusChange(payload.id, e.target.value)}
-                              className="bg-black border border-white/20 text-payload-neon py-1 px-2 rounded-none uppercase text-xs"
-                            >
-                              <option value="active">ACTIVE</option>
-                              <option value="paused">PAUSED</option>
-                              <option value="completed">COMPLETED</option>
-                            </select>
-                          </div>
+                          <p className="font-mono text-xs text-payload-muted mb-2">
+                            ASSIGNED TO: {getMemberName(payload.assigned_to)}
+                          </p>
                         )}
-                        <div>
-                          <div className="text-payload-muted uppercase tracking-widest mb-1">GOAL</div>
-                          <div className="text-payload-alert">${payload.funding_goal.toFixed(2)}</div>
-                        </div>
-                        <div>
-                          <div className="text-payload-muted uppercase tracking-widest mb-1">FUNDED</div>
-                          <div className="text-payload-neon">${payload.current_funding.toFixed(2)}</div>
+                        <p className="font-inter text-sm text-payload-text mb-4">{payload.description}</p>
+                        <div className="grid grid-cols-3 gap-4 font-mono text-xs">
+                          {isAdmin && (
+                            <div>
+                              <div className="text-payload-muted uppercase tracking-widest mb-1">STATUS</div>
+                              <select
+                                value={payload.status}
+                                onChange={(e) => handleStatusChange(payload.id, e.target.value)}
+                                className="bg-black border border-white/20 text-payload-neon py-1 px-2 rounded-none uppercase text-xs"
+                              >
+                                <option value="active">ACTIVE</option>
+                                <option value="paused">PAUSED</option>
+                                <option value="completed">COMPLETED</option>
+                              </select>
+                            </div>
+                          )}
+                          <div>
+                            <div className="text-payload-muted uppercase tracking-widest mb-1">GOAL</div>
+                            <div className="text-payload-alert">${payload.funding_goal.toFixed(2)}</div>
+                          </div>
+                          <div>
+                            <div className="text-payload-muted uppercase tracking-widest mb-1">FUNDED</div>
+                            <div className="text-payload-neon">${payload.current_funding.toFixed(2)}</div>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                    <div className="flex gap-2 ml-4">
-                      {isAdmin ? (
-                        <>
+                      <div className="flex gap-2 ml-4">
+                        {isAdmin ? (
+                          <>
+                            <button
+                              onClick={() => handleEdit(payload)}
+                              className="p-2 hover:bg-white/10 rounded-none transition-colors"
+                            >
+                              <Edit className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={() => handleDelete(payload.id)}
+                              className="p-2 hover:bg-red-500/20 text-red-500 rounded-none transition-colors"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </>
+                        ) : (
                           <button
-                            onClick={() => handleEdit(payload)}
-                            className="p-2 hover:bg-white/10 rounded-none transition-colors"
+                            data-testid={`toggle-payload-${index}`}
+                            onClick={() => handleToggleActive(payload.id)}
+                            className={`p-2 rounded-none transition-all ${
+                              payload.is_active 
+                                ? 'bg-payload-neon/20 text-payload-neon hover:bg-payload-neon/30' 
+                                : 'hover:bg-white/10 text-payload-muted'
+                            }`}
+                            title={payload.is_active ? 'Deactivate' : 'Activate'}
                           >
-                            <Edit className="w-4 h-4" />
+                            {payload.is_active ? <Power className="w-5 h-5" /> : <PowerOff className="w-5 h-5" />}
                           </button>
-                          <button
-                            onClick={() => handleDelete(payload.id)}
-                            className="p-2 hover:bg-red-500/20 text-red-500 rounded-none transition-colors"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </>
-                      ) : (
-                        <button
-                          data-testid={`toggle-payload-${index}`}
-                          onClick={() => handleToggleActive(payload.id)}
-                          className={`p-2 rounded-none transition-all ${
-                            payload.is_active 
-                              ? 'bg-payload-neon/20 text-payload-neon hover:bg-payload-neon/30' 
-                              : 'hover:bg-white/10 text-payload-muted'
-                          }`}
-                          title={payload.is_active ? 'Deactivate' : 'Activate'}
-                        >
-                          {payload.is_active ? <Power className="w-5 h-5" /> : <PowerOff className="w-5 h-5" />}
-                        </button>
-                      )}
+                        )}
+                      </div>
                     </div>
                   </div>
+
+                  {/* Inline Edit Form */}
+                  {editingId === payload.id && isAdmin && (
+                    <motion.form 
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      onSubmit={handleSubmit} 
+                      className="bg-payload-alert/10 border border-payload-alert/30 p-6 rounded-sm mt-2"
+                    >
+                      <h3 className="font-mono text-xs uppercase tracking-widest text-payload-alert mb-4 flex items-center gap-2">
+                        <Edit className="w-4 h-4" />
+                        EDIT PAYLOAD
+                      </h3>
+                      <div className="space-y-4">
+                        <div>
+                          <label className="font-mono text-xs uppercase tracking-widest text-payload-muted mb-2 block">ASSIGN TO MEMBER</label>
+                          <select
+                            required
+                            value={formData.assigned_to}
+                            onChange={(e) => setFormData({ ...formData, assigned_to: e.target.value })}
+                            className="w-full bg-black border border-white/20 text-payload-text py-2 px-2 rounded-none font-mono text-sm"
+                          >
+                            <option value="">Select Member</option>
+                            {members.map(member => (
+                              <option key={member.id} value={member.id}>{member.name} ({member.email})</option>
+                            ))}
+                          </select>
+                        </div>
+                        <div>
+                          <label className="font-mono text-xs uppercase tracking-widest text-payload-muted mb-2 block">TITLE</label>
+                          <input
+                            type="text"
+                            required
+                            value={formData.title}
+                            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                            className="w-full bg-black border-b border-white/20 focus:border-payload-alert focus:outline-none py-2 px-0 font-mono text-payload-text"
+                          />
+                        </div>
+                        <div>
+                          <label className="font-mono text-xs uppercase tracking-widest text-payload-muted mb-2 block">DESCRIPTION</label>
+                          <textarea
+                            required
+                            value={formData.description}
+                            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                            className="w-full bg-black border border-white/20 focus:border-payload-alert focus:outline-none py-2 px-3 font-mono text-payload-text resize-none"
+                            rows="3"
+                          />
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <label className="font-mono text-xs uppercase tracking-widest text-payload-muted mb-2 block">FUNDING GOAL</label>
+                            <input
+                              type="number"
+                              step="0.01"
+                              value={formData.funding_goal}
+                              onChange={(e) => setFormData({ ...formData, funding_goal: parseFloat(e.target.value) || 0 })}
+                              className="w-full bg-black border-b border-white/20 focus:border-payload-alert focus:outline-none py-2 px-0 font-mono text-payload-text"
+                            />
+                          </div>
+                          <div>
+                            <label className="font-mono text-xs uppercase tracking-widest text-payload-muted mb-2 block">CURRENT FUNDING</label>
+                            <input
+                              type="number"
+                              step="0.01"
+                              value={formData.current_funding}
+                              onChange={(e) => setFormData({ ...formData, current_funding: parseFloat(e.target.value) || 0 })}
+                              className="w-full bg-black border-b border-white/20 focus:border-payload-alert focus:outline-none py-2 px-0 font-mono text-payload-text"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex gap-3 mt-6">
+                        <button
+                          type="submit"
+                          className="flex items-center gap-2 flex-1 font-mono text-sm border border-payload-alert text-payload-alert py-2 rounded-none hover:bg-payload-alert hover:text-black transition-all"
+                        >
+                          <Check className="w-4 h-4" />
+                          UPDATE
+                        </button>
+                        <button
+                          type="button"
+                          onClick={handleCancelEdit}
+                          className="flex items-center gap-2 flex-1 font-mono text-sm border border-white/20 text-white py-2 rounded-none hover:bg-white/10 transition-all"
+                        >
+                          <XCircle className="w-4 h-4" />
+                          CANCEL
+                        </button>
+                      </div>
+                    </motion.form>
+                  )}
                 </div>
               ))
             )}
