@@ -100,6 +100,7 @@ class PayloadUpdate(BaseModel):
     status: Optional[PayloadStatus] = None
     funding_goal: Optional[float] = None
     current_funding: Optional[float] = None
+    assigned_to: Optional[str] = None
 
 class PayloadResponse(BaseModel):
     model_config = ConfigDict(extra="ignore")
