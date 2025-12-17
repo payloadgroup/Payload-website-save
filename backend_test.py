@@ -1225,7 +1225,7 @@ class AdminFeaturesAPITester:
 
 def main():
     print("🚀 Starting Payload Phase 2 API Testing...")
-    tester = PayloadAPITester()
+    tester = AdminFeaturesAPITester()
     
     # Test user registration flow
     print("\n" + "="*50)
