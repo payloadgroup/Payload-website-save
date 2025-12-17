@@ -783,6 +783,230 @@ class PayloadAPITester:
         )
         return success
 
+    # ===== ACCOUNT LOCKING FEATURE TESTING =====
+    def test_get_members(self):
+        """Test getting all approved members"""
+        if not self.admin_token:
+            print("❌ No admin token available")
+            return False
+            
+        headers = {'Authorization': f'Bearer {self.admin_token}'}
+        success, response = self.run_test(
+            "Get All Members",
+            "GET",
+            "admin/members",
+            200,
+            headers=headers
+        )
+        
+        if success:
+            print(f"   Found {len(response)} approved members")
+            return True
+        return False
+
+    def test_get_locked_users(self):
+        """Test getting locked users"""
+        if not self.admin_token:
+            print("❌ No admin token available")
+            return False
+            
+        headers = {'Authorization': f'Bearer {self.admin_token}'}
+        success, response = self.run_test(
+            "Get Locked Users",
+            "GET",
+            "admin/locked-users",
+            200,
+            headers=headers
+        )
+        
+        if success:
+            print(f"   Found {len(response)} locked users")
+            return True
+        return False
+
+    def test_create_test_user_for_locking(self):
+        """Create a test user specifically for locking operations"""
+        test_email = f"locktest_{datetime.now().strftime('%H%M%S')}@test.com"
+        
+        # Register test user
+        success, response = self.run_test(
+            "Register Test User for Locking",
+            "POST",
+            "auth/register",
+            200,
+            data={
+                "name": "Lock Test User",
+                "email": test_email,
+                "password": "testpass123",
+                "mobile": "1234567890",
+                "date_of_birth": "1990-01-01"
+            }
+        )
+        
+        if success and 'id' in response:
+            self.test_user_id = response['id']
+            print(f"   Test user created with ID: {self.test_user_id}")
+            
+            # Approve the test user
+            headers = {'Authorization': f'Bearer {self.admin_token}'}
+            approve_success, _ = self.run_test(
+                "Approve Test User for Locking",
+                "POST",
+                "admin/update-user-status",
+                200,
+                data={"user_id": self.test_user_id, "status": "approved"},
+                headers=headers
+            )
+            return approve_success
+        return False
+
+    def test_lock_user_account(self):
+        """Test locking a user account"""
+        if not self.admin_token or not self.test_user_id:
+            print("❌ Missing admin token or test user ID")
+            return False
+            
+        headers = {'Authorization': f'Bearer {self.admin_token}'}
+        success, _ = self.run_test(
+            "Lock User Account",
+            "POST",
+            f"admin/lock-user/{self.test_user_id}",
+            200,
+            headers=headers
+        )
+        return success
+
+    def test_locked_user_login_blocked(self):
+        """Test that locked user cannot login"""
+        if not self.test_user_id:
+            print("❌ No test user available for login test")
+            return False
+            
+        # Try to login with locked user (should fail with 403)
+        success, response = self.run_test(
+            "Locked User Login (Should Fail)",
+            "POST",
+            "auth/login",
+            403,  # Should be forbidden
+            data={"email": f"locktest_{datetime.now().strftime('%H%M%S')}@test.com", "password": "testpass123"}
+        )
+        return success
+
+    def test_unlock_user_account(self):
+        """Test unlocking a user account"""
+        if not self.admin_token or not self.test_user_id:
+            print("❌ Missing admin token or test user ID")
+            return False
+            
+        headers = {'Authorization': f'Bearer {self.admin_token}'}
+        success, _ = self.run_test(
+            "Unlock User Account",
+            "POST",
+            f"admin/unlock-user/{self.test_user_id}",
+            200,
+            headers=headers
+        )
+        return success
+
+    def test_delete_locked_user(self):
+        """Test permanently deleting a locked user account"""
+        if not self.admin_token or not self.test_user_id:
+            print("❌ Missing admin token or test user ID")
+            return False
+            
+        headers = {'Authorization': f'Bearer {self.admin_token}'}
+        
+        # First lock the user again
+        self.run_test(
+            "Lock User Before Delete",
+            "POST",
+            f"admin/lock-user/{self.test_user_id}",
+            200,
+            headers=headers
+        )
+        
+        # Then delete
+        success, _ = self.run_test(
+            "Delete Locked User Account",
+            "DELETE",
+            f"admin/delete-user/{self.test_user_id}",
+            200,
+            headers=headers
+        )
+        return success
+
+    def test_admin_protection_from_locking(self):
+        """Test that admin accounts cannot be locked or deleted"""
+        if not self.admin_token:
+            print("❌ No admin token available")
+            return False
+            
+        headers = {'Authorization': f'Bearer {self.admin_token}'}
+        
+        # Get admin user ID
+        success, response = self.run_test(
+            "Get Current Admin User",
+            "GET",
+            "users/me",
+            200,
+            headers=headers
+        )
+        
+        if success and 'id' in response:
+            admin_id = response['id']
+            
+            # Try to lock admin (should fail with 400)
+            lock_success, _ = self.run_test(
+                "Lock Admin Account (Should Fail)",
+                "POST",
+                f"admin/lock-user/{admin_id}",
+                400,  # Should be bad request
+                headers=headers
+            )
+            
+            # Try to delete admin (should fail with 400)
+            delete_success, _ = self.run_test(
+                "Delete Admin Account (Should Fail)",
+                "DELETE",
+                f"admin/delete-user/{admin_id}",
+                400,  # Should be bad request
+                headers=headers
+            )
+            
+            return lock_success and delete_success
+        return False
+
+    def test_member_unauthorized_admin_access(self):
+        """Test that regular members cannot access admin locking endpoints"""
+        if not self.user_token:
+            print("❌ No member token available")
+            return False
+            
+        headers = {'Authorization': f'Bearer {self.user_token}'}
+        
+        # Test unauthorized access to admin endpoints
+        tests = [
+            ("Get Members (Unauthorized)", "GET", "admin/members", 403),
+            ("Get Locked Users (Unauthorized)", "GET", "admin/locked-users", 403),
+            ("Lock User (Unauthorized)", "POST", f"admin/lock-user/dummy-id", 403),
+            ("Unlock User (Unauthorized)", "POST", f"admin/unlock-user/dummy-id", 403),
+            ("Delete User (Unauthorized)", "DELETE", f"admin/delete-user/dummy-id", 403),
+        ]
+        
+        all_passed = True
+        for test_name, method, endpoint, expected_status in tests:
+            success, _ = self.run_test(
+                test_name,
+                method,
+                endpoint,
+                expected_status,
+                headers=headers
+            )
+            if not success:
+                all_passed = False
+                
+        return all_passed
+
 def main():
     print("🚀 Starting Payload Phase 2 API Testing...")
     tester = PayloadAPITester()
