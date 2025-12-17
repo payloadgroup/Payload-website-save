@@ -45,25 +45,31 @@ const Analytics = () => {
   return (
     <div className="min-h-screen bg-payload-bg text-payload-text">
       <nav className="border-b border-payload-border bg-payload-surface">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-          <button
-            data-testid="logo-home-btn"
-            onClick={() => navigate('/dashboard')}
-            className="flex items-center gap-3 hover:opacity-80 transition-opacity"
-          >
-            <PayloadLogo size="default" />
-            <div className="font-rajdhani font-bold text-2xl tracking-widest text-payload-neon">
-              PAYLOAD
-            </div>
-          </button>
-          <button
-            data-testid="back-to-admin-btn"
-            onClick={() => navigate('/admin')}
-            className="flex items-center gap-2 font-mono text-sm border border-white/20 px-4 py-2 rounded-none hover:border-white hover:bg-white/5 transition-all duration-300"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            BACK TO ADMIN
-          </button>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4">
+          {/* Mobile: Stack vertically, Desktop: Side by side */}
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 sm:gap-0">
+            {/* Logo */}
+            <button
+              data-testid="logo-home-btn"
+              onClick={() => navigate('/dashboard')}
+              className="flex items-center gap-2 sm:gap-3 hover:opacity-80 transition-opacity"
+            >
+              <PayloadLogo size="default" />
+              <div className="font-rajdhani font-bold text-xl sm:text-2xl tracking-widest text-payload-neon">
+                PAYLOAD
+              </div>
+            </button>
+            
+            {/* Back button */}
+            <button
+              data-testid="back-to-admin-btn"
+              onClick={() => navigate('/admin')}
+              className="flex items-center gap-1 sm:gap-2 font-mono text-xs sm:text-sm border border-white/20 px-2 sm:px-4 py-1.5 sm:py-2 rounded-none hover:border-white hover:bg-white/5 transition-all duration-300 w-fit"
+            >
+              <ArrowLeft className="w-3 h-3 sm:w-4 sm:h-4" />
+              BACK TO ADMIN
+            </button>
+          </div>
         </div>
       </nav>
 
