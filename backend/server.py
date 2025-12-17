@@ -376,8 +376,12 @@ async def get_analytics(admin_user: User = Depends(get_admin_user)):
 
 @api_router.get("/dashboard")
 async def get_dashboard(current_user: User = Depends(get_current_user)):
-    payloads_count = await db.payloads.count_documents({"user_id": current_user.id})
-    missions_count = await db.missions.count_documents({"user_id": current_user.id})
+    if current_user.role == UserRole.ADMIN:
+        payloads_count = await db.payloads.count_documents({})
+        missions_count = await db.missions.count_documents({})
+    else:
+        payloads_count = await db.payloads.count_documents({"assigned_to": current_user.id, "is_active": True})
+        missions_count = await db.missions.count_documents({"assigned_to": current_user.id, "is_active": True})
     
     transactions = await db.transactions.find(
         {"user_id": current_user.id}
