@@ -75,6 +75,8 @@ class User(BaseModel):
     id: str
     name: str
     email: EmailStr
+    mobile: Optional[str] = None
+    date_of_birth: Optional[str] = None
     role: UserRole
     status: UserStatus
     referral_code: Optional[str] = None
