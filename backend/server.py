@@ -397,6 +397,16 @@ async def login(credentials: UserLogin):
     if user["status"] == UserStatus.LOCKED:
         raise HTTPException(status_code=403, detail="Your account has been locked. Please contact admin.")
     
+    # Update last login and login count
+    current_time = datetime.now(timezone.utc).isoformat()
+    login_count = user.get("login_count", 0) + 1
+    await db.users.update_one(
+        {"id": user["id"]},
+        {"$set": {"last_login": current_time, "login_count": login_count}}
+    )
+    user["last_login"] = current_time
+    user["login_count"] = login_count
+    
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
         data={"sub": user["id"]}, expires_delta=access_token_expires
