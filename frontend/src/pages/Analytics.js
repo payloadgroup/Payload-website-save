@@ -46,8 +46,11 @@ const Analytics = () => {
     <div className="min-h-screen bg-payload-bg text-payload-text">
       <nav className="border-b border-payload-border bg-payload-surface">
         <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-          <div className="font-rajdhani font-bold text-2xl tracking-widest text-payload-neon">
-            PAYLOAD
+          <div className="flex items-center gap-3">
+            <PayloadLogo size="default" />
+            <div className="font-rajdhani font-bold text-2xl tracking-widest text-payload-neon">
+              PAYLOAD
+            </div>
           </div>
           <button
             data-testid="back-to-admin-btn"
