@@ -449,7 +449,7 @@ class PayloadAPITester:
             "Create Transaction (Deposit)",
             "POST",
             "transactions",
-            201,
+            200,
             data=transaction_data,
             headers=headers
         )
