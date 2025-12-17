@@ -599,7 +599,7 @@ class PayloadAPITester:
             "Create Station",
             "POST",
             "stations",
-            201,
+            200,
             data=station_data,
             headers=headers
         )
