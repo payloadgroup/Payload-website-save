@@ -280,6 +280,8 @@ async def register(user_data: UserRegister):
         "name": user_data.name,
         "email": user_data.email,
         "password": hashed_pwd,
+        "mobile": user_data.mobile,
+        "date_of_birth": user_data.date_of_birth,
         "role": UserRole.MEMBER,
         "status": UserStatus.PENDING,
         "referral_code": user_data.referral_code,
