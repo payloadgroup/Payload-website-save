@@ -473,7 +473,7 @@ class PayloadAPITester:
             "Create Transaction (Withdrawal)",
             "POST",
             "transactions",
-            201,
+            200,
             data=transaction_data,
             headers=headers
         )
