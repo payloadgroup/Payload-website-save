@@ -320,6 +320,14 @@ async def get_pending_users(admin_user: User = Depends(get_admin_user)):
     ).to_list(1000)
     return [User(**user) for user in pending_users]
 
+@api_router.get("/admin/members", response_model=List[User])
+async def get_all_members(admin_user: User = Depends(get_admin_user)):
+    members = await db.users.find(
+        {"role": UserRole.MEMBER, "status": UserStatus.APPROVED},
+        {"_id": 0, "password": 0}
+    ).to_list(1000)
+    return [User(**user) for user in members]
+
 @api_router.post("/admin/update-user-status")
 async def update_user_status(
     request: UserApprovalRequest,
