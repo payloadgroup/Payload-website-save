@@ -22,12 +22,16 @@ const LandingPage = () => {
       <div className="relative z-10">
         <nav className="border-b border-white/10 bg-payload-surface/80 backdrop-blur-sm">
           <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-            <div className="flex items-center gap-3">
+            <button
+              data-testid="logo-home-btn"
+              onClick={() => navigate('/')}
+              className="flex items-center gap-3 hover:opacity-80 transition-opacity"
+            >
               <PayloadLogo size="default" />
               <div className="font-rajdhani font-bold text-2xl tracking-widest text-payload-neon">
                 PAYLOAD
               </div>
-            </div>
+            </button>
             <div className="flex gap-4">
               <button
                 data-testid="nav-login-btn"
