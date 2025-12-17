@@ -6,6 +6,7 @@ import LoginPage from "@/pages/LoginPage";
 import RegisterPage from "@/pages/RegisterPage";
 import Dashboard from "@/pages/Dashboard";
 import AdminPanel from "@/pages/AdminPanel";
+import Analytics from "@/pages/Analytics";
 import { AuthProvider, useAuth } from "@/context/AuthContext";
 
 const ProtectedRoute = ({ children, adminOnly = false }) => {
