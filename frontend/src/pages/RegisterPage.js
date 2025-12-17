@@ -20,8 +20,44 @@ const RegisterPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState({});
 
+  const validateForm = () => {
+    const newErrors = {};
+    
+    // Validate name has at least 2 words
+    const nameParts = formData.name.trim().split(/\s+/);
+    if (nameParts.length < 2) {
+      newErrors.name = 'Please enter your first and last name';
+    }
+    
+    // Validate age (must be 19+)
+    if (formData.date_of_birth) {
+      const birthDate = new Date(formData.date_of_birth);
+      const today = new Date();
+      const age = today.getFullYear() - birthDate.getFullYear();
+      const monthDiff = today.getMonth() - birthDate.getMonth();
+      const actualAge = monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate()) ? age - 1 : age;
+      
+      if (actualAge < 19) {
+        newErrors.date_of_birth = 'You must be at least 19 years old to apply';
+      }
+    }
+    
+    // Validate mobile number (basic check)
+    if (formData.mobile && !/^[\d\s\-+()]{10,}$/.test(formData.mobile)) {
+      newErrors.mobile = 'Please enter a valid mobile number';
+    }
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    if (!validateForm()) {
+      return;
+    }
+    
     setLoading(true);
 
     try {
@@ -29,6 +65,8 @@ const RegisterPage = () => {
         formData.name,
         formData.email,
         formData.password,
+        formData.mobile,
+        formData.date_of_birth,
         formData.referral_code || null
       );
       toast.success('Registration submitted! Awaiting admin approval.');
