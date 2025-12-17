@@ -151,6 +151,42 @@ const RegisterPage = () => {
 
             <div>
               <label className="font-mono text-xs uppercase tracking-widest text-payload-muted block mb-2">
+                MOBILE NUMBER
+              </label>
+              <input
+                data-testid="register-mobile-input"
+                type="tel"
+                required
+                value={formData.mobile}
+                onChange={(e) => setFormData({ ...formData, mobile: e.target.value })}
+                className={`w-full bg-black border-b ${errors.mobile ? 'border-red-500' : 'border-white/20'} focus:border-payload-neon focus:outline-none py-3 px-0 font-mono text-payload-text placeholder:text-white/30 transition-colors`}
+                placeholder="+1 234 567 8900"
+              />
+              {errors.mobile && (
+                <p className="text-red-500 text-xs font-mono mt-1">{errors.mobile}</p>
+              )}
+            </div>
+
+            <div>
+              <label className="font-mono text-xs uppercase tracking-widest text-payload-muted block mb-2">
+                DATE OF BIRTH
+              </label>
+              <input
+                data-testid="register-dob-input"
+                type="date"
+                required
+                value={formData.date_of_birth}
+                onChange={(e) => setFormData({ ...formData, date_of_birth: e.target.value })}
+                className={`w-full bg-black border-b ${errors.date_of_birth ? 'border-red-500' : 'border-white/20'} focus:border-payload-neon focus:outline-none py-3 px-0 font-mono text-payload-text placeholder:text-white/30 transition-colors`}
+              />
+              {errors.date_of_birth && (
+                <p className="text-red-500 text-xs font-mono mt-1">{errors.date_of_birth}</p>
+              )}
+              <p className="text-payload-muted text-xs font-mono mt-1">Must be 19 years or older</p>
+            </div>
+
+            <div>
+              <label className="font-mono text-xs uppercase tracking-widest text-payload-muted block mb-2">
                 PASSWORD
               </label>
               <div className="relative">
