@@ -393,23 +393,28 @@ async def get_dashboard(current_user: User = Depends(get_current_user)):
 
 @api_router.get("/payloads", response_model=List[PayloadResponse])
 async def get_payloads(current_user: User = Depends(get_current_user)):
-    payloads = await db.payloads.find(
-        {"user_id": current_user.id},
-        {"_id": 0}
-    ).to_list(1000)
+    if current_user.role == UserRole.ADMIN:
+        payloads = await db.payloads.find({}, {"_id": 0}).to_list(1000)
+    else:
+        payloads = await db.payloads.find(
+            {"assigned_to": current_user.id},
+            {"_id": 0}
+        ).to_list(1000)
     return [PayloadResponse(**p) for p in payloads]
 
 @api_router.post("/payloads", response_model=PayloadResponse)
-async def create_payload(payload_data: PayloadCreate, current_user: User = Depends(get_current_user)):
+async def create_payload(payload_data: PayloadCreate, admin_user: User = Depends(get_admin_user)):
     import uuid
     payload = {
         "id": str(uuid.uuid4()),
-        "user_id": current_user.id,
+        "assigned_to": payload_data.assigned_to,
+        "created_by": admin_user.id,
         "title": payload_data.title,
         "description": payload_data.description,
         "status": PayloadStatus.ACTIVE,
         "funding_goal": payload_data.funding_goal,
         "current_funding": payload_data.current_funding,
+        "is_active": False,
         "created_at": datetime.now(timezone.utc).isoformat(),
         "updated_at": datetime.now(timezone.utc).isoformat()
     }
