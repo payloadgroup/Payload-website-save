@@ -208,8 +208,8 @@ const AdminPanel = () => {
                     </div>
                   </div>
                 </motion.div>
-              ))
-            )
+              ))}
+            </div>
           ) : (
             /* All Members Tab */
             <div className="space-y-4">
