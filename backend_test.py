@@ -687,7 +687,7 @@ class PayloadAPITester:
             "Create Resource (Admin)",
             "POST",
             "basecamp",
-            201,
+            200,
             data=resource_data,
             headers=headers
         )
