@@ -79,6 +79,8 @@ class PayloadAPITester:
             "name": f"Test User {timestamp}",
             "email": f"testuser{timestamp}@payload.com",
             "password": "TestPass123!",
+            "mobile": "1234567890",
+            "date_of_birth": "1990-01-01",
             "referral_code": "REF-TEST"
         }
         
