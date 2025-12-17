@@ -1,0 +1,128 @@
+import { useState } from 'react';
+import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/context/AuthContext';
+import { toast } from 'sonner';
+import { ArrowLeft } from 'lucide-react';
+
+const LoginPage = () => {
+  const navigate = useNavigate();
+  const { login } = useAuth();
+  const [formData, setFormData] = useState({
+    email: '',
+    password: ''
+  });
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      await login(formData.email, formData.password);
+      toast.success('Access granted');
+      navigate('/dashboard');
+    } catch (error) {
+      const message = error.response?.data?.detail || 'Login failed';
+      toast.error(message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-payload-bg text-payload-text flex items-center justify-center relative overflow-hidden">
+      <div 
+        className="absolute inset-0 opacity-20"
+        style={{
+          backgroundImage: 'url(https://images.unsplash.com/photo-1711560707076-d50fbf8a3a26?crop=entropy&cs=srgb&fm=jpg&q=85)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center'
+        }}
+      />
+      
+      <div className="absolute inset-0 grid-bg opacity-50" />
+
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="relative z-10 w-full max-w-md mx-4"
+      >
+        <button
+          data-testid="back-to-home-btn"
+          onClick={() => navigate('/')}
+          className="flex items-center gap-2 font-mono text-sm text-payload-muted hover:text-payload-neon transition-colors mb-8"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          BACK TO HOME
+        </button>
+
+        <div className="bg-payload-surface border border-white/10 p-8 rounded-sm">
+          <h1 className="font-rajdhani font-bold text-4xl uppercase tracking-widest text-center mb-2">
+            LOGIN
+          </h1>
+          <p className="font-mono text-xs text-payload-muted text-center uppercase tracking-widest mb-8">
+            ACCESS MISSION CONTROL
+          </p>
+
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div>
+              <label className="font-mono text-xs uppercase tracking-widest text-payload-muted block mb-2">
+                EMAIL
+              </label>
+              <input
+                data-testid="login-email-input"
+                type="email"
+                required
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                className="w-full bg-black border-b border-white/20 focus:border-payload-neon focus:outline-none py-3 px-0 font-mono text-payload-text placeholder:text-white/30 transition-colors"
+                placeholder="commander@payload.com"
+              />
+            </div>
+
+            <div>
+              <label className="font-mono text-xs uppercase tracking-widest text-payload-muted block mb-2">
+                PASSWORD
+              </label>
+              <input
+                data-testid="login-password-input"
+                type="password"
+                required
+                value={formData.password}
+                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                className="w-full bg-black border-b border-white/20 focus:border-payload-neon focus:outline-none py-3 px-0 font-mono text-payload-text placeholder:text-white/30 transition-colors"
+                placeholder="Enter access code"
+              />
+            </div>
+
+            <button
+              data-testid="login-submit-btn"
+              type="submit"
+              disabled={loading}
+              className="w-full font-rajdhani font-bold text-lg uppercase tracking-widest border-2 border-payload-neon text-payload-neon py-3 rounded-none hover:bg-payload-neon hover:text-black transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {loading ? 'ACCESSING...' : 'LOGIN'}
+            </button>
+          </form>
+
+          <div className="mt-6 text-center">
+            <p className="font-mono text-sm text-payload-muted">
+              Need access?{' '}
+              <button
+                data-testid="goto-register-btn"
+                onClick={() => navigate('/register')}
+                className="text-payload-neon hover:underline"
+              >
+                Apply for membership
+              </button>
+            </p>
+          </div>
+        </div>
+      </motion.div>
+    </div>
+  );
+};
+
+export default LoginPage;
