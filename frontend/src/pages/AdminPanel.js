@@ -61,14 +61,24 @@ const AdminPanel = () => {
           <div className="font-rajdhani font-bold text-2xl tracking-widest text-payload-neon">
             PAYLOAD
           </div>
-          <button
-            data-testid="back-to-dashboard-btn"
-            onClick={() => navigate('/dashboard')}
-            className="flex items-center gap-2 font-mono text-sm border border-white/20 px-4 py-2 rounded-none hover:border-white hover:bg-white/5 transition-all duration-300"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            BACK TO DASHBOARD
-          </button>
+          <div className="flex items-center gap-3">
+            <button
+              data-testid="goto-analytics-btn"
+              onClick={() => navigate('/analytics')}
+              className="flex items-center gap-2 font-mono text-sm border border-payload-cyan text-payload-cyan px-4 py-2 rounded-none hover:bg-payload-cyan hover:text-black transition-all duration-300"
+            >
+              <BarChart3 className="w-4 h-4" />
+              ANALYTICS
+            </button>
+            <button
+              data-testid="back-to-dashboard-btn"
+              onClick={() => navigate('/dashboard')}
+              className="flex items-center gap-2 font-mono text-sm border border-white/20 px-4 py-2 rounded-none hover:border-white hover:bg-white/5 transition-all duration-300"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              DASHBOARD
+            </button>
+          </div>
         </div>
       </nav>
 
