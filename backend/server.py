@@ -109,6 +109,54 @@ class UserApprovalRequest(BaseModel):
     user_id: str
     status: UserStatus
 
+class UpdateTierRequest(BaseModel):
+    user_id: str
+    tier: MemberTier
+
+class AnnouncementCreate(BaseModel):
+    title: str
+    content: str
+    priority: AnnouncementPriority = AnnouncementPriority.NORMAL
+    is_pinned: bool = False
+    target_tiers: Optional[List[MemberTier]] = None  # None means all tiers
+    scheduled_for: Optional[str] = None
+
+class AnnouncementUpdate(BaseModel):
+    title: Optional[str] = None
+    content: Optional[str] = None
+    priority: Optional[AnnouncementPriority] = None
+    is_pinned: Optional[bool] = None
+    target_tiers: Optional[List[MemberTier]] = None
+    is_active: Optional[bool] = None
+
+class AnnouncementResponse(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str
+    title: str
+    content: str
+    priority: AnnouncementPriority
+    is_pinned: bool
+    is_active: bool
+    target_tiers: Optional[List[MemberTier]] = None
+    created_by: str
+    created_at: str
+    scheduled_for: Optional[str] = None
+    read_by: List[str] = []
+
+class ReferralStats(BaseModel):
+    total_referrals: int
+    successful_referrals: int
+    pending_referrals: int
+    top_referrers: List[dict]
+
+class ActivityStats(BaseModel):
+    total_members: int
+    active_last_7_days: int
+    active_last_30_days: int
+    inactive_members: int
+    tier_distribution: dict
+    recent_logins: List[dict]
+
 class PayloadCreate(BaseModel):
     title: str
     description: str
