@@ -3,25 +3,32 @@ import { motion } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
 import axios from 'axios';
 import { toast } from 'sonner';
-import { X, Plus, Edit, Trash2, Target } from 'lucide-react';
+import { X, Plus, Edit, Trash2, Target, Power, PowerOff } from 'lucide-react';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
 const MissionsModal = ({ onClose, onUpdate }) => {
-  const { token } = useAuth();
+  const { token, user } = useAuth();
   const [missions, setMissions] = useState([]);
+  const [members, setMembers] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [formData, setFormData] = useState({
     title: '',
     objective: '',
     priority: 'medium',
-    due_date: ''
+    due_date: '',
+    assigned_to: ''
   });
+
+  const isAdmin = user?.role === 'admin';
 
   useEffect(() => {
     fetchMissions();
+    if (isAdmin) {
+      fetchMembers();
+    }
   }, []);
 
   const fetchMissions = async () => {
@@ -32,6 +39,17 @@ const MissionsModal = ({ onClose, onUpdate }) => {
       setMissions(response.data);
     } catch (error) {
       console.error('Failed to fetch missions:', error);
+    }
+  };
+
+  const fetchMembers = async () => {
+    try {
+      const response = await axios.get(`${API}/admin/members`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setMembers(response.data);
+    } catch (error) {
+      console.error('Failed to fetch members:', error);
     }
   };
 
@@ -47,9 +65,9 @@ const MissionsModal = ({ onClose, onUpdate }) => {
         await axios.post(`${API}/missions`, formData, {
           headers: { Authorization: `Bearer ${token}` }
         });
-        toast.success('Mission created');
+        toast.success('Mission assigned');
       }
-      setFormData({ title: '', objective: '', priority: 'medium', due_date: '' });
+      setFormData({ title: '', objective: '', priority: 'medium', due_date: '', assigned_to: '' });
       setEditingId(null);
       setShowForm(false);
       fetchMissions();
@@ -64,7 +82,8 @@ const MissionsModal = ({ onClose, onUpdate }) => {
       title: mission.title,
       objective: mission.objective,
       priority: mission.priority,
-      due_date: mission.due_date || ''
+      due_date: mission.due_date || '',
+      assigned_to: mission.assigned_to
     });
     setEditingId(mission.id);
     setShowForm(true);
@@ -82,6 +101,19 @@ const MissionsModal = ({ onClose, onUpdate }) => {
       } catch (error) {
         toast.error('Failed to delete mission');
       }
+    }
+  };
+
+  const handleToggleActive = async (id) => {
+    try {
+      await axios.post(`${API}/missions/${id}/toggle-active`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      toast.success('Mission activation toggled');
+      fetchMissions();
+      onUpdate();
+    } catch (error) {
+      toast.error('Failed to toggle mission');
     }
   };
 
@@ -106,6 +138,11 @@ const MissionsModal = ({ onClose, onUpdate }) => {
     }
   };
 
+  const getMemberName = (userId) => {
+    const member = members.find(m => m.id === userId);
+    return member ? member.name : 'Unknown';
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
       <motion.div
@@ -117,7 +154,9 @@ const MissionsModal = ({ onClose, onUpdate }) => {
         <div className="border-b border-white/10 p-6 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Target className="w-6 h-6 text-payload-cyan" />
-            <h2 className="font-rajdhani font-bold text-2xl uppercase tracking-wide">MISSIONS</h2>
+            <h2 className="font-rajdhani font-bold text-2xl uppercase tracking-wide">
+              {isAdmin ? 'MISSIONS MANAGEMENT' : 'MY MISSIONS'}
+            </h2>
           </div>
           <button
             data-testid="close-modal-btn"
@@ -129,23 +168,37 @@ const MissionsModal = ({ onClose, onUpdate }) => {
         </div>
 
         <div className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
-          {!showForm && (
+          {isAdmin && !showForm && (
             <button
               data-testid="add-mission-btn"
               onClick={() => setShowForm(true)}
               className="w-full mb-6 font-mono text-sm border-2 border-dashed border-payload-cyan text-payload-cyan py-3 rounded-none hover:bg-payload-cyan/10 transition-all duration-300 flex items-center justify-center gap-2"
             >
               <Plus className="w-4 h-4" />
-              NEW MISSION
+              ASSIGN NEW MISSION
             </button>
           )}
 
-          {showForm && (
+          {showForm && isAdmin && (
             <form onSubmit={handleSubmit} className="bg-black/30 border border-white/10 p-6 rounded-sm mb-6">
               <h3 className="font-mono text-xs uppercase tracking-widest text-payload-muted mb-4">
-                {editingId ? 'EDIT MISSION' : 'NEW MISSION'}
+                {editingId ? 'EDIT MISSION' : 'ASSIGN NEW MISSION'}
               </h3>
               <div className="space-y-4">
+                <div>
+                  <label className="font-mono text-xs uppercase tracking-widest text-payload-muted mb-2 block">ASSIGN TO MEMBER</label>
+                  <select
+                    required
+                    value={formData.assigned_to}
+                    onChange={(e) => setFormData({ ...formData, assigned_to: e.target.value })}
+                    className="w-full bg-black border border-white/20 text-payload-text py-2 px-2 rounded-none font-mono text-sm"
+                  >
+                    <option value="">Select Member</option>
+                    {members.map(member => (
+                      <option key={member.id} value={member.id}>{member.name} ({member.email})</option>
+                    ))}
+                  </select>
+                </div>
                 <input
                   data-testid="mission-title-input"
                   type="text"
@@ -194,11 +247,11 @@ const MissionsModal = ({ onClose, onUpdate }) => {
                   type="submit"
                   className="flex-1 font-mono text-sm border border-payload-cyan text-payload-cyan py-2 rounded-none hover:bg-payload-cyan hover:text-black transition-all"
                 >
-                  {editingId ? 'UPDATE' : 'CREATE'}
+                  {editingId ? 'UPDATE' : 'ASSIGN'}
                 </button>
                 <button
                   type="button"
-                  onClick={() => { setShowForm(false); setEditingId(null); setFormData({ title: '', objective: '', priority: 'medium', due_date: '' }); }}
+                  onClick={() => { setShowForm(false); setEditingId(null); setFormData({ title: '', objective: '', priority: 'medium', due_date: '', assigned_to: '' }); }}
                   className="flex-1 font-mono text-sm border border-white/20 text-white py-2 rounded-none hover:bg-white/10 transition-all"
                 >
                   CANCEL
@@ -207,38 +260,58 @@ const MissionsModal = ({ onClose, onUpdate }) => {
             </form>
           )}
 
+          {!isAdmin && missions.length === 0 && (
+            <div className="text-center py-12 text-payload-muted font-mono text-sm">
+              <Target className="w-16 h-16 mx-auto mb-4 opacity-30" />
+              <p>NO MISSIONS ASSIGNED YET</p>
+              <p className="text-xs mt-2">Admin will assign missions to you</p>
+            </div>
+          )}
+
           <div className="space-y-4">
-            {missions.length === 0 ? (
+            {missions.length === 0 && isAdmin ? (
               <div className="text-center py-12 text-payload-muted font-mono text-sm">
-                NO MISSIONS YET
+                NO MISSIONS CREATED YET
               </div>
             ) : (
               missions.map((mission, index) => (
                 <div
                   key={mission.id}
                   data-testid={`mission-item-${index}`}
-                  className="bg-black/30 border border-white/10 p-6 rounded-sm hover:border-white/20 transition-all"
+                  className={`bg-black/30 border ${mission.is_active ? 'border-payload-cyan/30' : 'border-white/10'} p-6 rounded-sm hover:border-white/20 transition-all`}
                 >
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex-1">
-                      <h3 className="font-rajdhani font-bold text-xl uppercase tracking-wide text-payload-cyan mb-2">
-                        {mission.title}
-                      </h3>
+                      <div className="flex items-center gap-3 mb-2">
+                        <h3 className="font-rajdhani font-bold text-xl uppercase tracking-wide text-payload-cyan">
+                          {mission.title}
+                        </h3>
+                        {mission.is_active && (
+                          <span className="font-mono text-xs bg-payload-cyan/20 text-payload-cyan px-2 py-1 rounded-sm">ACTIVE</span>
+                        )}
+                      </div>
+                      {isAdmin && (
+                        <p className="font-mono text-xs text-payload-muted mb-2">
+                          ASSIGNED TO: {getMemberName(mission.assigned_to)}
+                        </p>
+                      )}
                       <p className="font-inter text-sm text-payload-text mb-4">{mission.objective}</p>
                       <div className="grid grid-cols-3 gap-4 font-mono text-xs">
-                        <div>
-                          <div className="text-payload-muted uppercase tracking-widest mb-1">STATUS</div>
-                          <select
-                            value={mission.status}
-                            onChange={(e) => handleStatusChange(mission.id, e.target.value)}
-                            className="bg-black border border-white/20 text-payload-cyan py-1 px-2 rounded-none uppercase text-xs"
-                          >
-                            <option value="pending">PENDING</option>
-                            <option value="in_progress">IN PROGRESS</option>
-                            <option value="completed">COMPLETED</option>
-                            <option value="failed">FAILED</option>
-                          </select>
-                        </div>
+                        {isAdmin && (
+                          <div>
+                            <div className="text-payload-muted uppercase tracking-widest mb-1">STATUS</div>
+                            <select
+                              value={mission.status}
+                              onChange={(e) => handleStatusChange(mission.id, e.target.value)}
+                              className="bg-black border border-white/20 text-payload-cyan py-1 px-2 rounded-none uppercase text-xs"
+                            >
+                              <option value="pending">PENDING</option>
+                              <option value="in_progress">IN PROGRESS</option>
+                              <option value="completed">COMPLETED</option>
+                              <option value="failed">FAILED</option>
+                            </select>
+                          </div>
+                        )}
                         <div>
                           <div className="text-payload-muted uppercase tracking-widest mb-1">PRIORITY</div>
                           <div className={`uppercase ${getPriorityColor(mission.priority)}`}>{mission.priority}</div>
@@ -250,18 +323,35 @@ const MissionsModal = ({ onClose, onUpdate }) => {
                       </div>
                     </div>
                     <div className="flex gap-2 ml-4">
-                      <button
-                        onClick={() => handleEdit(mission)}
-                        className="p-2 hover:bg-white/10 rounded-none transition-colors"
-                      >
-                        <Edit className="w-4 h-4" />
-                      </button>
-                      <button
-                        onClick={() => handleDelete(mission.id)}
-                        className="p-2 hover:bg-red-500/20 text-red-500 rounded-none transition-colors"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
+                      {isAdmin ? (
+                        <>
+                          <button
+                            onClick={() => handleEdit(mission)}
+                            className="p-2 hover:bg-white/10 rounded-none transition-colors"
+                          >
+                            <Edit className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(mission.id)}
+                            className="p-2 hover:bg-red-500/20 text-red-500 rounded-none transition-colors"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </>
+                      ) : (
+                        <button
+                          data-testid={`toggle-mission-${index}`}
+                          onClick={() => handleToggleActive(mission.id)}
+                          className={`p-2 rounded-none transition-all ${
+                            mission.is_active 
+                              ? 'bg-payload-cyan/20 text-payload-cyan hover:bg-payload-cyan/30' 
+                              : 'hover:bg-white/10 text-payload-muted'
+                          }`}
+                          title={mission.is_active ? 'Deactivate' : 'Activate'}
+                        >
+                          {mission.is_active ? <Power className="w-5 h-5" /> : <PowerOff className="w-5 h-5" />}
+                        </button>
+                      )}
                     </div>
                   </div>
                 </div>
