@@ -111,15 +111,15 @@ const LandingPage = () => {
           </motion.div>
         </section>
 
-        <footer className="border-t border-white/10 bg-payload-surface/80 backdrop-blur-sm mt-32">
-          <div className="max-w-7xl mx-auto px-6 py-8">
+        <footer className="border-t border-white/10 bg-payload-surface/80 backdrop-blur-sm mt-16 sm:mt-32">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
             <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-              <div className="font-mono text-sm text-payload-muted">
+              <div className="font-mono text-xs sm:text-sm text-payload-muted text-center md:text-left">
                 © 2025 PAYLOAD. All systems operational.
               </div>
-              <div className="flex gap-8 font-mono text-sm">
+              <div className="flex gap-4 sm:gap-8 font-mono text-xs sm:text-sm">
                 <button className="text-payload-muted hover:text-payload-neon transition-colors">About</button>
-                <button className="text-payload-muted hover:text-payload-neon transition-colors">Privacy Policy</button>
+                <button className="text-payload-muted hover:text-payload-neon transition-colors">Privacy</button>
                 <button className="text-payload-muted hover:text-payload-neon transition-colors">Contact</button>
               </div>
             </div>

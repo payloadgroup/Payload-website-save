@@ -186,8 +186,8 @@ const Analytics = () => {
           </div>
 
           {analytics?.recent_members && analytics.recent_members.length > 0 && (
-            <div className="bg-payload-surface border border-white/10 p-6 rounded-sm">
-              <h3 className="font-rajdhani font-bold text-xl uppercase tracking-wide mb-6">RECENT MEMBERS</h3>
+            <div className="bg-payload-surface border border-white/10 p-4 sm:p-6 rounded-sm">
+              <h3 className="font-rajdhani font-bold text-base sm:text-xl uppercase tracking-wide mb-4 sm:mb-6">RECENT MEMBERS</h3>
               <div className="space-y-3">
                 {analytics.recent_members.map((member, index) => (
                   <motion.div
@@ -196,17 +196,17 @@ const Analytics = () => {
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.5 + index * 0.1 }}
-                    className="flex items-center justify-between border-b border-white/5 pb-3"
+                    className="flex flex-col xs:flex-row xs:items-center justify-between border-b border-white/5 pb-3 gap-2 xs:gap-0"
                   >
-                    <div>
-                      <div className="font-mono text-sm text-payload-text">{member.name}</div>
-                      <div className="font-mono text-xs text-payload-muted">{member.email}</div>
+                    <div className="min-w-0 flex-1">
+                      <div className="font-mono text-xs sm:text-sm text-payload-text truncate">{member.name}</div>
+                      <div className="font-mono text-[10px] sm:text-xs text-payload-muted truncate">{member.email}</div>
                     </div>
-                    <div className="text-right">
-                      <div className="font-mono text-xs text-payload-muted">
+                    <div className="text-left xs:text-right flex xs:flex-col gap-2 xs:gap-0">
+                      <div className="font-mono text-[10px] sm:text-xs text-payload-muted">
                         {new Date(member.created_at).toLocaleDateString()}
                       </div>
-                      <div className={`font-mono text-xs uppercase tracking-widest ${
+                      <div className={`font-mono text-[10px] sm:text-xs uppercase tracking-widest ${
                         member.status === 'approved' ? 'text-payload-neon' : 
                         member.status === 'pending' ? 'text-payload-alert' : 'text-red-500'
                       }`}>
