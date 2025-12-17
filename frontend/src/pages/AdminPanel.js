@@ -14,10 +14,13 @@ const AdminPanel = () => {
   const navigate = useNavigate();
   const { token } = useAuth();
   const [pendingUsers, setPendingUsers] = useState([]);
+  const [allMembers, setAllMembers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState('pending');
 
   useEffect(() => {
     fetchPendingUsers();
+    fetchAllMembers();
   }, []);
 
   const fetchPendingUsers = async () => {
@@ -33,6 +36,19 @@ const AdminPanel = () => {
       toast.error('Failed to load pending users');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchAllMembers = async () => {
+    try {
+      const response = await axios.get(`${API}/admin/members`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      setAllMembers(response.data);
+    } catch (error) {
+      console.error('Failed to fetch members:', error);
     }
   };
 
