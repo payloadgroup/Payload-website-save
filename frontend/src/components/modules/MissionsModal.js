@@ -290,12 +290,12 @@ const MissionsModal = ({ onClose, onUpdate }) => {
               </div>
             ) : (
               missions.map((mission, index) => (
-                <div
-                  key={mission.id}
-                  data-testid={`mission-item-${index}`}
-                  className={`bg-black/30 border ${mission.is_active ? 'border-payload-cyan/30' : 'border-white/10'} p-6 rounded-sm hover:border-white/20 transition-all`}
-                >
-                  <div className="flex items-start justify-between mb-3">
+                <div key={mission.id}>
+                  <div
+                    data-testid={`mission-item-${index}`}
+                    className={`bg-black/30 border ${mission.is_active ? 'border-payload-cyan/30' : 'border-white/10'} p-6 rounded-sm hover:border-white/20 transition-all`}
+                  >
+                    <div className="flex items-start justify-between mb-3">
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-2">
                         <h3 className="font-rajdhani font-bold text-xl uppercase tracking-wide text-payload-cyan">
