@@ -149,13 +149,22 @@ const AdminPanel = () => {
             
             <div className="flex items-center gap-2 sm:gap-3">
               <button
+                data-testid="goto-management-btn"
+                onClick={() => navigate('/admin/management')}
+                className="flex items-center gap-1 sm:gap-2 font-mono text-xs sm:text-sm border border-payload-neon text-payload-neon px-2 sm:px-4 py-1.5 sm:py-2 rounded-none hover:bg-payload-neon hover:text-black transition-all duration-300"
+              >
+                <Crown className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span className="hidden xs:inline">MANAGE</span>
+                <span className="xs:hidden">⚙</span>
+              </button>
+              <button
                 data-testid="goto-analytics-btn"
                 onClick={() => navigate('/analytics')}
                 className="flex items-center gap-1 sm:gap-2 font-mono text-xs sm:text-sm border border-payload-cyan text-payload-cyan px-2 sm:px-4 py-1.5 sm:py-2 rounded-none hover:bg-payload-cyan hover:text-black transition-all duration-300"
               >
                 <BarChart3 className="w-3 h-3 sm:w-4 sm:h-4" />
                 <span className="hidden xs:inline">ANALYTICS</span>
-                <span className="xs:hidden">STATS</span>
+                <span className="xs:hidden">📊</span>
               </button>
               <button
                 data-testid="back-to-dashboard-btn"
@@ -164,7 +173,7 @@ const AdminPanel = () => {
               >
                 <ArrowLeft className="w-3 h-3 sm:w-4 sm:h-4" />
                 <span className="hidden xs:inline">DASHBOARD</span>
-                <span className="xs:hidden">BACK</span>
+                <span className="xs:hidden">←</span>
               </button>
             </div>
           </div>
