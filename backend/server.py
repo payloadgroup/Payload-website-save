@@ -92,6 +92,7 @@ class PayloadCreate(BaseModel):
     description: str
     funding_goal: float = 0.0
     current_funding: float = 0.0
+    assigned_to: str
 
 class PayloadUpdate(BaseModel):
     title: Optional[str] = None
@@ -103,12 +104,14 @@ class PayloadUpdate(BaseModel):
 class PayloadResponse(BaseModel):
     model_config = ConfigDict(extra="ignore")
     id: str
-    user_id: str
+    assigned_to: str
+    created_by: str
     title: str
     description: str
     status: PayloadStatus
     funding_goal: float
     current_funding: float
+    is_active: bool
     created_at: str
     updated_at: str
 
