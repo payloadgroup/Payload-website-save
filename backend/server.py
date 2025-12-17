@@ -92,7 +92,12 @@ class User(BaseModel):
     date_of_birth: Optional[str] = None
     role: UserRole
     status: UserStatus
+    tier: Optional[MemberTier] = MemberTier.CADET
     referral_code: Optional[str] = None
+    referred_by: Optional[str] = None
+    referral_count: int = 0
+    last_login: Optional[str] = None
+    login_count: int = 0
     created_at: str
 
 class Token(BaseModel):
