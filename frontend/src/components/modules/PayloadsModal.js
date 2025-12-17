@@ -87,6 +87,11 @@ const PayloadsModal = ({ onClose, onUpdate }) => {
     });
     setEditingId(payload.id);
     setShowForm(true);
+    // Scroll to top to show the form
+    setTimeout(() => {
+      const modal = document.querySelector('.overflow-y-auto');
+      if (modal) modal.scrollTop = 0;
+    }, 100);
   };
 
   const handleDelete = async (id) => {
