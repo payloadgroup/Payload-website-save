@@ -505,13 +505,21 @@ async def update_user_status(
     request: UserApprovalRequest,
     admin_user: User = Depends(get_admin_user)
 ):
+    user = await db.users.find_one({"id": request.user_id}, {"_id": 0})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
     result = await db.users.update_one(
         {"id": request.user_id},
         {"$set": {"status": request.status}}
     )
     
-    if result.matched_count == 0:
-        raise HTTPException(status_code=404, detail="User not found")
+    # If user is being approved and they were referred by someone, increment referrer's count
+    if request.status == UserStatus.APPROVED and user.get("referred_by"):
+        await db.users.update_one(
+            {"id": user["referred_by"]},
+            {"$inc": {"referral_count": 1}}
+        )
     
     return {"message": f"User status updated to {request.status}"}
 
