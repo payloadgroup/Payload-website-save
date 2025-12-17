@@ -880,7 +880,7 @@ class PayloadAPITester:
 
     def test_locked_user_login_blocked(self):
         """Test that locked user cannot login"""
-        if not self.test_user_id:
+        if not self.test_user_id or not hasattr(self, 'test_user_email'):
             print("❌ No test user available for login test")
             return False
             
@@ -890,7 +890,7 @@ class PayloadAPITester:
             "POST",
             "auth/login",
             403,  # Should be forbidden
-            data={"email": f"locktest_{datetime.now().strftime('%H%M%S')}@test.com", "password": "testpass123"}
+            data={"email": self.test_user_email, "password": "testpass123"}
         )
         return success
 
