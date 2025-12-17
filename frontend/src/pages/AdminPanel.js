@@ -65,6 +65,7 @@ const AdminPanel = () => {
       );
       toast.success(`User ${status}`);
       fetchPendingUsers();
+      fetchAllMembers();
     } catch (error) {
       console.error('Failed to update user status:', error);
       toast.error('Failed to update user status');
