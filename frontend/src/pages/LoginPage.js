@@ -87,15 +87,25 @@ const LoginPage = () => {
               <label className="font-mono text-xs uppercase tracking-widest text-payload-muted block mb-2">
                 PASSWORD
               </label>
-              <input
-                data-testid="login-password-input"
-                type="password"
-                required
-                value={formData.password}
-                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                className="w-full bg-black border-b border-white/20 focus:border-payload-neon focus:outline-none py-3 px-0 font-mono text-payload-text placeholder:text-white/30 transition-colors"
-                placeholder="Enter access code"
-              />
+              <div className="relative">
+                <input
+                  data-testid="login-password-input"
+                  type={showPassword ? "text" : "password"}
+                  required
+                  value={formData.password}
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                  className="w-full bg-black border-b border-white/20 focus:border-payload-neon focus:outline-none py-3 pr-10 px-0 font-mono text-payload-text placeholder:text-white/30 transition-colors"
+                  placeholder="Enter access code"
+                />
+                <button
+                  data-testid="toggle-password-visibility"
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-0 top-1/2 -translate-y-1/2 p-2 text-payload-muted hover:text-payload-neon transition-colors"
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
             </div>
 
             <button
