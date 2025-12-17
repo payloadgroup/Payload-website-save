@@ -1145,6 +1145,17 @@ def main():
     tester.test_admin_protection_from_locking()
     tester.test_member_unauthorized_admin_access()
     
+    # Test new admin features
+    print("\n" + "="*60)
+    print("TESTING NEW ADMIN FEATURES")
+    print("="*60)
+    
+    tester.test_member_tiers()
+    tester.test_announcements_system()
+    tester.test_activity_monitoring()
+    tester.test_referral_management()
+    tester.test_admin_access_control()
+    
     # Clean up - delete created items
     print("\n" + "="*50)
     print("CLEANUP - DELETING TEST DATA")
