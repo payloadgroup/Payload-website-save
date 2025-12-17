@@ -340,6 +340,67 @@ async def get_all_members(admin_user: User = Depends(get_admin_user)):
     ).to_list(1000)
     return [User(**user) for user in members]
 
+@api_router.get("/admin/locked-users", response_model=List[User])
+async def get_locked_users(admin_user: User = Depends(get_admin_user)):
+    locked_users = await db.users.find(
+        {"status": UserStatus.LOCKED},
+        {"_id": 0, "password": 0}
+    ).to_list(1000)
+    return [User(**user) for user in locked_users]
+
+@api_router.post("/admin/lock-user/{user_id}")
+async def lock_user(user_id: str, admin_user: User = Depends(get_admin_user)):
+    user = await db.users.find_one({"id": user_id}, {"_id": 0})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    if user.get("role") == UserRole.ADMIN:
+        raise HTTPException(status_code=400, detail="Cannot lock admin accounts")
+    
+    result = await db.users.update_one(
+        {"id": user_id},
+        {"$set": {"status": UserStatus.LOCKED}}
+    )
+    
+    return {"message": "User account locked successfully"}
+
+@api_router.post("/admin/unlock-user/{user_id}")
+async def unlock_user(user_id: str, admin_user: User = Depends(get_admin_user)):
+    user = await db.users.find_one({"id": user_id}, {"_id": 0})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    result = await db.users.update_one(
+        {"id": user_id},
+        {"$set": {"status": UserStatus.APPROVED}}
+    )
+    
+    return {"message": "User account unlocked successfully"}
+
+@api_router.delete("/admin/delete-user/{user_id}")
+async def delete_user(user_id: str, admin_user: User = Depends(get_admin_user)):
+    user = await db.users.find_one({"id": user_id}, {"_id": 0})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    if user.get("role") == UserRole.ADMIN:
+        raise HTTPException(status_code=400, detail="Cannot delete admin accounts")
+    
+    # Delete user's related data
+    await db.payloads.delete_many({"assigned_to": user_id})
+    await db.missions.delete_many({"assigned_to": user_id})
+    await db.transactions.delete_many({"user_id": user_id})
+    await db.headquarters.delete_many({"user_id": user_id})
+    await db.stations.delete_many({"user_id": user_id})
+    
+    # Delete the user
+    result = await db.users.delete_one({"id": user_id})
+    
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Failed to delete user")
+    
+    return {"message": "User account and related data deleted successfully"}
+
 @api_router.post("/admin/update-user-status")
 async def update_user_status(
     request: UserApprovalRequest,
