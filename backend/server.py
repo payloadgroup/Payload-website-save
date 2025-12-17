@@ -495,12 +495,12 @@ async def create_mission(mission_data: MissionCreate, admin_user: User = Depends
 async def update_mission(
     mission_id: str,
     mission_data: MissionUpdate,
-    current_user: User = Depends(get_current_user)
+    admin_user: User = Depends(get_admin_user)
 ):
     update_data = {k: v for k, v in mission_data.model_dump().items() if v is not None}
     
     result = await db.missions.update_one(
-        {"id": mission_id, "user_id": current_user.id},
+        {"id": mission_id},
         {"$set": update_data}
     )
     
@@ -510,9 +510,22 @@ async def update_mission(
     mission = await db.missions.find_one({"id": mission_id}, {"_id": 0})
     return MissionResponse(**mission)
 
+@api_router.post("/missions/{mission_id}/toggle-active")
+async def toggle_mission_active(mission_id: str, current_user: User = Depends(get_current_user)):
+    mission = await db.missions.find_one({"id": mission_id, "assigned_to": current_user.id}, {"_id": 0})
+    if not mission:
+        raise HTTPException(status_code=404, detail="Mission not found")
+    
+    new_active_state = not mission.get("is_active", False)
+    await db.missions.update_one(
+        {"id": mission_id},
+        {"$set": {"is_active": new_active_state}}
+    )
+    return {"message": "Mission activation toggled", "is_active": new_active_state}
+
 @api_router.delete("/missions/{mission_id}")
-async def delete_mission(mission_id: str, current_user: User = Depends(get_current_user)):
-    result = await db.missions.delete_one({"id": mission_id, "user_id": current_user.id})
+async def delete_mission(mission_id: str, admin_user: User = Depends(get_admin_user)):
+    result = await db.missions.delete_one({"id": mission_id})
     if result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Mission not found")
     return {"message": "Mission deleted"}
