@@ -331,6 +331,14 @@ async def get_admin_user(current_user: User = Depends(get_current_user)) -> User
         raise HTTPException(status_code=403, detail="Admin access required")
     return current_user
 
+def generate_referral_code(name: str) -> str:
+    import uuid
+    import hashlib
+    # Generate a unique referral code based on name and random uuid
+    base = f"{name.upper().replace(' ', '')[:4]}"
+    unique_part = hashlib.md5(str(uuid.uuid4()).encode()).hexdigest()[:6].upper()
+    return f"{base}{unique_part}"
+
 @api_router.post("/auth/register", response_model=User)
 async def register(user_data: UserRegister):
     existing_user = await db.users.find_one({"email": user_data.email}, {"_id": 0})
@@ -341,6 +349,16 @@ async def register(user_data: UserRegister):
     user_id = str(uuid.uuid4())
     hashed_pwd = hash_password(user_data.password)
     
+    # Generate unique referral code for this user
+    own_referral_code = generate_referral_code(user_data.name)
+    
+    # Check if they were referred by someone
+    referred_by = None
+    if user_data.referral_code:
+        referrer = await db.users.find_one({"own_referral_code": user_data.referral_code}, {"_id": 0})
+        if referrer:
+            referred_by = referrer["id"]
+    
     new_user = {
         "id": user_id,
         "name": user_data.name,
@@ -350,7 +368,13 @@ async def register(user_data: UserRegister):
         "date_of_birth": user_data.date_of_birth,
         "role": UserRole.MEMBER,
         "status": UserStatus.PENDING,
-        "referral_code": user_data.referral_code,
+        "tier": MemberTier.CADET,
+        "referral_code": user_data.referral_code,  # Code they used to sign up
+        "own_referral_code": own_referral_code,  # Their own code to share
+        "referred_by": referred_by,
+        "referral_count": 0,
+        "last_login": None,
+        "login_count": 0,
         "created_at": datetime.now(timezone.utc).isoformat()
     }
     
