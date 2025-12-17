@@ -500,6 +500,252 @@ async def delete_user(user_id: str, admin_user: User = Depends(get_admin_user)):
     
     return {"message": "User account and related data deleted successfully"}
 
+# ============ MEMBER TIER MANAGEMENT ============
+
+@api_router.post("/admin/update-tier")
+async def update_member_tier(
+    request: UpdateTierRequest,
+    admin_user: User = Depends(get_admin_user)
+):
+    user = await db.users.find_one({"id": request.user_id}, {"_id": 0})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    if user.get("role") == UserRole.ADMIN:
+        raise HTTPException(status_code=400, detail="Cannot change admin tier")
+    
+    result = await db.users.update_one(
+        {"id": request.user_id},
+        {"$set": {"tier": request.tier}}
+    )
+    
+    return {"message": f"User tier updated to {request.tier}"}
+
+@api_router.get("/admin/members-by-tier/{tier}", response_model=List[User])
+async def get_members_by_tier(tier: MemberTier, admin_user: User = Depends(get_admin_user)):
+    members = await db.users.find(
+        {"role": UserRole.MEMBER, "status": UserStatus.APPROVED, "tier": tier},
+        {"_id": 0, "password": 0}
+    ).to_list(1000)
+    return [User(**user) for user in members]
+
+# ============ ANNOUNCEMENTS ============
+
+@api_router.post("/admin/announcements", response_model=AnnouncementResponse)
+async def create_announcement(
+    announcement: AnnouncementCreate,
+    admin_user: User = Depends(get_admin_user)
+):
+    import uuid
+    announcement_id = str(uuid.uuid4())
+    
+    new_announcement = {
+        "id": announcement_id,
+        "title": announcement.title,
+        "content": announcement.content,
+        "priority": announcement.priority,
+        "is_pinned": announcement.is_pinned,
+        "is_active": True,
+        "target_tiers": announcement.target_tiers,
+        "created_by": admin_user.id,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "scheduled_for": announcement.scheduled_for,
+        "read_by": []
+    }
+    
+    await db.announcements.insert_one(new_announcement)
+    return AnnouncementResponse(**new_announcement)
+
+@api_router.get("/admin/announcements", response_model=List[AnnouncementResponse])
+async def get_all_announcements(admin_user: User = Depends(get_admin_user)):
+    announcements = await db.announcements.find(
+        {},
+        {"_id": 0}
+    ).sort("created_at", -1).to_list(100)
+    return [AnnouncementResponse(**a) for a in announcements]
+
+@api_router.put("/admin/announcements/{announcement_id}", response_model=AnnouncementResponse)
+async def update_announcement(
+    announcement_id: str,
+    update: AnnouncementUpdate,
+    admin_user: User = Depends(get_admin_user)
+):
+    update_data = {k: v for k, v in update.model_dump().items() if v is not None}
+    if not update_data:
+        raise HTTPException(status_code=400, detail="No fields to update")
+    
+    result = await db.announcements.update_one(
+        {"id": announcement_id},
+        {"$set": update_data}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Announcement not found")
+    
+    updated = await db.announcements.find_one({"id": announcement_id}, {"_id": 0})
+    return AnnouncementResponse(**updated)
+
+@api_router.delete("/admin/announcements/{announcement_id}")
+async def delete_announcement(
+    announcement_id: str,
+    admin_user: User = Depends(get_admin_user)
+):
+    result = await db.announcements.delete_one({"id": announcement_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Announcement not found")
+    return {"message": "Announcement deleted"}
+
+@api_router.get("/announcements", response_model=List[AnnouncementResponse])
+async def get_member_announcements(current_user: User = Depends(get_current_user)):
+    # Get announcements visible to this user's tier
+    query = {"is_active": True}
+    
+    announcements = await db.announcements.find(
+        query,
+        {"_id": 0}
+    ).sort([("is_pinned", -1), ("created_at", -1)]).to_list(50)
+    
+    # Filter by tier if target_tiers is set
+    user_tier = current_user.tier or MemberTier.CADET
+    filtered = []
+    for a in announcements:
+        if a.get("target_tiers") is None or user_tier in a.get("target_tiers", []):
+            filtered.append(AnnouncementResponse(**a))
+    
+    return filtered
+
+@api_router.post("/announcements/{announcement_id}/read")
+async def mark_announcement_read(
+    announcement_id: str,
+    current_user: User = Depends(get_current_user)
+):
+    result = await db.announcements.update_one(
+        {"id": announcement_id},
+        {"$addToSet": {"read_by": current_user.id}}
+    )
+    return {"message": "Marked as read"}
+
+# ============ ACTIVITY MONITORING ============
+
+@api_router.get("/admin/activity-stats")
+async def get_activity_stats(admin_user: User = Depends(get_admin_user)):
+    now = datetime.now(timezone.utc)
+    seven_days_ago = (now - timedelta(days=7)).isoformat()
+    thirty_days_ago = (now - timedelta(days=30)).isoformat()
+    
+    total_members = await db.users.count_documents({"role": UserRole.MEMBER, "status": UserStatus.APPROVED})
+    
+    # Active in last 7 days
+    active_7 = await db.users.count_documents({
+        "role": UserRole.MEMBER,
+        "status": UserStatus.APPROVED,
+        "last_login": {"$gte": seven_days_ago}
+    })
+    
+    # Active in last 30 days
+    active_30 = await db.users.count_documents({
+        "role": UserRole.MEMBER,
+        "status": UserStatus.APPROVED,
+        "last_login": {"$gte": thirty_days_ago}
+    })
+    
+    # Inactive (no login in 30+ days or never logged in)
+    inactive = total_members - active_30
+    
+    # Tier distribution
+    tier_distribution = {}
+    for tier in MemberTier:
+        count = await db.users.count_documents({
+            "role": UserRole.MEMBER,
+            "status": UserStatus.APPROVED,
+            "tier": tier
+        })
+        tier_distribution[tier.value] = count
+    
+    # Recent logins (last 20)
+    recent_logins = await db.users.find(
+        {"role": UserRole.MEMBER, "last_login": {"$ne": None}},
+        {"_id": 0, "password": 0}
+    ).sort("last_login", -1).to_list(20)
+    
+    return {
+        "total_members": total_members,
+        "active_last_7_days": active_7,
+        "active_last_30_days": active_30,
+        "inactive_members": inactive,
+        "tier_distribution": tier_distribution,
+        "recent_logins": [{"id": u["id"], "name": u["name"], "email": u["email"], "last_login": u.get("last_login"), "login_count": u.get("login_count", 0)} for u in recent_logins]
+    }
+
+@api_router.get("/admin/inactive-members", response_model=List[User])
+async def get_inactive_members(days: int = 30, admin_user: User = Depends(get_admin_user)):
+    cutoff = (datetime.now(timezone.utc) - timedelta(days=days)).isoformat()
+    
+    # Members who haven't logged in since cutoff or never logged in
+    inactive = await db.users.find(
+        {
+            "role": UserRole.MEMBER,
+            "status": UserStatus.APPROVED,
+            "$or": [
+                {"last_login": {"$lt": cutoff}},
+                {"last_login": None}
+            ]
+        },
+        {"_id": 0, "password": 0}
+    ).to_list(1000)
+    
+    return [User(**u) for u in inactive]
+
+# ============ REFERRAL MANAGEMENT ============
+
+@api_router.get("/admin/referral-stats")
+async def get_referral_stats(admin_user: User = Depends(get_admin_user)):
+    # Total referrals (users who were referred by someone)
+    total_referrals = await db.users.count_documents({"referred_by": {"$ne": None}})
+    
+    # Successful referrals (approved users who were referred)
+    successful_referrals = await db.users.count_documents({
+        "referred_by": {"$ne": None},
+        "status": UserStatus.APPROVED
+    })
+    
+    # Pending referrals
+    pending_referrals = await db.users.count_documents({
+        "referred_by": {"$ne": None},
+        "status": UserStatus.PENDING
+    })
+    
+    # Top referrers
+    top_referrers = await db.users.find(
+        {"referral_count": {"$gt": 0}},
+        {"_id": 0, "password": 0}
+    ).sort("referral_count", -1).to_list(10)
+    
+    return {
+        "total_referrals": total_referrals,
+        "successful_referrals": successful_referrals,
+        "pending_referrals": pending_referrals,
+        "top_referrers": [{"id": u["id"], "name": u["name"], "referral_count": u.get("referral_count", 0), "own_referral_code": u.get("own_referral_code")} for u in top_referrers]
+    }
+
+@api_router.get("/admin/referrals-by-user/{user_id}")
+async def get_user_referrals(user_id: str, admin_user: User = Depends(get_admin_user)):
+    # Get all users referred by this user
+    referrals = await db.users.find(
+        {"referred_by": user_id},
+        {"_id": 0, "password": 0}
+    ).to_list(100)
+    
+    return [User(**u) for u in referrals]
+
+@api_router.get("/users/my-referral-code")
+async def get_my_referral_code(current_user: User = Depends(get_current_user)):
+    user = await db.users.find_one({"id": current_user.id}, {"_id": 0})
+    return {
+        "own_referral_code": user.get("own_referral_code"),
+        "referral_count": user.get("referral_count", 0)
+    }
+
 @api_router.post("/admin/update-user-status")
 async def update_user_status(
     request: UserApprovalRequest,
