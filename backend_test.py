@@ -34,6 +34,10 @@ class PayloadAPITester:
                 response = requests.get(url, headers=default_headers)
             elif method == 'POST':
                 response = requests.post(url, json=data, headers=default_headers)
+            elif method == 'PUT':
+                response = requests.put(url, json=data, headers=default_headers)
+            elif method == 'DELETE':
+                response = requests.delete(url, headers=default_headers)
 
             success = response.status_code == expected_status
             if success:
