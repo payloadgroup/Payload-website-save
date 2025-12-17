@@ -293,24 +293,24 @@ const PayloadsModal = ({ onClose, onUpdate }) => {
                 <div key={payload.id}>
                   <div
                     data-testid={`payload-item-${index}`}
-                    className={`bg-black/30 border ${payload.is_active ? 'border-payload-neon/30' : 'border-white/10'} p-6 rounded-sm hover:border-white/20 transition-all`}
+                    className={`bg-black/30 border ${payload.is_active ? 'border-payload-neon/30' : 'border-white/10'} p-4 sm:p-6 rounded-sm hover:border-white/20 transition-all`}
                   >
-                    <div className="flex items-start justify-between mb-3">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-3 mb-2">
-                          <h3 className="font-rajdhani font-bold text-xl uppercase tracking-wide text-payload-neon">
+                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-3 gap-2">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-2">
+                          <h3 className="font-rajdhani font-bold text-base sm:text-xl uppercase tracking-wide text-payload-neon">
                             {payload.title}
                           </h3>
                           {payload.is_active && (
-                            <span className="font-mono text-xs bg-payload-neon/20 text-payload-neon px-2 py-1 rounded-sm">ACTIVE</span>
+                            <span className="font-mono text-[10px] sm:text-xs bg-payload-neon/20 text-payload-neon px-2 py-0.5 sm:py-1 rounded-sm">ACTIVE</span>
                           )}
                         </div>
                         {isAdmin && (
-                          <p className="font-mono text-xs text-payload-muted mb-2">
+                          <p className="font-mono text-[10px] sm:text-xs text-payload-muted mb-2 truncate">
                             ASSIGNED TO: {getMemberName(payload.assigned_to)}
                           </p>
                         )}
-                        <p className="font-inter text-sm text-payload-text mb-4">{payload.description}</p>
+                        <p className="font-inter text-xs sm:text-sm text-payload-text mb-4">{payload.description}</p>
                         <div className={`grid ${isAdmin ? 'grid-cols-1 xs:grid-cols-3' : 'grid-cols-2'} gap-3 sm:gap-4 font-mono text-xs`}>
                           {isAdmin && (
                             <div className="col-span-1 xs:col-span-1">
