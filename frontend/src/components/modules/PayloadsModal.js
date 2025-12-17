@@ -336,7 +336,7 @@ const PayloadsModal = ({ onClose, onUpdate }) => {
                           </div>
                         </div>
                       </div>
-                      <div className="flex gap-2 ml-4">
+                      <div className="flex gap-2 sm:ml-4 self-start sm:self-auto">
                         {isAdmin ? (
                           <>
                             <button
