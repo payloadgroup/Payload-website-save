@@ -164,6 +164,7 @@ const MissionsModal = ({ onClose, onUpdate }) => {
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
         className="bg-payload-surface border border-white/20 rounded-sm w-full max-w-4xl max-h-[90vh] overflow-hidden"
+        onClick={(e) => e.stopPropagation()}
       >
         <div className="border-b border-white/10 p-6 flex items-center justify-between">
           <div className="flex items-center gap-3">
