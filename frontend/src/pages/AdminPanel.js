@@ -113,13 +113,37 @@ const AdminPanel = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <div className="mb-12">
+          <div className="mb-8">
             <h1 className="font-rajdhani font-bold text-4xl uppercase tracking-wide mb-2">
               ADMIN CONTROL
             </h1>
             <p className="font-mono text-sm text-payload-alert uppercase tracking-widest">
-              MEMBERSHIP APPROVAL SYSTEM
+              MEMBERSHIP MANAGEMENT SYSTEM
             </p>
+          </div>
+
+          {/* Tabs */}
+          <div className="flex gap-4 mb-8 border-b border-white/10">
+            <button
+              onClick={() => setActiveTab('pending')}
+              className={`font-mono text-sm uppercase tracking-widest pb-4 px-6 transition-all ${
+                activeTab === 'pending'
+                  ? 'text-payload-alert border-b-2 border-payload-alert'
+                  : 'text-payload-muted hover:text-payload-text'
+              }`}
+            >
+              PENDING APPROVALS ({pendingUsers.length})
+            </button>
+            <button
+              onClick={() => setActiveTab('members')}
+              className={`font-mono text-sm uppercase tracking-widest pb-4 px-6 transition-all ${
+                activeTab === 'members'
+                  ? 'text-payload-neon border-b-2 border-payload-neon'
+                  : 'text-payload-muted hover:text-payload-text'
+              }`}
+            >
+              ALL MEMBERS ({allMembers.length})
+            </button>
           </div>
 
           {loading ? (
