@@ -1011,6 +1011,218 @@ class AdminFeaturesAPITester:
                 
         return all_passed
 
+    # ============ ADMIN FEATURES TESTING ============
+    
+    def test_member_tiers(self):
+        """Test member tier management"""
+        if not self.admin_token:
+            print("❌ No admin token available")
+            return False
+
+        headers = {'Authorization': f'Bearer {self.admin_token}'}
+        
+        # Get all members first
+        success, members = self.run_test(
+            "Get All Members",
+            "GET", 
+            "admin/members",
+            200,
+            headers=headers
+        )
+        
+        if success and members:
+            member_id = members[0]['id']
+            
+            # Test tier update
+            success = self.run_test(
+                "Update Member Tier",
+                "POST",
+                "admin/update-tier",
+                200,
+                data={"user_id": member_id, "tier": "lieutenant"},
+                headers=headers
+            )[0]
+            
+            # Test get members by tier
+            success = self.run_test(
+                "Get Members by Tier",
+                "GET",
+                "admin/members-by-tier/lieutenant",
+                200,
+                headers=headers
+            )[0] and success
+            
+            return success
+        
+        return False
+
+    def test_announcements_system(self):
+        """Test announcement system"""
+        if not self.admin_token:
+            print("❌ No admin token available")
+            return False
+
+        admin_headers = {'Authorization': f'Bearer {self.admin_token}'}
+        member_headers = {'Authorization': f'Bearer {self.user_token}'}
+
+        # Create announcement
+        announcement_data = {
+            "title": "Test Announcement",
+            "content": "This is a test announcement for admin features",
+            "priority": "high",
+            "is_pinned": True,
+            "target_tiers": ["cadet", "lieutenant"]
+        }
+        
+        success, created = self.run_test(
+            "Create Announcement",
+            "POST",
+            "admin/announcements",
+            200,
+            data=announcement_data,
+            headers=admin_headers
+        )
+        
+        announcement_id = None
+        if success and 'id' in created:
+            announcement_id = created['id']
+        
+        # Get all announcements (admin)
+        success = self.run_test(
+            "Get All Announcements (Admin)",
+            "GET",
+            "admin/announcements", 
+            200,
+            headers=admin_headers
+        )[0] and success
+        
+        # Get member announcements
+        if self.user_token:
+            success = self.run_test(
+                "Get Member Announcements",
+                "GET",
+                "announcements",
+                200,
+                headers=member_headers
+            )[0] and success
+        
+        if announcement_id:
+            # Update announcement
+            success = self.run_test(
+                "Update Announcement",
+                "PUT",
+                f"admin/announcements/{announcement_id}",
+                200,
+                data={"is_pinned": False},
+                headers=admin_headers
+            )[0] and success
+            
+            # Mark as read (if member token available)
+            if self.user_token:
+                success = self.run_test(
+                    "Mark Announcement Read",
+                    "POST",
+                    f"announcements/{announcement_id}/read",
+                    200,
+                    headers=member_headers
+                )[0] and success
+            
+            # Delete announcement
+            success = self.run_test(
+                "Delete Announcement",
+                "DELETE",
+                f"admin/announcements/{announcement_id}",
+                200,
+                headers=admin_headers
+            )[0] and success
+        
+        return success
+
+    def test_activity_monitoring(self):
+        """Test activity monitoring endpoints"""
+        if not self.admin_token:
+            print("❌ No admin token available")
+            return False
+
+        headers = {'Authorization': f'Bearer {self.admin_token}'}
+
+        # Get activity stats
+        success = self.run_test(
+            "Get Activity Stats",
+            "GET",
+            "admin/activity-stats",
+            200,
+            headers=headers
+        )[0]
+        
+        # Get inactive members
+        success = self.run_test(
+            "Get Inactive Members",
+            "GET",
+            "admin/inactive-members?days=30",
+            200,
+            headers=headers
+        )[0] and success
+        
+        return success
+
+    def test_referral_management(self):
+        """Test referral management endpoints"""
+        if not self.admin_token:
+            print("❌ No admin token available")
+            return False
+
+        admin_headers = {'Authorization': f'Bearer {self.admin_token}'}
+        member_headers = {'Authorization': f'Bearer {self.user_token}'}
+
+        # Get referral stats
+        success = self.run_test(
+            "Get Referral Stats",
+            "GET",
+            "admin/referral-stats",
+            200,
+            headers=admin_headers
+        )[0]
+        
+        # Get user's own referral code (if member token available)
+        if self.user_token:
+            success = self.run_test(
+                "Get My Referral Code",
+                "GET",
+                "users/my-referral-code",
+                200,
+                headers=member_headers
+            )[0] and success
+        
+        return success
+
+    def test_admin_access_control(self):
+        """Test that member cannot access admin endpoints"""
+        if not self.user_token:
+            print("❌ No member token available")
+            return False
+
+        member_headers = {'Authorization': f'Bearer {self.user_token}'}
+
+        # Member should not access admin endpoints
+        success = self.run_test(
+            "Member Access to Admin Tiers (Should Fail)",
+            "GET",
+            "admin/members",
+            403,
+            headers=member_headers
+        )[0]
+        
+        success = self.run_test(
+            "Member Access to Admin Stats (Should Fail)",
+            "GET", 
+            "admin/activity-stats",
+            403,
+            headers=member_headers
+        )[0] and success
+        
+        return success
+
 def main():
     print("🚀 Starting Payload Phase 2 API Testing...")
     tester = PayloadAPITester()
