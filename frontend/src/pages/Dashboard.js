@@ -77,12 +77,6 @@ const Dashboard = () => {
               </button>
             )}
             <button
-              data-testid="settings-btn"
-              className="p-2 hover:bg-white/5 rounded-none border border-transparent hover:border-white/20 transition-all"
-            >
-              <Settings className="w-5 h-5" />
-            </button>
-            <button
               data-testid="logout-btn"
               onClick={handleLogout}
               className="flex items-center gap-2 font-mono text-sm border border-white/20 px-4 py-2 rounded-none hover:border-white hover:bg-white/5 transition-all duration-300"
