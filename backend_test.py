@@ -829,6 +829,7 @@ class PayloadAPITester:
     def test_create_test_user_for_locking(self):
         """Create a test user specifically for locking operations"""
         test_email = f"locktest_{datetime.now().strftime('%H%M%S')}@test.com"
+        self.test_user_email = test_email  # Store for later use
         
         # Register test user
         success, response = self.run_test(
@@ -848,6 +849,7 @@ class PayloadAPITester:
         if success and 'id' in response:
             self.test_user_id = response['id']
             print(f"   Test user created with ID: {self.test_user_id}")
+            print(f"   Test user email: {test_email}")
             
             # Approve the test user
             headers = {'Authorization': f'Bearer {self.admin_token}'}
