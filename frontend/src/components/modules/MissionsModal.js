@@ -194,10 +194,10 @@ const MissionsModal = ({ onClose, onUpdate }) => {
             </button>
           )}
 
-          {showForm && isAdmin && (
+          {showForm && isAdmin && !editingId && (
             <form onSubmit={handleSubmit} className="bg-black/30 border border-white/10 p-6 rounded-sm mb-6">
               <h3 className="font-mono text-xs uppercase tracking-widest text-payload-muted mb-4">
-                {editingId ? 'EDIT MISSION' : 'ASSIGN NEW MISSION'}
+                ASSIGN NEW MISSION
               </h3>
               <div className="space-y-4">
                 <div>
