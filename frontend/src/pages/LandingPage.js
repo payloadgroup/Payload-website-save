@@ -47,6 +47,9 @@ const LandingPage = () => {
             transition={{ duration: 0.8 }}
             className="text-center mb-20"
           >
+            <div className="flex justify-center mb-8">
+              <PayloadLogo size="hero" className="animate-pulse" />
+            </div>
             <h1 className="font-rajdhani font-bold text-5xl sm:text-6xl lg:text-7xl uppercase tracking-wide mb-6">
               PAYLOAD
             </h1>
