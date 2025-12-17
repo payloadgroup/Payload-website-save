@@ -210,3 +210,5 @@ agent_communication:
     message: "Implemented mobile responsiveness fixes for all pages. Key changes: 1) Added vertical stacking of nav elements on mobile, 2) Fixed approve/deny buttons to stay inside card on mobile, 3) Added xs breakpoint (480px) to tailwind, 4) Optimized all pages for small screens. Screenshots verified - please test on mobile viewport sizes (375px and 320px width)."
   - agent: "main"
     message: "Implemented account locking feature. Backend: Added LOCKED status, lock/unlock/delete endpoints. Frontend: Added new 'Locked Accounts' tab in AdminPanel with UNLOCK and DELETE buttons. Members tab now has LOCK button. Locked users cannot log in."
+  - agent: "main"
+    message: "Implemented all 4 high priority admin features: 1) Member Tiers System (cadet/lieutenant/commander/admiral), 2) Broadcast Announcements with pin/priority/tier targeting, 3) Activity Monitoring with login tracking and inactive member detection, 4) Referral Code Management with auto-generated codes and tracking. New AdminManagement page at /admin/management."
