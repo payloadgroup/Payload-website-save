@@ -463,24 +463,29 @@ async def delete_payload(payload_id: str, admin_user: User = Depends(get_admin_u
 
 @api_router.get("/missions", response_model=List[MissionResponse])
 async def get_missions(current_user: User = Depends(get_current_user)):
-    missions = await db.missions.find(
-        {"user_id": current_user.id},
-        {"_id": 0}
-    ).to_list(1000)
+    if current_user.role == UserRole.ADMIN:
+        missions = await db.missions.find({}, {"_id": 0}).to_list(1000)
+    else:
+        missions = await db.missions.find(
+            {"assigned_to": current_user.id},
+            {"_id": 0}
+        ).to_list(1000)
     return [MissionResponse(**m) for m in missions]
 
 @api_router.post("/missions", response_model=MissionResponse)
-async def create_mission(mission_data: MissionCreate, current_user: User = Depends(get_current_user)):
+async def create_mission(mission_data: MissionCreate, admin_user: User = Depends(get_admin_user)):
     import uuid
     mission = {
         "id": str(uuid.uuid4()),
-        "user_id": current_user.id,
+        "assigned_to": mission_data.assigned_to,
+        "created_by": admin_user.id,
         "payload_id": mission_data.payload_id,
         "title": mission_data.title,
         "objective": mission_data.objective,
         "status": MissionStatus.PENDING,
         "due_date": mission_data.due_date,
         "priority": mission_data.priority,
+        "is_active": False,
         "created_at": datetime.now(timezone.utc).isoformat()
     }
     await db.missions.insert_one(mission)
