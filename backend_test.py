@@ -783,7 +783,7 @@ class PayloadAPITester:
         return success
 
 def main():
-    print("🚀 Starting Payload API Testing...")
+    print("🚀 Starting Payload Phase 2 API Testing...")
     tester = PayloadAPITester()
     
     # Test user registration flow
@@ -829,6 +829,66 @@ def main():
     tester.test_get_user_profile()
     tester.test_dashboard_access()
     
+    # Test Phase 2 Modules
+    print("\n" + "="*60)
+    print("TESTING PAYLOADS MODULE (CRUD)")
+    print("="*60)
+    
+    tester.test_create_payload()
+    tester.test_get_payloads()
+    tester.test_update_payload()
+    # Don't delete payload yet, we'll use it for dashboard testing
+    
+    print("\n" + "="*60)
+    print("TESTING MISSIONS MODULE (CRUD)")
+    print("="*60)
+    
+    tester.test_create_mission()
+    tester.test_get_missions()
+    tester.test_update_mission()
+    # Don't delete mission yet, we'll use it for dashboard testing
+    
+    print("\n" + "="*60)
+    print("TESTING BUSINESS BANK MODULE")
+    print("="*60)
+    
+    tester.test_create_transaction()
+    tester.test_create_withdrawal()
+    tester.test_get_transactions()
+    tester.test_get_balance()
+    
+    print("\n" + "="*60)
+    print("TESTING HEADQUARTERS MODULE")
+    print("="*60)
+    
+    tester.test_create_headquarters()
+    tester.test_get_headquarters()
+    tester.test_update_headquarters()
+    
+    print("\n" + "="*60)
+    print("TESTING STATIONS MODULE (CRUD)")
+    print("="*60)
+    
+    tester.test_create_station()
+    tester.test_get_stations()
+    tester.test_update_station()
+    # Don't delete station yet, we'll use it for dashboard testing
+    
+    print("\n" + "="*60)
+    print("TESTING BASECAMP MODULE")
+    print("="*60)
+    
+    tester.test_create_resource()
+    tester.test_get_resources()
+    tester.test_user_create_resource_forbidden()
+    
+    print("\n" + "="*60)
+    print("TESTING ADMIN ANALYTICS")
+    print("="*60)
+    
+    tester.test_admin_analytics()
+    tester.test_user_analytics_forbidden()
+    
     # Test security
     print("\n" + "="*50)
     print("TESTING SECURITY & ACCESS CONTROL")
@@ -836,6 +896,15 @@ def main():
     
     tester.test_unauthorized_access()
     tester.test_non_admin_access()
+    
+    # Clean up - delete created items
+    print("\n" + "="*50)
+    print("CLEANUP - DELETING TEST DATA")
+    print("="*50)
+    
+    tester.test_delete_payload()
+    tester.test_delete_mission()
+    tester.test_delete_station()
     
     # Print final results
     print("\n" + "="*50)
