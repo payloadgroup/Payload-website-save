@@ -6,6 +6,7 @@ import LoginPage from "@/pages/LoginPage";
 import RegisterPage from "@/pages/RegisterPage";
 import Dashboard from "@/pages/Dashboard";
 import AdminPanel from "@/pages/AdminPanel";
+import AdminManagement from "@/pages/AdminManagement";
 import Analytics from "@/pages/Analytics";
 import { AuthProvider, useAuth } from "@/context/AuthContext";
 
@@ -61,6 +62,14 @@ function App() {
               element={
                 <ProtectedRoute adminOnly={true}>
                   <Analytics />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/management"
+              element={
+                <ProtectedRoute adminOnly={true}>
+                  <AdminManagement />
                 </ProtectedRoute>
               }
             />
