@@ -148,6 +148,47 @@ const Dashboard = () => {
             </p>
           </div>
 
+          {/* Announcements Section */}
+          {visibleAnnouncements.length > 0 && (
+            <div className="mb-6 sm:mb-8 space-y-3">
+              {visibleAnnouncements.slice(0, 3).map((announcement) => (
+                <motion.div
+                  key={announcement.id}
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className={`bg-payload-surface border ${PRIORITY_COLORS[announcement.priority]} p-3 sm:p-4 rounded-sm`}
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex items-start gap-2 sm:gap-3 flex-1 min-w-0">
+                      {announcement.is_pinned ? (
+                        <Pin className="w-4 h-4 text-payload-alert flex-shrink-0 mt-0.5" />
+                      ) : (
+                        <Megaphone className="w-4 h-4 text-payload-cyan flex-shrink-0 mt-0.5" />
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <h4 className="font-rajdhani font-bold text-sm sm:text-base uppercase tracking-wide mb-1">
+                          {announcement.title}
+                        </h4>
+                        <p className="font-inter text-xs sm:text-sm text-payload-muted line-clamp-2">
+                          {announcement.content}
+                        </p>
+                        <p className="font-mono text-[10px] text-payload-muted mt-1">
+                          {new Date(announcement.created_at).toLocaleDateString()}
+                        </p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => dismissAnnouncement(announcement.id)}
+                      className="p-1 hover:bg-white/10 rounded-sm flex-shrink-0"
+                    >
+                      <X className="w-4 h-4 text-payload-muted" />
+                    </button>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          )}
+
           <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             <motion.div
               data-testid="payloads-card"
