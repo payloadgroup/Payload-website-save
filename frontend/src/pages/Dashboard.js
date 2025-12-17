@@ -15,14 +15,24 @@ import BasecampModal from '@/components/modules/BasecampModal';
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
+const PRIORITY_COLORS = {
+  low: 'border-gray-500/30',
+  normal: 'border-blue-500/30',
+  high: 'border-orange-500/30',
+  urgent: 'border-red-500/50 bg-red-500/5'
+};
+
 const Dashboard = () => {
   const navigate = useNavigate();
   const { user, logout, token } = useAuth();
   const [dashboardData, setDashboardData] = useState(null);
   const [activeModal, setActiveModal] = useState(null);
+  const [announcements, setAnnouncements] = useState([]);
+  const [dismissedAnnouncements, setDismissedAnnouncements] = useState([]);
 
   useEffect(() => {
     fetchDashboardData();
+    fetchAnnouncements();
   }, []);
 
   const fetchDashboardData = async () => {
@@ -37,6 +47,30 @@ const Dashboard = () => {
       console.error('Failed to fetch dashboard data:', error);
     }
   };
+
+  const fetchAnnouncements = async () => {
+    try {
+      const response = await axios.get(`${API}/announcements`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setAnnouncements(response.data);
+    } catch (error) {
+      console.error('Failed to fetch announcements:', error);
+    }
+  };
+
+  const dismissAnnouncement = async (id) => {
+    setDismissedAnnouncements([...dismissedAnnouncements, id]);
+    try {
+      await axios.post(`${API}/announcements/${id}/read`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+    } catch (error) {
+      console.error('Failed to mark as read:', error);
+    }
+  };
+
+  const visibleAnnouncements = announcements.filter(a => !dismissedAnnouncements.includes(a.id));
 
   const handleLogout = () => {
     logout();
