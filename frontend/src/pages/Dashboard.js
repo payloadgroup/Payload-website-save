@@ -99,37 +99,37 @@ const Dashboard = () => {
         </div>
       </nav>
 
-      <div className="max-w-7xl mx-auto px-6 py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <div className="mb-12">
-            <h1 className="font-rajdhani font-bold text-4xl uppercase tracking-wide mb-2">
+          <div className="mb-8 sm:mb-12">
+            <h1 className="font-rajdhani font-bold text-2xl sm:text-4xl uppercase tracking-wide mb-2">
               MISSION CONTROL
             </h1>
-            <p className="font-mono text-sm text-payload-neon uppercase tracking-widest">
+            <p className="font-mono text-xs sm:text-sm text-payload-neon uppercase tracking-widest">
               {dashboardData?.status || 'SYSTEMS ONLINE'}
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             <motion.div
               data-testid="payloads-card"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.1 }}
               onClick={() => setActiveModal('payloads')}
-              className="bg-payload-surface border border-white/10 p-6 rounded-sm hover:border-payload-neon/50 transition-all duration-300 cursor-pointer"
+              className="bg-payload-surface border border-white/10 p-4 sm:p-6 rounded-sm hover:border-payload-neon/50 transition-all duration-300 cursor-pointer"
             >
-              <div className="flex items-start justify-between mb-4">
-                <Rocket className="w-8 h-8 text-payload-neon" />
-                <span className="font-mono text-xs text-payload-muted uppercase tracking-widest">ACTIVE</span>
+              <div className="flex items-start justify-between mb-3 sm:mb-4">
+                <Rocket className="w-6 h-6 sm:w-8 sm:h-8 text-payload-neon" />
+                <span className="font-mono text-[10px] sm:text-xs text-payload-muted uppercase tracking-widest">ACTIVE</span>
               </div>
-              <h3 className="font-rajdhani font-bold text-2xl uppercase tracking-wide mb-2">PAYLOADS</h3>
-              <p className="font-inter text-sm text-payload-muted mb-4">Active business ventures and projects</p>
-              <div className="font-mono text-3xl text-payload-neon">{dashboardData?.payloads_count || 0}</div>
+              <h3 className="font-rajdhani font-bold text-lg sm:text-2xl uppercase tracking-wide mb-1 sm:mb-2">PAYLOADS</h3>
+              <p className="font-inter text-xs sm:text-sm text-payload-muted mb-3 sm:mb-4">Active ventures & projects</p>
+              <div className="font-mono text-2xl sm:text-3xl text-payload-neon">{dashboardData?.payloads_count || 0}</div>
             </motion.div>
 
             <motion.div
@@ -138,15 +138,15 @@ const Dashboard = () => {
               animate={{ opacity: 1 }}
               transition={{ delay: 0.2 }}
               onClick={() => setActiveModal('missions')}
-              className="bg-payload-surface border border-white/10 p-6 rounded-sm hover:border-payload-cyan/50 transition-all duration-300 cursor-pointer"
+              className="bg-payload-surface border border-white/10 p-4 sm:p-6 rounded-sm hover:border-payload-cyan/50 transition-all duration-300 cursor-pointer"
             >
-              <div className="flex items-start justify-between mb-4">
-                <Target className="w-8 h-8 text-payload-cyan" />
-                <span className="font-mono text-xs text-payload-muted uppercase tracking-widest">IN PROGRESS</span>
+              <div className="flex items-start justify-between mb-3 sm:mb-4">
+                <Target className="w-6 h-6 sm:w-8 sm:h-8 text-payload-cyan" />
+                <span className="font-mono text-[10px] sm:text-xs text-payload-muted uppercase tracking-widest">IN PROGRESS</span>
               </div>
-              <h3 className="font-rajdhani font-bold text-2xl uppercase tracking-wide mb-2">MISSIONS</h3>
-              <p className="font-inter text-sm text-payload-muted mb-4">Current tasks and objectives</p>
-              <div className="font-mono text-3xl text-payload-cyan">{dashboardData?.missions_count || 0}</div>
+              <h3 className="font-rajdhani font-bold text-lg sm:text-2xl uppercase tracking-wide mb-1 sm:mb-2">MISSIONS</h3>
+              <p className="font-inter text-xs sm:text-sm text-payload-muted mb-3 sm:mb-4">Tasks and objectives</p>
+              <div className="font-mono text-2xl sm:text-3xl text-payload-cyan">{dashboardData?.missions_count || 0}</div>
             </motion.div>
 
             <motion.div
@@ -155,15 +155,15 @@ const Dashboard = () => {
               animate={{ opacity: 1 }}
               transition={{ delay: 0.3 }}
               onClick={() => setActiveModal('bank')}
-              className="bg-payload-surface border border-white/10 p-6 rounded-sm hover:border-payload-alert/50 transition-all duration-300 cursor-pointer"
+              className="bg-payload-surface border border-white/10 p-4 sm:p-6 rounded-sm hover:border-payload-alert/50 transition-all duration-300 cursor-pointer"
             >
-              <div className="flex items-start justify-between mb-4">
-                <DollarSign className="w-8 h-8 text-payload-alert" />
-                <span className="font-mono text-xs text-payload-muted uppercase tracking-widest">BALANCE</span>
+              <div className="flex items-start justify-between mb-3 sm:mb-4">
+                <DollarSign className="w-6 h-6 sm:w-8 sm:h-8 text-payload-alert" />
+                <span className="font-mono text-[10px] sm:text-xs text-payload-muted uppercase tracking-widest">BALANCE</span>
               </div>
-              <h3 className="font-rajdhani font-bold text-2xl uppercase tracking-wide mb-2">BUSINESS BANK</h3>
-              <p className="font-inter text-sm text-payload-muted mb-4">Financial resources</p>
-              <div className="font-mono text-3xl text-payload-alert">${(dashboardData?.balance || 0).toFixed(2)}</div>
+              <h3 className="font-rajdhani font-bold text-lg sm:text-2xl uppercase tracking-wide mb-1 sm:mb-2">BUSINESS BANK</h3>
+              <p className="font-inter text-xs sm:text-sm text-payload-muted mb-3 sm:mb-4">Financial resources</p>
+              <div className="font-mono text-2xl sm:text-3xl text-payload-alert">${(dashboardData?.balance || 0).toFixed(2)}</div>
             </motion.div>
 
             <motion.div
@@ -172,15 +172,15 @@ const Dashboard = () => {
               animate={{ opacity: 1 }}
               transition={{ delay: 0.4 }}
               onClick={() => setActiveModal('headquarters')}
-              className="bg-payload-surface border border-white/10 p-6 rounded-sm hover:border-white/30 transition-all duration-300 cursor-pointer"
+              className="bg-payload-surface border border-white/10 p-4 sm:p-6 rounded-sm hover:border-white/30 transition-all duration-300 cursor-pointer"
             >
-              <div className="flex items-start justify-between mb-4">
-                <Building className="w-8 h-8 text-white" />
-                <span className="font-mono text-xs text-payload-muted uppercase tracking-widest">OPERATIONAL</span>
+              <div className="flex items-start justify-between mb-3 sm:mb-4">
+                <Building className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
+                <span className="font-mono text-[10px] sm:text-xs text-payload-muted uppercase tracking-widest">OPERATIONAL</span>
               </div>
-              <h3 className="font-rajdhani font-bold text-2xl uppercase tracking-wide mb-2">HEADQUARTERS</h3>
-              <p className="font-inter text-sm text-payload-muted mb-4">Main operations base</p>
-              <div className="font-mono text-sm text-white">{dashboardData?.headquarters ? 'SET' : 'NOT SET'}</div>
+              <h3 className="font-rajdhani font-bold text-lg sm:text-2xl uppercase tracking-wide mb-1 sm:mb-2">HEADQUARTERS</h3>
+              <p className="font-inter text-xs sm:text-sm text-payload-muted mb-3 sm:mb-4">Main operations base</p>
+              <div className="font-mono text-xs sm:text-sm text-white">{dashboardData?.headquarters ? 'SET' : 'NOT SET'}</div>
             </motion.div>
 
             <motion.div
@@ -189,15 +189,15 @@ const Dashboard = () => {
               animate={{ opacity: 1 }}
               transition={{ delay: 0.5 }}
               onClick={() => setActiveModal('stations')}
-              className="bg-payload-surface border border-white/10 p-6 rounded-sm hover:border-white/30 transition-all duration-300 cursor-pointer"
+              className="bg-payload-surface border border-white/10 p-4 sm:p-6 rounded-sm hover:border-white/30 transition-all duration-300 cursor-pointer"
             >
-              <div className="flex items-start justify-between mb-4">
-                <MapPin className="w-8 h-8 text-white" />
-                <span className="font-mono text-xs text-payload-muted uppercase tracking-widest">LINKED</span>
+              <div className="flex items-start justify-between mb-3 sm:mb-4">
+                <MapPin className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
+                <span className="font-mono text-[10px] sm:text-xs text-payload-muted uppercase tracking-widest">LINKED</span>
               </div>
-              <h3 className="font-rajdhani font-bold text-2xl uppercase tracking-wide mb-2">STATIONS</h3>
-              <p className="font-inter text-sm text-payload-muted mb-4">Active locations and partnerships</p>
-              <div className="font-mono text-3xl text-white">{dashboardData?.stations_count || 0}</div>
+              <h3 className="font-rajdhani font-bold text-lg sm:text-2xl uppercase tracking-wide mb-1 sm:mb-2">STATIONS</h3>
+              <p className="font-inter text-xs sm:text-sm text-payload-muted mb-3 sm:mb-4">Locations & partnerships</p>
+              <div className="font-mono text-2xl sm:text-3xl text-white">{dashboardData?.stations_count || 0}</div>
             </motion.div>
 
             <motion.div
@@ -206,15 +206,15 @@ const Dashboard = () => {
               animate={{ opacity: 1 }}
               transition={{ delay: 0.6 }}
               onClick={() => setActiveModal('basecamp')}
-              className="bg-payload-surface border border-white/10 p-6 rounded-sm hover:border-white/30 transition-all duration-300 cursor-pointer"
+              className="bg-payload-surface border border-white/10 p-4 sm:p-6 rounded-sm hover:border-white/30 transition-all duration-300 cursor-pointer"
             >
-              <div className="flex items-start justify-between mb-4">
-                <BookOpen className="w-8 h-8 text-white" />
-                <span className="font-mono text-xs text-payload-muted uppercase tracking-widest">AVAILABLE</span>
+              <div className="flex items-start justify-between mb-3 sm:mb-4">
+                <BookOpen className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
+                <span className="font-mono text-[10px] sm:text-xs text-payload-muted uppercase tracking-widest">AVAILABLE</span>
               </div>
-              <h3 className="font-rajdhani font-bold text-2xl uppercase tracking-wide mb-2">BASECAMP</h3>
-              <p className="font-inter text-sm text-payload-muted mb-4">Resources and training materials</p>
-              <div className="font-mono text-sm text-white">ACCESS</div>
+              <h3 className="font-rajdhani font-bold text-lg sm:text-2xl uppercase tracking-wide mb-1 sm:mb-2">BASECAMP</h3>
+              <p className="font-inter text-xs sm:text-sm text-payload-muted mb-3 sm:mb-4">Resources & training</p>
+              <div className="font-mono text-xs sm:text-sm text-white">ACCESS</div>
             </motion.div>
           </div>
 
