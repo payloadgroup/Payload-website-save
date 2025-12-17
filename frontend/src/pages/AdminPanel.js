@@ -75,34 +75,42 @@ const AdminPanel = () => {
   return (
     <div className="min-h-screen bg-payload-bg text-payload-text">
       <nav className="border-b border-payload-border bg-payload-surface">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-          <button
-            data-testid="logo-home-btn"
-            onClick={() => navigate('/dashboard')}
-            className="flex items-center gap-3 hover:opacity-80 transition-opacity"
-          >
-            <PayloadLogo size="default" />
-            <div className="font-rajdhani font-bold text-2xl tracking-widest text-payload-neon">
-              PAYLOAD
-            </div>
-          </button>
-          <div className="flex items-center gap-3">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4">
+          {/* Mobile: Stack vertically, Desktop: Side by side */}
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 sm:gap-0">
+            {/* Logo */}
             <button
-              data-testid="goto-analytics-btn"
-              onClick={() => navigate('/analytics')}
-              className="flex items-center gap-2 font-mono text-sm border border-payload-cyan text-payload-cyan px-4 py-2 rounded-none hover:bg-payload-cyan hover:text-black transition-all duration-300"
-            >
-              <BarChart3 className="w-4 h-4" />
-              ANALYTICS
-            </button>
-            <button
-              data-testid="back-to-dashboard-btn"
+              data-testid="logo-home-btn"
               onClick={() => navigate('/dashboard')}
-              className="flex items-center gap-2 font-mono text-sm border border-white/20 px-4 py-2 rounded-none hover:border-white hover:bg-white/5 transition-all duration-300"
+              className="flex items-center gap-2 sm:gap-3 hover:opacity-80 transition-opacity"
             >
-              <ArrowLeft className="w-4 h-4" />
-              DASHBOARD
+              <PayloadLogo size="default" />
+              <div className="font-rajdhani font-bold text-xl sm:text-2xl tracking-widest text-payload-neon">
+                PAYLOAD
+              </div>
             </button>
+            
+            {/* Action buttons */}
+            <div className="flex items-center gap-2 sm:gap-3">
+              <button
+                data-testid="goto-analytics-btn"
+                onClick={() => navigate('/analytics')}
+                className="flex items-center gap-1 sm:gap-2 font-mono text-xs sm:text-sm border border-payload-cyan text-payload-cyan px-2 sm:px-4 py-1.5 sm:py-2 rounded-none hover:bg-payload-cyan hover:text-black transition-all duration-300"
+              >
+                <BarChart3 className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span className="hidden xs:inline">ANALYTICS</span>
+                <span className="xs:hidden">STATS</span>
+              </button>
+              <button
+                data-testid="back-to-dashboard-btn"
+                onClick={() => navigate('/dashboard')}
+                className="flex items-center gap-1 sm:gap-2 font-mono text-xs sm:text-sm border border-white/20 px-2 sm:px-4 py-1.5 sm:py-2 rounded-none hover:border-white hover:bg-white/5 transition-all duration-300"
+              >
+                <ArrowLeft className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span className="hidden xs:inline">DASHBOARD</span>
+                <span className="xs:hidden">BACK</span>
+              </button>
+            </div>
           </div>
         </div>
       </nav>
@@ -163,17 +171,18 @@ const AdminPanel = () => {
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: index * 0.1 }}
-                  className="bg-payload-surface border border-white/10 p-6 rounded-sm hover:border-white/20 transition-all"
+                  className="bg-payload-surface border border-white/10 p-4 sm:p-6 rounded-sm hover:border-white/20 transition-all"
                 >
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <h3 className="font-rajdhani font-bold text-xl uppercase tracking-wide mb-2">
+                  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+                    {/* User info */}
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-rajdhani font-bold text-lg sm:text-xl uppercase tracking-wide mb-2 truncate">
                         {user.name}
                       </h3>
-                      <div className="space-y-1 font-mono text-sm">
-                        <div className="flex items-center gap-2">
+                      <div className="space-y-1 font-mono text-xs sm:text-sm">
+                        <div className="flex flex-col xs:flex-row xs:items-center gap-1 xs:gap-2">
                           <span className="text-payload-muted uppercase tracking-widest">EMAIL:</span>
-                          <span className="text-payload-text">{user.email}</span>
+                          <span className="text-payload-text break-all">{user.email}</span>
                         </div>
                         {user.referral_code && (
                           <div className="flex items-center gap-2">
@@ -188,21 +197,22 @@ const AdminPanel = () => {
                       </div>
                     </div>
 
-                    <div className="flex gap-3">
+                    {/* Action buttons - stack on mobile, row on desktop */}
+                    <div className="flex flex-row sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
                       <button
                         data-testid={`approve-btn-${index}`}
                         onClick={() => handleUpdateStatus(user.id, 'approved')}
-                        className="flex items-center gap-2 font-mono text-sm border border-payload-neon text-payload-neon px-4 py-2 rounded-none hover:bg-payload-neon hover:text-black transition-all duration-300"
+                        className="flex-1 sm:flex-initial flex items-center justify-center gap-1 sm:gap-2 font-mono text-xs sm:text-sm border border-payload-neon text-payload-neon px-3 sm:px-4 py-2 rounded-none hover:bg-payload-neon hover:text-black transition-all duration-300"
                       >
-                        <CheckCircle className="w-4 h-4" />
+                        <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4" />
                         APPROVE
                       </button>
                       <button
                         data-testid={`deny-btn-${index}`}
                         onClick={() => handleUpdateStatus(user.id, 'denied')}
-                        className="flex items-center gap-2 font-mono text-sm border border-red-500 text-red-500 px-4 py-2 rounded-none hover:bg-red-500 hover:text-black transition-all duration-300"
+                        className="flex-1 sm:flex-initial flex items-center justify-center gap-1 sm:gap-2 font-mono text-xs sm:text-sm border border-red-500 text-red-500 px-3 sm:px-4 py-2 rounded-none hover:bg-red-500 hover:text-black transition-all duration-300"
                       >
-                        <XCircle className="w-4 h-4" />
+                        <XCircle className="w-3 h-3 sm:w-4 sm:h-4" />
                         DENY
                       </button>
                     </div>

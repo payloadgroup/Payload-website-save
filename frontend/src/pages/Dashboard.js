@@ -50,40 +50,51 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen bg-payload-bg text-payload-text">
       <nav className="border-b border-payload-border bg-payload-surface">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-          <button
-            data-testid="logo-home-btn"
-            onClick={() => navigate('/dashboard')}
-            className="flex items-center gap-3 hover:opacity-80 transition-opacity"
-          >
-            <PayloadLogo size="default" />
-            <div className="font-rajdhani font-bold text-2xl tracking-widest text-payload-neon">
-              PAYLOAD
-            </div>
-          </button>
-          <div className="flex items-center gap-6">
-            <div className="font-mono text-xs">
-              <span className="text-payload-muted uppercase tracking-widest">COMMANDER: </span>
-              <span className="text-payload-neon">{user?.name}</span>
-            </div>
-            {user?.role === 'admin' && (
-              <button
-                data-testid="goto-admin-btn"
-                onClick={() => navigate('/admin')}
-                className="flex items-center gap-2 font-mono text-sm border border-payload-alert text-payload-alert px-4 py-2 rounded-none hover:bg-payload-alert hover:text-black transition-all duration-300"
-              >
-                <Shield className="w-4 h-4" />
-                ADMIN
-              </button>
-            )}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4">
+          {/* Mobile: Stack vertically, Desktop: Side by side */}
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 sm:gap-0">
+            {/* Logo */}
             <button
-              data-testid="logout-btn"
-              onClick={handleLogout}
-              className="flex items-center gap-2 font-mono text-sm border border-white/20 px-4 py-2 rounded-none hover:border-white hover:bg-white/5 transition-all duration-300"
+              data-testid="logo-home-btn"
+              onClick={() => navigate('/dashboard')}
+              className="flex items-center gap-2 sm:gap-3 hover:opacity-80 transition-opacity"
             >
-              <LogOut className="w-4 h-4" />
-              LOGOUT
+              <PayloadLogo size="default" />
+              <div className="font-rajdhani font-bold text-xl sm:text-2xl tracking-widest text-payload-neon">
+                PAYLOAD
+              </div>
             </button>
+            
+            {/* Nav Items */}
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-6">
+              {/* Commander info */}
+              <div className="font-mono text-xs order-first sm:order-none">
+                <span className="text-payload-muted uppercase tracking-widest">COMMANDER: </span>
+                <span className="text-payload-neon">{user?.name}</span>
+              </div>
+              
+              {/* Action buttons */}
+              <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
+                {user?.role === 'admin' && (
+                  <button
+                    data-testid="goto-admin-btn"
+                    onClick={() => navigate('/admin')}
+                    className="flex items-center gap-1 sm:gap-2 font-mono text-xs sm:text-sm border border-payload-alert text-payload-alert px-2 sm:px-4 py-1.5 sm:py-2 rounded-none hover:bg-payload-alert hover:text-black transition-all duration-300"
+                  >
+                    <Shield className="w-3 h-3 sm:w-4 sm:h-4" />
+                    ADMIN
+                  </button>
+                )}
+                <button
+                  data-testid="logout-btn"
+                  onClick={handleLogout}
+                  className="flex items-center gap-1 sm:gap-2 font-mono text-xs sm:text-sm border border-white/20 px-2 sm:px-4 py-1.5 sm:py-2 rounded-none hover:border-white hover:bg-white/5 transition-all duration-300"
+                >
+                  <LogOut className="w-3 h-3 sm:w-4 sm:h-4" />
+                  LOGOUT
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </nav>
