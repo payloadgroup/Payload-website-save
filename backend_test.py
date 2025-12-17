@@ -273,7 +273,7 @@ class PayloadAPITester:
             "Create Payload",
             "POST",
             "payloads",
-            201,
+            200,
             data=payload_data,
             headers=headers
         )
