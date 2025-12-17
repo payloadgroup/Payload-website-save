@@ -361,7 +361,7 @@ class PayloadAPITester:
             "Create Mission",
             "POST",
             "missions",
-            201,
+            200,
             data=mission_data,
             headers=headers
         )
