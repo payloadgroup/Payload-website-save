@@ -39,6 +39,25 @@ class UserStatus(str, Enum):
     APPROVED = "approved"
     DENIED = "denied"
 
+class PayloadStatus(str, Enum):
+    ACTIVE = "active"
+    PAUSED = "paused"
+    COMPLETED = "completed"
+
+class MissionStatus(str, Enum):
+    PENDING = "pending"
+    IN_PROGRESS = "in_progress"
+    COMPLETED = "completed"
+    FAILED = "failed"
+
+class TransactionType(str, Enum):
+    DEPOSIT = "deposit"
+    WITHDRAWAL = "withdrawal"
+
+class StationStatus(str, Enum):
+    ACTIVE = "active"
+    INACTIVE = "inactive"
+
 class UserRegister(BaseModel):
     name: str
     email: EmailStr
@@ -67,6 +86,133 @@ class Token(BaseModel):
 class UserApprovalRequest(BaseModel):
     user_id: str
     status: UserStatus
+
+class PayloadCreate(BaseModel):
+    title: str
+    description: str
+    funding_goal: float = 0.0
+    current_funding: float = 0.0
+
+class PayloadUpdate(BaseModel):
+    title: Optional[str] = None
+    description: Optional[str] = None
+    status: Optional[PayloadStatus] = None
+    funding_goal: Optional[float] = None
+    current_funding: Optional[float] = None
+
+class PayloadResponse(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str
+    user_id: str
+    title: str
+    description: str
+    status: PayloadStatus
+    funding_goal: float
+    current_funding: float
+    created_at: str
+    updated_at: str
+
+class MissionCreate(BaseModel):
+    title: str
+    objective: str
+    payload_id: Optional[str] = None
+    due_date: Optional[str] = None
+    priority: str = "medium"
+
+class MissionUpdate(BaseModel):
+    title: Optional[str] = None
+    objective: Optional[str] = None
+    status: Optional[MissionStatus] = None
+    due_date: Optional[str] = None
+    priority: Optional[str] = None
+
+class MissionResponse(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str
+    user_id: str
+    payload_id: Optional[str] = None
+    title: str
+    objective: str
+    status: MissionStatus
+    due_date: Optional[str] = None
+    priority: str
+    created_at: str
+
+class TransactionCreate(BaseModel):
+    type: TransactionType
+    amount: float
+    description: str
+    category: str = "general"
+
+class TransactionResponse(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str
+    user_id: str
+    type: TransactionType
+    amount: float
+    description: str
+    category: str
+    balance_after: float
+    date: str
+
+class HeadquartersCreate(BaseModel):
+    name: str
+    location: str
+    description: str
+
+class HeadquartersUpdate(BaseModel):
+    name: Optional[str] = None
+    location: Optional[str] = None
+    description: Optional[str] = None
+
+class HeadquartersResponse(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str
+    user_id: str
+    name: str
+    location: str
+    description: str
+    established_date: str
+
+class StationCreate(BaseModel):
+    name: str
+    location: str
+    type: str
+    description: str = ""
+
+class StationUpdate(BaseModel):
+    name: Optional[str] = None
+    location: Optional[str] = None
+    type: Optional[str] = None
+    description: Optional[str] = None
+    status: Optional[StationStatus] = None
+
+class StationResponse(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str
+    user_id: str
+    name: str
+    location: str
+    type: str
+    description: str
+    status: StationStatus
+    established_date: str
+
+class ResourceCreate(BaseModel):
+    title: str
+    description: str
+    type: str
+    url: str = ""
+
+class ResourceResponse(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str
+    title: str
+    description: str
+    type: str
+    url: str
+    uploaded_by: str
+    created_at: str
 
 def hash_password(password: str) -> str:
     return pwd_context.hash(password)
@@ -183,13 +329,320 @@ async def update_user_status(
     
     return {"message": f"User status updated to {request.status}"}
 
+@api_router.get("/admin/analytics")
+async def get_analytics(admin_user: User = Depends(get_admin_user)):
+    total_members = await db.users.count_documents({"role": UserRole.MEMBER})
+    approved_members = await db.users.count_documents({"role": UserRole.MEMBER, "status": UserStatus.APPROVED})
+    pending_members = await db.users.count_documents({"status": UserStatus.PENDING})
+    
+    total_payloads = await db.payloads.count_documents({})
+    active_payloads = await db.payloads.count_documents({"status": PayloadStatus.ACTIVE})
+    
+    total_missions = await db.missions.count_documents({})
+    completed_missions = await db.missions.count_documents({"status": MissionStatus.COMPLETED})
+    
+    total_transactions = await db.transactions.count_documents({})
+    
+    recent_members = await db.users.find(
+        {"role": UserRole.MEMBER},
+        {"_id": 0, "password": 0}
+    ).sort("created_at", -1).limit(5).to_list(5)
+    
+    return {
+        "total_members": total_members,
+        "approved_members": approved_members,
+        "pending_members": pending_members,
+        "total_payloads": total_payloads,
+        "active_payloads": active_payloads,
+        "total_missions": total_missions,
+        "completed_missions": completed_missions,
+        "total_transactions": total_transactions,
+        "recent_members": recent_members
+    }
+
 @api_router.get("/dashboard")
 async def get_dashboard(current_user: User = Depends(get_current_user)):
+    payloads_count = await db.payloads.count_documents({"user_id": current_user.id})
+    missions_count = await db.missions.count_documents({"user_id": current_user.id})
+    
+    transactions = await db.transactions.find(
+        {"user_id": current_user.id}
+    ).sort("date", -1).limit(1).to_list(1)
+    
+    balance = transactions[0]["balance_after"] if transactions else 0.0
+    
+    headquarters = await db.headquarters.find_one({"user_id": current_user.id}, {"_id": 0})
+    stations_count = await db.stations.count_documents({"user_id": current_user.id})
+    
     return {
         "welcome_message": f"Welcome to Payload, {current_user.name}",
         "member_since": current_user.created_at,
-        "status": "Mission Control Online"
+        "status": "Mission Control Online",
+        "payloads_count": payloads_count,
+        "missions_count": missions_count,
+        "balance": balance,
+        "headquarters": headquarters,
+        "stations_count": stations_count
     }
+
+@api_router.get("/payloads", response_model=List[PayloadResponse])
+async def get_payloads(current_user: User = Depends(get_current_user)):
+    payloads = await db.payloads.find(
+        {"user_id": current_user.id},
+        {"_id": 0}
+    ).to_list(1000)
+    return [PayloadResponse(**p) for p in payloads]
+
+@api_router.post("/payloads", response_model=PayloadResponse)
+async def create_payload(payload_data: PayloadCreate, current_user: User = Depends(get_current_user)):
+    import uuid
+    payload = {
+        "id": str(uuid.uuid4()),
+        "user_id": current_user.id,
+        "title": payload_data.title,
+        "description": payload_data.description,
+        "status": PayloadStatus.ACTIVE,
+        "funding_goal": payload_data.funding_goal,
+        "current_funding": payload_data.current_funding,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "updated_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.payloads.insert_one(payload)
+    return PayloadResponse(**payload)
+
+@api_router.put("/payloads/{payload_id}", response_model=PayloadResponse)
+async def update_payload(
+    payload_id: str,
+    payload_data: PayloadUpdate,
+    current_user: User = Depends(get_current_user)
+):
+    update_data = {k: v for k, v in payload_data.model_dump().items() if v is not None}
+    update_data["updated_at"] = datetime.now(timezone.utc).isoformat()
+    
+    result = await db.payloads.update_one(
+        {"id": payload_id, "user_id": current_user.id},
+        {"$set": update_data}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Payload not found")
+    
+    payload = await db.payloads.find_one({"id": payload_id}, {"_id": 0})
+    return PayloadResponse(**payload)
+
+@api_router.delete("/payloads/{payload_id}")
+async def delete_payload(payload_id: str, current_user: User = Depends(get_current_user)):
+    result = await db.payloads.delete_one({"id": payload_id, "user_id": current_user.id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Payload not found")
+    return {"message": "Payload deleted"}
+
+@api_router.get("/missions", response_model=List[MissionResponse])
+async def get_missions(current_user: User = Depends(get_current_user)):
+    missions = await db.missions.find(
+        {"user_id": current_user.id},
+        {"_id": 0}
+    ).to_list(1000)
+    return [MissionResponse(**m) for m in missions]
+
+@api_router.post("/missions", response_model=MissionResponse)
+async def create_mission(mission_data: MissionCreate, current_user: User = Depends(get_current_user)):
+    import uuid
+    mission = {
+        "id": str(uuid.uuid4()),
+        "user_id": current_user.id,
+        "payload_id": mission_data.payload_id,
+        "title": mission_data.title,
+        "objective": mission_data.objective,
+        "status": MissionStatus.PENDING,
+        "due_date": mission_data.due_date,
+        "priority": mission_data.priority,
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.missions.insert_one(mission)
+    return MissionResponse(**mission)
+
+@api_router.put("/missions/{mission_id}", response_model=MissionResponse)
+async def update_mission(
+    mission_id: str,
+    mission_data: MissionUpdate,
+    current_user: User = Depends(get_current_user)
+):
+    update_data = {k: v for k, v in mission_data.model_dump().items() if v is not None}
+    
+    result = await db.missions.update_one(
+        {"id": mission_id, "user_id": current_user.id},
+        {"$set": update_data}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Mission not found")
+    
+    mission = await db.missions.find_one({"id": mission_id}, {"_id": 0})
+    return MissionResponse(**mission)
+
+@api_router.delete("/missions/{mission_id}")
+async def delete_mission(mission_id: str, current_user: User = Depends(get_current_user)):
+    result = await db.missions.delete_one({"id": mission_id, "user_id": current_user.id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Mission not found")
+    return {"message": "Mission deleted"}
+
+@api_router.get("/transactions", response_model=List[TransactionResponse])
+async def get_transactions(current_user: User = Depends(get_current_user)):
+    transactions = await db.transactions.find(
+        {"user_id": current_user.id},
+        {"_id": 0}
+    ).sort("date", -1).to_list(1000)
+    return [TransactionResponse(**t) for t in transactions]
+
+@api_router.post("/transactions", response_model=TransactionResponse)
+async def create_transaction(transaction_data: TransactionCreate, current_user: User = Depends(get_current_user)):
+    import uuid
+    
+    last_transaction = await db.transactions.find_one(
+        {"user_id": current_user.id},
+        {"_id": 0},
+        sort=[("date", -1)]
+    )
+    
+    current_balance = last_transaction["balance_after"] if last_transaction else 0.0
+    
+    if transaction_data.type == TransactionType.DEPOSIT:
+        new_balance = current_balance + transaction_data.amount
+    else:
+        new_balance = current_balance - transaction_data.amount
+    
+    transaction = {
+        "id": str(uuid.uuid4()),
+        "user_id": current_user.id,
+        "type": transaction_data.type,
+        "amount": transaction_data.amount,
+        "description": transaction_data.description,
+        "category": transaction_data.category,
+        "balance_after": new_balance,
+        "date": datetime.now(timezone.utc).isoformat()
+    }
+    await db.transactions.insert_one(transaction)
+    return TransactionResponse(**transaction)
+
+@api_router.get("/bank/balance")
+async def get_balance(current_user: User = Depends(get_current_user)):
+    last_transaction = await db.transactions.find_one(
+        {"user_id": current_user.id},
+        {"_id": 0},
+        sort=[("date", -1)]
+    )
+    balance = last_transaction["balance_after"] if last_transaction else 0.0
+    return {"balance": balance}
+
+@api_router.get("/headquarters", response_model=Optional[HeadquartersResponse])
+async def get_headquarters(current_user: User = Depends(get_current_user)):
+    hq = await db.headquarters.find_one({"user_id": current_user.id}, {"_id": 0})
+    return HeadquartersResponse(**hq) if hq else None
+
+@api_router.post("/headquarters", response_model=HeadquartersResponse)
+async def create_headquarters(hq_data: HeadquartersCreate, current_user: User = Depends(get_current_user)):
+    existing = await db.headquarters.find_one({"user_id": current_user.id})
+    if existing:
+        raise HTTPException(status_code=400, detail="Headquarters already exists")
+    
+    import uuid
+    hq = {
+        "id": str(uuid.uuid4()),
+        "user_id": current_user.id,
+        "name": hq_data.name,
+        "location": hq_data.location,
+        "description": hq_data.description,
+        "established_date": datetime.now(timezone.utc).isoformat()
+    }
+    await db.headquarters.insert_one(hq)
+    return HeadquartersResponse(**hq)
+
+@api_router.put("/headquarters", response_model=HeadquartersResponse)
+async def update_headquarters(hq_data: HeadquartersUpdate, current_user: User = Depends(get_current_user)):
+    update_data = {k: v for k, v in hq_data.model_dump().items() if v is not None}
+    
+    result = await db.headquarters.update_one(
+        {"user_id": current_user.id},
+        {"$set": update_data}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Headquarters not found")
+    
+    hq = await db.headquarters.find_one({"user_id": current_user.id}, {"_id": 0})
+    return HeadquartersResponse(**hq)
+
+@api_router.get("/stations", response_model=List[StationResponse])
+async def get_stations(current_user: User = Depends(get_current_user)):
+    stations = await db.stations.find(
+        {"user_id": current_user.id},
+        {"_id": 0}
+    ).to_list(1000)
+    return [StationResponse(**s) for s in stations]
+
+@api_router.post("/stations", response_model=StationResponse)
+async def create_station(station_data: StationCreate, current_user: User = Depends(get_current_user)):
+    import uuid
+    station = {
+        "id": str(uuid.uuid4()),
+        "user_id": current_user.id,
+        "name": station_data.name,
+        "location": station_data.location,
+        "type": station_data.type,
+        "description": station_data.description,
+        "status": StationStatus.ACTIVE,
+        "established_date": datetime.now(timezone.utc).isoformat()
+    }
+    await db.stations.insert_one(station)
+    return StationResponse(**station)
+
+@api_router.put("/stations/{station_id}", response_model=StationResponse)
+async def update_station(
+    station_id: str,
+    station_data: StationUpdate,
+    current_user: User = Depends(get_current_user)
+):
+    update_data = {k: v for k, v in station_data.model_dump().items() if v is not None}
+    
+    result = await db.stations.update_one(
+        {"id": station_id, "user_id": current_user.id},
+        {"$set": update_data}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Station not found")
+    
+    station = await db.stations.find_one({"id": station_id}, {"_id": 0})
+    return StationResponse(**station)
+
+@api_router.delete("/stations/{station_id}")
+async def delete_station(station_id: str, current_user: User = Depends(get_current_user)):
+    result = await db.stations.delete_one({"id": station_id, "user_id": current_user.id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Station not found")
+    return {"message": "Station deleted"}
+
+@api_router.get("/basecamp", response_model=List[ResourceResponse])
+async def get_resources(current_user: User = Depends(get_current_user)):
+    resources = await db.resources.find({}, {"_id": 0}).to_list(1000)
+    return [ResourceResponse(**r) for r in resources]
+
+@api_router.post("/basecamp", response_model=ResourceResponse)
+async def create_resource(resource_data: ResourceCreate, admin_user: User = Depends(get_admin_user)):
+    import uuid
+    resource = {
+        "id": str(uuid.uuid4()),
+        "title": resource_data.title,
+        "description": resource_data.description,
+        "type": resource_data.type,
+        "url": resource_data.url,
+        "uploaded_by": admin_user.id,
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.resources.insert_one(resource)
+    return ResourceResponse(**resource)
 
 app.include_router(api_router)
 
