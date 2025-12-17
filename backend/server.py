@@ -59,6 +59,18 @@ class StationStatus(str, Enum):
     ACTIVE = "active"
     INACTIVE = "inactive"
 
+class MemberTier(str, Enum):
+    CADET = "cadet"
+    LIEUTENANT = "lieutenant"
+    COMMANDER = "commander"
+    ADMIRAL = "admiral"
+
+class AnnouncementPriority(str, Enum):
+    LOW = "low"
+    NORMAL = "normal"
+    HIGH = "high"
+    URGENT = "urgent"
+
 class UserRegister(BaseModel):
     name: str
     email: EmailStr
