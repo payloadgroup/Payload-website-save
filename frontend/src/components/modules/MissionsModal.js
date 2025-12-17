@@ -86,7 +86,12 @@ const MissionsModal = ({ onClose, onUpdate }) => {
       assigned_to: mission.assigned_to
     });
     setEditingId(mission.id);
-    setShowForm(true);
+    setShowForm(false);
+  };
+
+  const handleCancelEdit = () => {
+    setEditingId(null);
+    setFormData({ title: '', objective: '', priority: 'medium', due_date: '', assigned_to: '' });
   };
 
   const handleDelete = async (id) => {
