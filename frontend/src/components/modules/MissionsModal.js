@@ -163,14 +163,14 @@ const MissionsModal = ({ onClose, onUpdate }) => {
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
-        className="bg-payload-surface border border-white/20 rounded-sm w-full max-w-4xl max-h-[90vh] overflow-hidden"
+        className="bg-payload-surface border border-white/20 rounded-sm w-full max-w-4xl max-h-[90vh] overflow-hidden mx-2 sm:mx-4"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="border-b border-white/10 p-6 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Target className="w-6 h-6 text-payload-cyan" />
-            <h2 className="font-rajdhani font-bold text-2xl uppercase tracking-wide">
-              {isAdmin ? 'MISSIONS MANAGEMENT' : 'MY MISSIONS'}
+        <div className="border-b border-white/10 p-4 sm:p-6 flex items-center justify-between">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <Target className="w-5 h-5 sm:w-6 sm:h-6 text-payload-cyan flex-shrink-0" />
+            <h2 className="font-rajdhani font-bold text-lg sm:text-2xl uppercase tracking-wide">
+              {isAdmin ? 'MISSIONS' : 'MY MISSIONS'}
             </h2>
           </div>
           <button
@@ -182,7 +182,7 @@ const MissionsModal = ({ onClose, onUpdate }) => {
           </button>
         </div>
 
-        <div className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+        <div className="p-4 sm:p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
           {isAdmin && !showForm && !editingId && (
             <button
               data-testid="add-mission-btn"
@@ -293,32 +293,32 @@ const MissionsModal = ({ onClose, onUpdate }) => {
                 <div key={mission.id}>
                   <div
                     data-testid={`mission-item-${index}`}
-                    className={`bg-black/30 border ${mission.is_active ? 'border-payload-cyan/30' : 'border-white/10'} p-6 rounded-sm hover:border-white/20 transition-all`}
+                    className={`bg-black/30 border ${mission.is_active ? 'border-payload-cyan/30' : 'border-white/10'} p-4 sm:p-6 rounded-sm hover:border-white/20 transition-all`}
                   >
-                    <div className="flex items-start justify-between mb-3">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-2">
-                        <h3 className="font-rajdhani font-bold text-xl uppercase tracking-wide text-payload-cyan">
+                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-3 gap-2">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-2">
+                        <h3 className="font-rajdhani font-bold text-base sm:text-xl uppercase tracking-wide text-payload-cyan">
                           {mission.title}
                         </h3>
                         {mission.is_active && (
-                          <span className="font-mono text-xs bg-payload-cyan/20 text-payload-cyan px-2 py-1 rounded-sm">ACTIVE</span>
+                          <span className="font-mono text-[10px] sm:text-xs bg-payload-cyan/20 text-payload-cyan px-2 py-0.5 sm:py-1 rounded-sm">ACTIVE</span>
                         )}
                       </div>
                       {isAdmin && (
-                        <p className="font-mono text-xs text-payload-muted mb-2">
+                        <p className="font-mono text-[10px] sm:text-xs text-payload-muted mb-2 truncate">
                           ASSIGNED TO: {getMemberName(mission.assigned_to)}
                         </p>
                       )}
-                      <p className="font-inter text-sm text-payload-text mb-4">{mission.objective}</p>
-                      <div className="grid grid-cols-3 gap-4 font-mono text-xs">
+                      <p className="font-inter text-xs sm:text-sm text-payload-text mb-4">{mission.objective}</p>
+                      <div className={`grid ${isAdmin ? 'grid-cols-1 xs:grid-cols-3' : 'grid-cols-2'} gap-3 sm:gap-4 font-mono text-xs`}>
                         {isAdmin && (
-                          <div>
+                          <div className="col-span-1 xs:col-span-1">
                             <div className="text-payload-muted uppercase tracking-widest mb-1">STATUS</div>
                             <select
                               value={mission.status}
                               onChange={(e) => handleStatusChange(mission.id, e.target.value)}
-                              className="bg-black border border-white/20 text-payload-cyan py-1 px-2 rounded-none uppercase text-xs"
+                              className="bg-black border border-white/20 text-payload-cyan py-1 px-2 rounded-none uppercase text-xs w-full max-w-[140px]"
                             >
                               <option value="pending">PENDING</option>
                               <option value="in_progress">IN PROGRESS</option>
@@ -329,15 +329,15 @@ const MissionsModal = ({ onClose, onUpdate }) => {
                         )}
                         <div>
                           <div className="text-payload-muted uppercase tracking-widest mb-1">PRIORITY</div>
-                          <div className={`uppercase ${getPriorityColor(mission.priority)}`}>{mission.priority}</div>
+                          <div className={`uppercase text-sm sm:text-xs ${getPriorityColor(mission.priority)}`}>{mission.priority}</div>
                         </div>
                         <div>
                           <div className="text-payload-muted uppercase tracking-widest mb-1">DUE DATE</div>
-                          <div className="text-payload-text">{mission.due_date ? new Date(mission.due_date).toLocaleDateString() : 'N/A'}</div>
+                          <div className="text-payload-text text-sm sm:text-xs">{mission.due_date ? new Date(mission.due_date).toLocaleDateString() : 'N/A'}</div>
                         </div>
                       </div>
                     </div>
-                    <div className="flex gap-2 ml-4">
+                    <div className="flex gap-2 sm:ml-4 self-start sm:self-auto">
                       {isAdmin ? (
                         <>
                           <button
