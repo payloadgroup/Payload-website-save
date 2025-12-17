@@ -1,6 +1,8 @@
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { Rocket, Users, Target, Zap } from 'lucide-react';
+import PayloadLogo from '@/components/PayloadLogo';
+import PayloadIcon from '@/components/PayloadIcon';
 
 const LandingPage = () => {
   const navigate = useNavigate();
