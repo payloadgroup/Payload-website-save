@@ -208,6 +208,48 @@ const AdminPanel = () => {
                     </div>
                   </div>
                 </motion.div>
+              ))
+            )
+          ) : (
+            /* All Members Tab */
+            <div className="space-y-4">
+              {allMembers.map((member, index) => (
+                <motion.div
+                  key={member.id}
+                  data-testid={`member-item-${index}`}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: index * 0.05 }}
+                  className="bg-payload-surface border border-white/10 p-6 rounded-sm hover:border-white/20 transition-all"
+                >
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <h3 className="font-rajdhani font-bold text-xl uppercase tracking-wide mb-2 text-payload-neon">
+                        {member.name}
+                      </h3>
+                      <div className="space-y-1 font-mono text-sm">
+                        <div className="flex items-center gap-2">
+                          <span className="text-payload-muted uppercase tracking-widest">EMAIL:</span>
+                          <span className="text-payload-text">{member.email}</span>
+                        </div>
+                        {member.referral_code && (
+                          <div className="flex items-center gap-2">
+                            <span className="text-payload-muted uppercase tracking-widest">REFERRAL:</span>
+                            <span className="text-payload-neon">{member.referral_code}</span>
+                          </div>
+                        )}
+                        <div className="flex items-center gap-2">
+                          <span className="text-payload-muted uppercase tracking-widest">JOINED:</span>
+                          <span className="text-payload-text">{new Date(member.created_at).toLocaleDateString()}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-payload-muted uppercase tracking-widest">STATUS:</span>
+                          <span className="text-payload-neon uppercase">{member.status}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
               ))}
             </div>
           )}
