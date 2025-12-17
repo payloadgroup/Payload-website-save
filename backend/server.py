@@ -305,6 +305,9 @@ async def login(credentials: UserLogin):
     if user["status"] == UserStatus.DENIED:
         raise HTTPException(status_code=403, detail="Your registration has been denied")
     
+    if user["status"] == UserStatus.LOCKED:
+        raise HTTPException(status_code=403, detail="Your account has been locked. Please contact admin.")
+    
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
         data={"sub": user["id"]}, expires_delta=access_token_expires
