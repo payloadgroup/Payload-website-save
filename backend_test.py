@@ -1122,6 +1122,25 @@ def main():
     tester.test_unauthorized_access()
     tester.test_non_admin_access()
     
+    # Test account locking feature
+    print("\n" + "="*60)
+    print("TESTING ACCOUNT LOCKING FEATURE")
+    print("="*60)
+    
+    tester.test_get_members()
+    tester.test_get_locked_users()
+    
+    # Create test user for locking operations
+    if tester.test_create_test_user_for_locking():
+        tester.test_lock_user_account()
+        tester.test_locked_user_login_blocked()
+        tester.test_unlock_user_account()
+        tester.test_delete_locked_user()
+    
+    # Test admin protection and unauthorized access
+    tester.test_admin_protection_from_locking()
+    tester.test_member_unauthorized_admin_access()
+    
     # Clean up - delete created items
     print("\n" + "="*50)
     print("CLEANUP - DELETING TEST DATA")
