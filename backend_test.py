@@ -254,6 +254,534 @@ class PayloadAPITester:
         )
         return success
 
+    # ===== PAYLOADS MODULE TESTING =====
+    def test_create_payload(self):
+        """Test creating a payload"""
+        if not self.user_token:
+            print("❌ No user token available")
+            return False
+            
+        headers = {'Authorization': f'Bearer {self.user_token}'}
+        payload_data = {
+            "title": "Test Payload",
+            "description": "A test payload for API testing",
+            "funding_goal": 10000.0,
+            "current_funding": 2500.0
+        }
+        
+        success, response = self.run_test(
+            "Create Payload",
+            "POST",
+            "payloads",
+            201,
+            data=payload_data,
+            headers=headers
+        )
+        
+        if success and 'id' in response:
+            self.created_payload_id = response['id']
+            print(f"   Payload ID: {self.created_payload_id}")
+            return True
+        return False
+
+    def test_get_payloads(self):
+        """Test getting user's payloads"""
+        if not self.user_token:
+            print("❌ No user token available")
+            return False
+            
+        headers = {'Authorization': f'Bearer {self.user_token}'}
+        success, response = self.run_test(
+            "Get Payloads",
+            "GET",
+            "payloads",
+            200,
+            headers=headers
+        )
+        
+        if success:
+            print(f"   Found {len(response)} payloads")
+            return True
+        return False
+
+    def test_update_payload(self):
+        """Test updating a payload"""
+        if not self.user_token or not self.created_payload_id:
+            print("❌ Missing user token or payload ID")
+            return False
+            
+        headers = {'Authorization': f'Bearer {self.user_token}'}
+        update_data = {
+            "status": "paused",
+            "current_funding": 5000.0
+        }
+        
+        success, response = self.run_test(
+            "Update Payload",
+            "PUT",
+            f"payloads/{self.created_payload_id}",
+            200,
+            data=update_data,
+            headers=headers
+        )
+        return success
+
+    def test_delete_payload(self):
+        """Test deleting a payload"""
+        if not self.user_token or not self.created_payload_id:
+            print("❌ Missing user token or payload ID")
+            return False
+            
+        headers = {'Authorization': f'Bearer {self.user_token}'}
+        success, response = self.run_test(
+            "Delete Payload",
+            "DELETE",
+            f"payloads/{self.created_payload_id}",
+            200,
+            headers=headers
+        )
+        return success
+
+    # ===== MISSIONS MODULE TESTING =====
+    def test_create_mission(self):
+        """Test creating a mission"""
+        if not self.user_token:
+            print("❌ No user token available")
+            return False
+            
+        headers = {'Authorization': f'Bearer {self.user_token}'}
+        mission_data = {
+            "title": "Test Mission",
+            "objective": "Complete API testing for missions module",
+            "priority": "high",
+            "due_date": "2024-12-31"
+        }
+        
+        success, response = self.run_test(
+            "Create Mission",
+            "POST",
+            "missions",
+            201,
+            data=mission_data,
+            headers=headers
+        )
+        
+        if success and 'id' in response:
+            self.created_mission_id = response['id']
+            print(f"   Mission ID: {self.created_mission_id}")
+            return True
+        return False
+
+    def test_get_missions(self):
+        """Test getting user's missions"""
+        if not self.user_token:
+            print("❌ No user token available")
+            return False
+            
+        headers = {'Authorization': f'Bearer {self.user_token}'}
+        success, response = self.run_test(
+            "Get Missions",
+            "GET",
+            "missions",
+            200,
+            headers=headers
+        )
+        
+        if success:
+            print(f"   Found {len(response)} missions")
+            return True
+        return False
+
+    def test_update_mission(self):
+        """Test updating a mission"""
+        if not self.user_token or not self.created_mission_id:
+            print("❌ Missing user token or mission ID")
+            return False
+            
+        headers = {'Authorization': f'Bearer {self.user_token}'}
+        update_data = {
+            "status": "completed",
+            "priority": "medium"
+        }
+        
+        success, response = self.run_test(
+            "Update Mission",
+            "PUT",
+            f"missions/{self.created_mission_id}",
+            200,
+            data=update_data,
+            headers=headers
+        )
+        return success
+
+    def test_delete_mission(self):
+        """Test deleting a mission"""
+        if not self.user_token or not self.created_mission_id:
+            print("❌ Missing user token or mission ID")
+            return False
+            
+        headers = {'Authorization': f'Bearer {self.user_token}'}
+        success, response = self.run_test(
+            "Delete Mission",
+            "DELETE",
+            f"missions/{self.created_mission_id}",
+            200,
+            headers=headers
+        )
+        return success
+
+    # ===== BUSINESS BANK MODULE TESTING =====
+    def test_create_transaction(self):
+        """Test creating a transaction"""
+        if not self.user_token:
+            print("❌ No user token available")
+            return False
+            
+        headers = {'Authorization': f'Bearer {self.user_token}'}
+        transaction_data = {
+            "type": "deposit",
+            "amount": 1000.0,
+            "description": "Test deposit transaction",
+            "category": "testing"
+        }
+        
+        success, response = self.run_test(
+            "Create Transaction (Deposit)",
+            "POST",
+            "transactions",
+            201,
+            data=transaction_data,
+            headers=headers
+        )
+        return success
+
+    def test_create_withdrawal(self):
+        """Test creating a withdrawal transaction"""
+        if not self.user_token:
+            print("❌ No user token available")
+            return False
+            
+        headers = {'Authorization': f'Bearer {self.user_token}'}
+        transaction_data = {
+            "type": "withdrawal",
+            "amount": 250.0,
+            "description": "Test withdrawal transaction",
+            "category": "testing"
+        }
+        
+        success, response = self.run_test(
+            "Create Transaction (Withdrawal)",
+            "POST",
+            "transactions",
+            201,
+            data=transaction_data,
+            headers=headers
+        )
+        return success
+
+    def test_get_transactions(self):
+        """Test getting user's transactions"""
+        if not self.user_token:
+            print("❌ No user token available")
+            return False
+            
+        headers = {'Authorization': f'Bearer {self.user_token}'}
+        success, response = self.run_test(
+            "Get Transactions",
+            "GET",
+            "transactions",
+            200,
+            headers=headers
+        )
+        
+        if success:
+            print(f"   Found {len(response)} transactions")
+            return True
+        return False
+
+    def test_get_balance(self):
+        """Test getting current balance"""
+        if not self.user_token:
+            print("❌ No user token available")
+            return False
+            
+        headers = {'Authorization': f'Bearer {self.user_token}'}
+        success, response = self.run_test(
+            "Get Balance",
+            "GET",
+            "bank/balance",
+            200,
+            headers=headers
+        )
+        
+        if success:
+            print(f"   Current balance: ${response.get('balance', 0)}")
+            return True
+        return False
+
+    # ===== HEADQUARTERS MODULE TESTING =====
+    def test_create_headquarters(self):
+        """Test creating headquarters"""
+        if not self.user_token:
+            print("❌ No user token available")
+            return False
+            
+        headers = {'Authorization': f'Bearer {self.user_token}'}
+        hq_data = {
+            "name": "Test HQ",
+            "location": "Test City, Test State",
+            "description": "A test headquarters for API testing"
+        }
+        
+        success, response = self.run_test(
+            "Create Headquarters",
+            "POST",
+            "headquarters",
+            201,
+            data=hq_data,
+            headers=headers
+        )
+        return success
+
+    def test_get_headquarters(self):
+        """Test getting headquarters"""
+        if not self.user_token:
+            print("❌ No user token available")
+            return False
+            
+        headers = {'Authorization': f'Bearer {self.user_token}'}
+        success, response = self.run_test(
+            "Get Headquarters",
+            "GET",
+            "headquarters",
+            200,
+            headers=headers
+        )
+        return success
+
+    def test_update_headquarters(self):
+        """Test updating headquarters"""
+        if not self.user_token:
+            print("❌ No user token available")
+            return False
+            
+        headers = {'Authorization': f'Bearer {self.user_token}'}
+        update_data = {
+            "description": "Updated test headquarters description"
+        }
+        
+        success, response = self.run_test(
+            "Update Headquarters",
+            "PUT",
+            "headquarters",
+            200,
+            data=update_data,
+            headers=headers
+        )
+        return success
+
+    # ===== STATIONS MODULE TESTING =====
+    def test_create_station(self):
+        """Test creating a station"""
+        if not self.user_token:
+            print("❌ No user token available")
+            return False
+            
+        headers = {'Authorization': f'Bearer {self.user_token}'}
+        station_data = {
+            "name": "Test Station",
+            "location": "Test Location",
+            "type": "office",
+            "description": "A test station for API testing"
+        }
+        
+        success, response = self.run_test(
+            "Create Station",
+            "POST",
+            "stations",
+            201,
+            data=station_data,
+            headers=headers
+        )
+        
+        if success and 'id' in response:
+            self.created_station_id = response['id']
+            print(f"   Station ID: {self.created_station_id}")
+            return True
+        return False
+
+    def test_get_stations(self):
+        """Test getting user's stations"""
+        if not self.user_token:
+            print("❌ No user token available")
+            return False
+            
+        headers = {'Authorization': f'Bearer {self.user_token}'}
+        success, response = self.run_test(
+            "Get Stations",
+            "GET",
+            "stations",
+            200,
+            headers=headers
+        )
+        
+        if success:
+            print(f"   Found {len(response)} stations")
+            return True
+        return False
+
+    def test_update_station(self):
+        """Test updating a station"""
+        if not self.user_token or not self.created_station_id:
+            print("❌ Missing user token or station ID")
+            return False
+            
+        headers = {'Authorization': f'Bearer {self.user_token}'}
+        update_data = {
+            "status": "inactive",
+            "type": "warehouse"
+        }
+        
+        success, response = self.run_test(
+            "Update Station",
+            "PUT",
+            f"stations/{self.created_station_id}",
+            200,
+            data=update_data,
+            headers=headers
+        )
+        return success
+
+    def test_delete_station(self):
+        """Test deleting a station"""
+        if not self.user_token or not self.created_station_id:
+            print("❌ Missing user token or station ID")
+            return False
+            
+        headers = {'Authorization': f'Bearer {self.user_token}'}
+        success, response = self.run_test(
+            "Delete Station",
+            "DELETE",
+            f"stations/{self.created_station_id}",
+            200,
+            headers=headers
+        )
+        return success
+
+    # ===== BASECAMP MODULE TESTING =====
+    def test_create_resource(self):
+        """Test creating a resource (admin only)"""
+        if not self.admin_token:
+            print("❌ No admin token available")
+            return False
+            
+        headers = {'Authorization': f'Bearer {self.admin_token}'}
+        resource_data = {
+            "title": "Test Resource",
+            "description": "A test resource for API testing",
+            "type": "document",
+            "url": "https://example.com/test-resource"
+        }
+        
+        success, response = self.run_test(
+            "Create Resource (Admin)",
+            "POST",
+            "basecamp",
+            201,
+            data=resource_data,
+            headers=headers
+        )
+        
+        if success and 'id' in response:
+            self.created_resource_id = response['id']
+            print(f"   Resource ID: {self.created_resource_id}")
+            return True
+        return False
+
+    def test_get_resources(self):
+        """Test getting resources"""
+        if not self.user_token:
+            print("❌ No user token available")
+            return False
+            
+        headers = {'Authorization': f'Bearer {self.user_token}'}
+        success, response = self.run_test(
+            "Get Resources",
+            "GET",
+            "basecamp",
+            200,
+            headers=headers
+        )
+        
+        if success:
+            print(f"   Found {len(response)} resources")
+            return True
+        return False
+
+    def test_user_create_resource_forbidden(self):
+        """Test that regular users cannot create resources"""
+        if not self.user_token:
+            print("❌ No user token available")
+            return False
+            
+        headers = {'Authorization': f'Bearer {self.user_token}'}
+        resource_data = {
+            "title": "Unauthorized Resource",
+            "description": "This should fail",
+            "type": "document",
+            "url": "https://example.com/unauthorized"
+        }
+        
+        success, response = self.run_test(
+            "User Create Resource (should fail)",
+            "POST",
+            "basecamp",
+            403,
+            data=resource_data,
+            headers=headers
+        )
+        return success
+
+    # ===== ADMIN ANALYTICS TESTING =====
+    def test_admin_analytics(self):
+        """Test admin analytics endpoint"""
+        if not self.admin_token:
+            print("❌ No admin token available")
+            return False
+            
+        headers = {'Authorization': f'Bearer {self.admin_token}'}
+        success, response = self.run_test(
+            "Admin Analytics",
+            "GET",
+            "admin/analytics",
+            200,
+            headers=headers
+        )
+        
+        if success:
+            print(f"   Total members: {response.get('total_members', 0)}")
+            print(f"   Total payloads: {response.get('total_payloads', 0)}")
+            print(f"   Total missions: {response.get('total_missions', 0)}")
+            print(f"   Total transactions: {response.get('total_transactions', 0)}")
+            return True
+        return False
+
+    def test_user_analytics_forbidden(self):
+        """Test that regular users cannot access analytics"""
+        if not self.user_token:
+            print("❌ No user token available")
+            return False
+            
+        headers = {'Authorization': f'Bearer {self.user_token}'}
+        success, response = self.run_test(
+            "User Access Analytics (should fail)",
+            "GET",
+            "admin/analytics",
+            403,
+            headers=headers
+        )
+        return success
+
 def main():
     print("🚀 Starting Payload API Testing...")
     tester = PayloadAPITester()
