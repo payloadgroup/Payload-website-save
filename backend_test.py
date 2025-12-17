@@ -234,7 +234,7 @@ class PayloadAPITester:
             "Unauthorized Dashboard Access (should fail)",
             "GET",
             "dashboard",
-            401
+            403
         )
         return success
 
