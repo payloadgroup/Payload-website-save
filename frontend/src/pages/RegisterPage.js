@@ -12,10 +12,13 @@ const RegisterPage = () => {
     name: '',
     email: '',
     password: '',
+    mobile: '',
+    date_of_birth: '',
     referral_code: ''
   });
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [errors, setErrors] = useState({});
 
   const handleSubmit = async (e) => {
     e.preventDefault();
