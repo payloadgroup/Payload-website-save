@@ -7,7 +7,7 @@ import PayloadLogo from '@/components/PayloadLogo';
 const ROOMS = [
   {
     id: 1,
-    name: 'DepoBond & Tech Platform',
+    name: 'Depobond',
     type: 'R&D',
     icon: Beaker,
     color: 'text-purple-400',
