@@ -315,9 +315,16 @@ const AdminPanel = () => {
                   >
                     <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4">
                       <div className="flex-1 min-w-0">
-                        <h3 className="font-rajdhani font-bold text-lg sm:text-xl uppercase tracking-wide mb-2 text-payload-neon truncate">
-                          {member.name}
-                        </h3>
+                        <div className="flex items-center gap-3 mb-2">
+                          <h3 className="font-rajdhani font-bold text-lg sm:text-xl uppercase tracking-wide text-payload-neon truncate">
+                            {member.name}
+                          </h3>
+                          {member.credit_score && (
+                            <span className="font-mono text-xs bg-payload-neon/20 text-payload-neon px-2 py-0.5 rounded-sm">
+                              CS: {member.credit_score}
+                            </span>
+                          )}
+                        </div>
                         <div className="space-y-1 font-mono text-xs sm:text-sm">
                           <div className="flex flex-col xs:flex-row xs:items-center gap-1 xs:gap-2">
                             <span className="text-payload-muted uppercase tracking-widest">EMAIL:</span>
