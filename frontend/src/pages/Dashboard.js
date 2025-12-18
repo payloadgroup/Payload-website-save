@@ -246,16 +246,16 @@ const Dashboard = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.4 }}
-              onClick={() => setActiveModal('headquarters')}
+              onClick={() => navigate('/headquarters')}
               className="bg-payload-surface border border-white/10 p-4 sm:p-6 rounded-sm hover:border-white/30 transition-all duration-300 cursor-pointer"
             >
               <div className="flex items-start justify-between gap-2 mb-3 sm:mb-4">
                 <Building className="w-6 h-6 sm:w-8 sm:h-8 text-white flex-shrink-0" />
-                <span className="font-mono text-[8px] sm:text-xs text-payload-muted uppercase tracking-normal sm:tracking-widest text-right">ACTIVE</span>
+                <span className="font-mono text-[8px] sm:text-xs text-payload-muted uppercase tracking-normal sm:tracking-widest text-right">8 ROOMS</span>
               </div>
               <h3 className="font-rajdhani font-bold text-base sm:text-2xl uppercase tracking-wide mb-1 sm:mb-2">HQ</h3>
-              <p className="font-inter text-[11px] sm:text-sm text-payload-muted mb-3 sm:mb-4 line-clamp-2">Main operations base</p>
-              <div className="font-mono text-xs sm:text-sm text-white">{dashboardData?.headquarters ? 'SET' : 'NOT SET'}</div>
+              <p className="font-inter text-[11px] sm:text-sm text-payload-muted mb-3 sm:mb-4 line-clamp-2">Business Operations</p>
+              <div className="font-mono text-xs sm:text-sm text-white">VIEW ROOMS</div>
             </motion.div>
 
             <motion.div
