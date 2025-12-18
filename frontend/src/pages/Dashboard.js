@@ -29,11 +29,28 @@ const Dashboard = () => {
   const [activeModal, setActiveModal] = useState(null);
   const [announcements, setAnnouncements] = useState([]);
   const [dismissedAnnouncements, setDismissedAnnouncements] = useState([]);
+  const [profile, setProfile] = useState(null);
 
   useEffect(() => {
     fetchDashboardData();
     fetchAnnouncements();
+    fetchProfile();
   }, []);
+
+  const fetchProfile = async () => {
+    try {
+      const response = await axios.get(`${API}/users/profile`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setProfile(response.data);
+      // Redirect to onboarding if not complete (members only)
+      if (user?.role === 'member' && !response.data.onboarding_complete) {
+        navigate('/onboarding');
+      }
+    } catch (error) {
+      console.error('Failed to fetch profile:', error);
+    }
+  };
 
   const fetchDashboardData = async () => {
     try {
