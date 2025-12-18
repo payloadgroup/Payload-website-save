@@ -136,6 +136,7 @@ const Dashboard = () => {
                     ADMIN
                   </button>
                 )}
+                <SettingsDropdown />
                 <button
                   data-testid="logout-btn"
                   onClick={handleLogout}
