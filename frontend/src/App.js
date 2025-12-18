@@ -74,6 +74,14 @@ function App() {
                 </ProtectedRoute>
               }
             />
+            <Route
+              path="/headquarters"
+              element={
+                <ProtectedRoute>
+                  <HeadquartersPage />
+                </ProtectedRoute>
+              }
+            />
           </Routes>
         </BrowserRouter>
         <Toaster position="top-right" theme="dark" />
