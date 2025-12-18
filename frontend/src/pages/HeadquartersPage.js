@@ -39,14 +39,14 @@ const ROOMS = [
   },
   {
     id: 3,
-    name: 'Casa Pyramids',
+    name: 'Censored Referrals',
     type: 'OPERATIONAL',
     icon: Home,
     color: 'text-blue-400',
     borderColor: 'border-blue-500/30',
     bgColor: 'bg-blue-500/10',
-    description: 'Online promotion and management of the Casa referral program.',
-    focus: null,
+    description: 'Member referral tracking and social media content guidance program.',
+    focus: 'Grow the community through referrals and boost your member tier.',
     details: null
   },
   {
