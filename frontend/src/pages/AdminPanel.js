@@ -157,6 +157,14 @@ const AdminPanel = () => {
                 <span>MANAGE</span>
               </button>
               <button
+                data-testid="goto-notifications-btn"
+                onClick={() => navigate('/notifications')}
+                className="flex items-center gap-1 sm:gap-2 font-mono text-xs sm:text-sm border border-green-500 text-green-500 px-2 sm:px-4 py-1.5 sm:py-2 rounded-none hover:bg-green-500 hover:text-black transition-all duration-300"
+              >
+                <Bell className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span>ALERTS</span>
+              </button>
+              <button
                 data-testid="goto-analytics-btn"
                 onClick={() => navigate('/analytics')}
                 className="flex items-center gap-1 sm:gap-2 font-mono text-xs sm:text-sm border border-payload-cyan text-payload-cyan px-2 sm:px-4 py-1.5 sm:py-2 rounded-none hover:bg-payload-cyan hover:text-black transition-all duration-300"
