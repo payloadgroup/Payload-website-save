@@ -315,7 +315,6 @@ const Dashboard = () => {
       {activeModal === 'payloads' && <PayloadsModal onClose={() => setActiveModal(null)} onUpdate={refreshData} />}
       {activeModal === 'missions' && <MissionsModal onClose={() => setActiveModal(null)} onUpdate={refreshData} />}
       {activeModal === 'bank' && <BankModal onClose={() => setActiveModal(null)} onUpdate={refreshData} />}
-      {activeModal === 'headquarters' && <HeadquartersModal onClose={() => setActiveModal(null)} onUpdate={refreshData} />}
       {activeModal === 'stations' && <StationsModal onClose={() => setActiveModal(null)} onUpdate={refreshData} />}
       {activeModal === 'basecamp' && <BasecampModal onClose={() => setActiveModal(null)} />}
     </div>
