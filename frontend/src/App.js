@@ -9,6 +9,11 @@ import AdminPanel from "@/pages/AdminPanel";
 import AdminManagement from "@/pages/AdminManagement";
 import Analytics from "@/pages/Analytics";
 import HeadquartersPage from "@/pages/HeadquartersPage";
+import ProfilePage from "@/pages/ProfilePage";
+import AccountSettingsPage from "@/pages/AccountSettingsPage";
+import OnboardingPage from "@/pages/OnboardingPage";
+import ReferralsPage from "@/pages/ReferralsPage";
+import NotificationSettingsPage from "@/pages/NotificationSettingsPage";
 import { AuthProvider, useAuth } from "@/context/AuthContext";
 
 const ProtectedRoute = ({ children, adminOnly = false }) => {
