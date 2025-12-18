@@ -36,6 +36,7 @@ api_router.include_router(bank.router)
 api_router.include_router(headquarters.router)
 api_router.include_router(stations.router)
 api_router.include_router(basecamp.router)
+api_router.include_router(notifications.router)
 
 app.include_router(api_router)
 
