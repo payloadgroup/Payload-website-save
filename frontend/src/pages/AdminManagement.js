@@ -206,7 +206,7 @@ const AdminManagement = () => {
               className="flex items-center gap-1 sm:gap-2 font-mono text-xs sm:text-sm border border-white/20 px-2 sm:px-4 py-1.5 sm:py-2 rounded-none hover:border-white hover:bg-white/5 transition-all duration-300 w-fit"
             >
               <ArrowLeft className="w-3 h-3 sm:w-4 sm:h-4" />
-              ADMIN PANEL
+              <span>ADMIN PANEL</span>
             </button>
           </div>
         </div>
@@ -241,7 +241,7 @@ const AdminManagement = () => {
                 }`}
               >
                 <tab.icon className="w-3 h-3 sm:w-4 sm:h-4" />
-                <span className="hidden sm:inline">{tab.label}</span>
+                <span>{tab.label}</span>
               </button>
             ))}
           </div>

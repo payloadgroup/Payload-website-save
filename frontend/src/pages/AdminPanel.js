@@ -154,8 +154,7 @@ const AdminPanel = () => {
                 className="flex items-center gap-1 sm:gap-2 font-mono text-xs sm:text-sm border border-payload-neon text-payload-neon px-2 sm:px-4 py-1.5 sm:py-2 rounded-none hover:bg-payload-neon hover:text-black transition-all duration-300"
               >
                 <Crown className="w-3 h-3 sm:w-4 sm:h-4" />
-                <span className="hidden xs:inline">MANAGE</span>
-                <span className="xs:hidden">⚙</span>
+                <span>MANAGE</span>
               </button>
               <button
                 data-testid="goto-analytics-btn"
@@ -163,8 +162,7 @@ const AdminPanel = () => {
                 className="flex items-center gap-1 sm:gap-2 font-mono text-xs sm:text-sm border border-payload-cyan text-payload-cyan px-2 sm:px-4 py-1.5 sm:py-2 rounded-none hover:bg-payload-cyan hover:text-black transition-all duration-300"
               >
                 <BarChart3 className="w-3 h-3 sm:w-4 sm:h-4" />
-                <span className="hidden xs:inline">ANALYTICS</span>
-                <span className="xs:hidden">📊</span>
+                <span>ANALYTICS</span>
               </button>
               <button
                 data-testid="back-to-dashboard-btn"
@@ -172,8 +170,7 @@ const AdminPanel = () => {
                 className="flex items-center gap-1 sm:gap-2 font-mono text-xs sm:text-sm border border-white/20 px-2 sm:px-4 py-1.5 sm:py-2 rounded-none hover:border-white hover:bg-white/5 transition-all duration-300"
               >
                 <ArrowLeft className="w-3 h-3 sm:w-4 sm:h-4" />
-                <span className="hidden xs:inline">DASHBOARD</span>
-                <span className="xs:hidden">←</span>
+                <span>DASHBOARD</span>
               </button>
             </div>
           </div>
@@ -206,7 +203,7 @@ const AdminPanel = () => {
               }`}
             >
               <Clock className="w-3 h-3 sm:w-4 sm:h-4" />
-              <span className="hidden sm:inline">PENDING</span> ({pendingUsers.length})
+              <span>PENDING</span> ({pendingUsers.length})
             </button>
             <button
               onClick={() => setActiveTab('members')}
@@ -217,7 +214,7 @@ const AdminPanel = () => {
               }`}
             >
               <Users className="w-3 h-3 sm:w-4 sm:h-4" />
-              <span className="hidden sm:inline">MEMBERS</span> ({allMembers.length})
+              <span>MEMBERS</span> ({allMembers.length})
             </button>
             <button
               onClick={() => setActiveTab('locked')}
@@ -228,7 +225,7 @@ const AdminPanel = () => {
               }`}
             >
               <ShieldOff className="w-3 h-3 sm:w-4 sm:h-4" />
-              <span className="hidden sm:inline">LOCKED</span> ({lockedUsers.length})
+              <span>LOCKED</span> ({lockedUsers.length})
             </button>
           </div>
 
