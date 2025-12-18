@@ -160,7 +160,7 @@ const RegisterPage = () => {
                 value={formData.mobile}
                 onChange={(e) => setFormData({ ...formData, mobile: e.target.value })}
                 className={`w-full bg-black border-b ${errors.mobile ? 'border-red-500' : 'border-white/20'} focus:border-payload-neon focus:outline-none py-3 px-0 font-mono text-payload-text placeholder:text-white/30 transition-colors`}
-                placeholder="+1 234 567 8900"
+                placeholder="+61 4XX XXX XXX"
               />
               {errors.mobile && (
                 <p className="text-red-500 text-xs font-mono mt-1">{errors.mobile}</p>
