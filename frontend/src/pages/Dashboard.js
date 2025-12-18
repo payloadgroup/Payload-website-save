@@ -158,12 +158,28 @@ const Dashboard = () => {
           transition={{ duration: 0.5 }}
         >
           <div className="mb-8 sm:mb-12">
-            <h1 className="font-rajdhani font-bold text-2xl sm:text-4xl uppercase tracking-wide mb-2">
-              MISSION CONTROL
-            </h1>
-            <p className="font-mono text-xs sm:text-sm text-payload-neon uppercase tracking-widest">
-              {dashboardData?.status || 'SYSTEMS ONLINE'}
-            </p>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div>
+                <h1 className="font-rajdhani font-bold text-2xl sm:text-4xl uppercase tracking-wide mb-2">
+                  MISSION CONTROL
+                </h1>
+                <p className="font-mono text-xs sm:text-sm text-payload-neon uppercase tracking-widest">
+                  {dashboardData?.status || 'SYSTEMS ONLINE'}
+                </p>
+              </div>
+              {/* Credit Score Display */}
+              {profile?.credit_score && (
+                <div className="bg-black border-2 border-payload-neon rounded-sm px-4 py-2 shadow-[0_0_15px_rgba(0,255,170,0.3)]">
+                  <div className="flex items-center gap-2">
+                    <CreditCard className="w-5 h-5 text-payload-neon" />
+                    <div>
+                      <div className="font-mono text-[10px] text-payload-muted uppercase">CREDIT SCORE</div>
+                      <div className="font-mono text-2xl text-payload-neon font-bold">{profile.credit_score}</div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Announcements Section */}
