@@ -8,7 +8,6 @@ import PayloadLogo from '@/components/PayloadLogo';
 import PayloadsModal from '@/components/modules/PayloadsModal';
 import MissionsModal from '@/components/modules/MissionsModal';
 import BankModal from '@/components/modules/BankModal';
-import HeadquartersModal from '@/components/modules/HeadquartersModal';
 import StationsModal from '@/components/modules/StationsModal';
 import BasecampModal from '@/components/modules/BasecampModal';
 
