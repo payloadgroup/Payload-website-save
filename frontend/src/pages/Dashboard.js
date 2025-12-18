@@ -223,7 +223,7 @@ const Dashboard = () => {
             </div>
           )}
 
-          <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             <motion.div
               data-testid="payloads-card"
               initial={{ opacity: 0 }}
@@ -234,11 +234,11 @@ const Dashboard = () => {
             >
               <div className="flex items-start justify-between gap-2 mb-3 sm:mb-4">
                 <Rocket className="w-6 h-6 sm:w-8 sm:h-8 text-payload-neon flex-shrink-0" />
-                <span className="font-mono text-[8px] sm:text-xs text-payload-muted uppercase tracking-normal sm:tracking-widest text-right">ACTIVE</span>
+                <span className="font-mono text-[8px] sm:text-xs text-payload-muted uppercase tracking-widest text-right">ACTIVE</span>
               </div>
-              <h3 className="font-rajdhani font-bold text-base sm:text-2xl uppercase tracking-wide mb-1 sm:mb-2">PAYLOADS</h3>
-              <p className="font-inter text-[11px] sm:text-sm text-payload-muted mb-3 sm:mb-4 line-clamp-2">Active ventures & projects</p>
-              <div className="font-mono text-2xl sm:text-3xl text-payload-neon">{dashboardData?.payloads_count || 0}</div>
+              <h3 className="font-rajdhani font-bold text-base sm:text-xl uppercase tracking-wide mb-1 sm:mb-2">PAYLOADS</h3>
+              <p className="font-inter text-[10px] sm:text-xs text-payload-muted mb-2 sm:mb-4 line-clamp-2">Ventures & projects</p>
+              <div className="font-mono text-xl sm:text-2xl text-payload-neon">{dashboardData?.payloads_count || 0}</div>
             </motion.div>
 
             <motion.div
@@ -251,11 +251,11 @@ const Dashboard = () => {
             >
               <div className="flex items-start justify-between gap-2 mb-3 sm:mb-4">
                 <Target className="w-6 h-6 sm:w-8 sm:h-8 text-payload-cyan flex-shrink-0" />
-                <span className="font-mono text-[8px] sm:text-xs text-payload-muted uppercase tracking-normal sm:tracking-widest text-right">PROGRESS</span>
+                <span className="font-mono text-[8px] sm:text-xs text-payload-muted uppercase tracking-widest text-right">PROGRESS</span>
               </div>
-              <h3 className="font-rajdhani font-bold text-base sm:text-2xl uppercase tracking-wide mb-1 sm:mb-2">MISSIONS</h3>
-              <p className="font-inter text-[11px] sm:text-sm text-payload-muted mb-3 sm:mb-4 line-clamp-2">Tasks and objectives</p>
-              <div className="font-mono text-2xl sm:text-3xl text-payload-cyan">{dashboardData?.missions_count || 0}</div>
+              <h3 className="font-rajdhani font-bold text-base sm:text-xl uppercase tracking-wide mb-1 sm:mb-2">MISSIONS</h3>
+              <p className="font-inter text-[10px] sm:text-xs text-payload-muted mb-2 sm:mb-4 line-clamp-2">Tasks & objectives</p>
+              <div className="font-mono text-xl sm:text-2xl text-payload-cyan">{dashboardData?.missions_count || 0}</div>
             </motion.div>
 
             <motion.div
@@ -268,11 +268,11 @@ const Dashboard = () => {
             >
               <div className="flex items-start justify-between gap-2 mb-3 sm:mb-4">
                 <DollarSign className="w-6 h-6 sm:w-8 sm:h-8 text-payload-alert flex-shrink-0" />
-                <span className="font-mono text-[8px] sm:text-xs text-payload-muted uppercase tracking-normal sm:tracking-widest text-right">BALANCE</span>
+                <span className="font-mono text-[8px] sm:text-xs text-payload-muted uppercase tracking-widest text-right">BALANCE</span>
               </div>
-              <h3 className="font-rajdhani font-bold text-base sm:text-2xl uppercase tracking-wide mb-1 sm:mb-2">BANK</h3>
-              <p className="font-inter text-[11px] sm:text-sm text-payload-muted mb-3 sm:mb-4 line-clamp-2">Financial resources</p>
-              <div className="font-mono text-xl sm:text-3xl text-payload-alert">${(dashboardData?.balance || 0).toFixed(2)}</div>
+              <h3 className="font-rajdhani font-bold text-base sm:text-xl uppercase tracking-wide mb-1 sm:mb-2">BANK</h3>
+              <p className="font-inter text-[10px] sm:text-xs text-payload-muted mb-2 sm:mb-4 line-clamp-2">Financial resources</p>
+              <div className="font-mono text-lg sm:text-2xl text-payload-alert">${(dashboardData?.balance || 0).toFixed(2)}</div>
             </motion.div>
 
             <motion.div
@@ -285,10 +285,10 @@ const Dashboard = () => {
             >
               <div className="flex items-start justify-between gap-2 mb-3 sm:mb-4">
                 <Building className="w-6 h-6 sm:w-8 sm:h-8 text-white flex-shrink-0" />
-                <span className="font-mono text-[8px] sm:text-xs text-payload-muted uppercase tracking-normal sm:tracking-widest text-right">8 ROOMS</span>
+                <span className="font-mono text-[8px] sm:text-xs text-payload-muted uppercase tracking-widest text-right">8 ROOMS</span>
               </div>
-              <h3 className="font-rajdhani font-bold text-base sm:text-2xl uppercase tracking-wide mb-1 sm:mb-2">HQ</h3>
-              <p className="font-inter text-[11px] sm:text-sm text-payload-muted mb-3 sm:mb-4 line-clamp-2">Business Operations</p>
+              <h3 className="font-rajdhani font-bold text-base sm:text-xl uppercase tracking-wide mb-1 sm:mb-2">HQ</h3>
+              <p className="font-inter text-[10px] sm:text-xs text-payload-muted mb-2 sm:mb-4 line-clamp-2">Business Operations</p>
               <div className="font-mono text-xs sm:text-sm text-white">VIEW ROOMS</div>
             </motion.div>
 
@@ -302,11 +302,11 @@ const Dashboard = () => {
             >
               <div className="flex items-start justify-between gap-2 mb-3 sm:mb-4">
                 <MapPin className="w-6 h-6 sm:w-8 sm:h-8 text-white flex-shrink-0" />
-                <span className="font-mono text-[8px] sm:text-xs text-payload-muted uppercase tracking-normal sm:tracking-widest text-right">LINKED</span>
+                <span className="font-mono text-[8px] sm:text-xs text-payload-muted uppercase tracking-widest text-right">LINKED</span>
               </div>
-              <h3 className="font-rajdhani font-bold text-base sm:text-2xl uppercase tracking-wide mb-1 sm:mb-2">STATIONS</h3>
-              <p className="font-inter text-[11px] sm:text-sm text-payload-muted mb-3 sm:mb-4 line-clamp-2">Locations & partnerships</p>
-              <div className="font-mono text-2xl sm:text-3xl text-white">{dashboardData?.stations_count || 0}</div>
+              <h3 className="font-rajdhani font-bold text-base sm:text-xl uppercase tracking-wide mb-1 sm:mb-2">STATIONS</h3>
+              <p className="font-inter text-[10px] sm:text-xs text-payload-muted mb-2 sm:mb-4 line-clamp-2">Locations & partners</p>
+              <div className="font-mono text-xl sm:text-2xl text-white">{dashboardData?.stations_count || 0}</div>
             </motion.div>
 
             <motion.div
@@ -319,11 +319,29 @@ const Dashboard = () => {
             >
               <div className="flex items-start justify-between gap-2 mb-3 sm:mb-4">
                 <BookOpen className="w-6 h-6 sm:w-8 sm:h-8 text-white flex-shrink-0" />
-                <span className="font-mono text-[8px] sm:text-xs text-payload-muted uppercase tracking-normal sm:tracking-widest text-right">READY</span>
+                <span className="font-mono text-[8px] sm:text-xs text-payload-muted uppercase tracking-widest text-right">READY</span>
               </div>
-              <h3 className="font-rajdhani font-bold text-base sm:text-2xl uppercase tracking-wide mb-1 sm:mb-2">BASECAMP</h3>
-              <p className="font-inter text-[11px] sm:text-sm text-payload-muted mb-3 sm:mb-4 line-clamp-2">Resources & training</p>
+              <h3 className="font-rajdhani font-bold text-base sm:text-xl uppercase tracking-wide mb-1 sm:mb-2">BASECAMP</h3>
+              <p className="font-inter text-[10px] sm:text-xs text-payload-muted mb-2 sm:mb-4 line-clamp-2">Resources & training</p>
               <div className="font-mono text-xs sm:text-sm text-white">ACCESS</div>
+            </motion.div>
+
+            {/* Referrals Card - replaces Casa Pyramids */}
+            <motion.div
+              data-testid="referrals-card"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.7 }}
+              onClick={() => navigate('/referrals')}
+              className="bg-payload-surface border border-purple-500/30 p-4 sm:p-6 rounded-sm hover:border-purple-500/50 transition-all duration-300 cursor-pointer col-span-2"
+            >
+              <div className="flex items-start justify-between gap-2 mb-3 sm:mb-4">
+                <Gift className="w-6 h-6 sm:w-8 sm:h-8 text-purple-400 flex-shrink-0" />
+                <span className="font-mono text-[8px] sm:text-xs text-purple-400 uppercase tracking-widest text-right">GROW</span>
+              </div>
+              <h3 className="font-rajdhani font-bold text-base sm:text-xl uppercase tracking-wide mb-1 sm:mb-2">CENSORED REFERRALS</h3>
+              <p className="font-inter text-[10px] sm:text-xs text-payload-muted mb-2 sm:mb-4">Track referrals & learn content creation to boost your tier</p>
+              <div className="font-mono text-xs sm:text-sm text-purple-400">VIEW REFERRALS</div>
             </motion.div>
           </div>
 
