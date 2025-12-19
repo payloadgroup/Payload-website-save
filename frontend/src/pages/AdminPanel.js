@@ -104,12 +104,29 @@ const AdminPanel = () => {
   };
 
   const handleDeleteUser = async (userId, userName) => {
-    if (!window.confirm(`Delete ${userName}'s account permanently?`)) return;
+    if (!window.confirm(`Delete ${userName}'s account?`)) return;
     try {
       await axios.delete(`${API}/admin/delete-user/${userId}`, { headers: { Authorization: `Bearer ${token}` } });
-      toast.success('Account deleted');
+      toast.success('Account moved to deleted');
       fetchAllData();
     } catch (error) { toast.error(error.response?.data?.detail || 'Failed to delete'); }
+  };
+
+  const handleRestoreUser = async (userId) => {
+    try {
+      await axios.post(`${API}/admin/restore-user/${userId}`, {}, { headers: { Authorization: `Bearer ${token}` } });
+      toast.success('User restored to pending');
+      fetchAllData();
+    } catch (error) { toast.error(error.response?.data?.detail || 'Failed to restore'); }
+  };
+
+  const handlePermanentDelete = async (userId, userName) => {
+    if (!window.confirm(`PERMANENTLY delete ${userName}'s account? This cannot be undone!`)) return;
+    try {
+      await axios.delete(`${API}/admin/permanent-delete-user/${userId}`, { headers: { Authorization: `Bearer ${token}` } });
+      toast.success('Account permanently deleted');
+      fetchAllData();
+    } catch (error) { toast.error(error.response?.data?.detail || 'Failed to permanently delete'); }
   };
 
   const handleCreateMember = async (e) => {
