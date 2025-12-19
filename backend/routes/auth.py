@@ -39,7 +39,7 @@ async def register(user_data: UserRegister):
         "date_of_birth": user_data.date_of_birth,
         "role": UserRole.MEMBER,
         "status": UserStatus.PENDING,
-        "tier": MemberTier.CADET,
+        "tier": MemberTier.JUNIOR_RECRUIT,
         "referral_code": user_data.referral_code,
         "own_referral_code": own_referral_code,
         "referred_by": referred_by,
