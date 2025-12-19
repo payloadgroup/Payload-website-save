@@ -109,6 +109,177 @@ const AdminPanel = () => {
     setCreating(false);
   };
 
+  const calculateAge = (dob) => {
+    if (!dob) return 'N/A';
+    const birthDate = new Date(dob);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) age--;
+    return age;
+  };
+
+  const openProfileModal = (user) => {
+    setSelectedUser(user);
+    setShowProfileModal(true);
+  };
+
+  const ProfileModal = () => {
+    if (!selectedUser) return null;
+    return (
+      <AnimatePresence>
+        {showProfileModal && (
+          <motion.div 
+            initial={{ opacity: 0 }} 
+            animate={{ opacity: 1 }} 
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            onClick={() => setShowProfileModal(false)}
+          >
+            <motion.div 
+              initial={{ scale: 0.9, opacity: 0 }} 
+              animate={{ scale: 1, opacity: 1 }} 
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-payload-surface border border-payload-neon/50 rounded-sm w-full max-w-lg max-h-[90vh] overflow-y-auto"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Header */}
+              <div className="bg-payload-neon/10 border-b border-payload-neon/30 p-4 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-full bg-payload-neon/20 flex items-center justify-center">
+                    <User className="w-6 h-6 text-payload-neon" />
+                  </div>
+                  <div>
+                    <h2 className="font-rajdhani font-bold text-xl uppercase text-payload-neon">{selectedUser.name}</h2>
+                    <span className="font-mono text-xs text-payload-muted">{TIER_CONFIG[selectedUser.tier]?.icon} {TIER_CONFIG[selectedUser.tier]?.label || 'JUNIOR RECRUIT'}</span>
+                  </div>
+                </div>
+                <button onClick={() => setShowProfileModal(false)} className="p-2 hover:bg-white/10 rounded-sm transition-colors">
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Profile Details */}
+              <div className="p-6 space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {/* Name */}
+                  <div className="bg-black/30 border border-white/10 p-4 rounded-sm">
+                    <div className="flex items-center gap-2 text-payload-muted mb-1">
+                      <User className="w-4 h-4" />
+                      <span className="font-mono text-xs uppercase">Full Name</span>
+                    </div>
+                    <p className="font-mono text-sm text-payload-text">{selectedUser.name || 'N/A'}</p>
+                  </div>
+
+                  {/* Age */}
+                  <div className="bg-black/30 border border-white/10 p-4 rounded-sm">
+                    <div className="flex items-center gap-2 text-payload-muted mb-1">
+                      <Calendar className="w-4 h-4" />
+                      <span className="font-mono text-xs uppercase">Age</span>
+                    </div>
+                    <p className="font-mono text-sm text-payload-text">{calculateAge(selectedUser.date_of_birth)} years old</p>
+                  </div>
+
+                  {/* Email */}
+                  <div className="bg-black/30 border border-white/10 p-4 rounded-sm sm:col-span-2">
+                    <div className="flex items-center gap-2 text-payload-muted mb-1">
+                      <Mail className="w-4 h-4" />
+                      <span className="font-mono text-xs uppercase">Email</span>
+                    </div>
+                    <p className="font-mono text-sm text-payload-text break-all">{selectedUser.email || 'N/A'}</p>
+                  </div>
+
+                  {/* Mobile */}
+                  <div className="bg-black/30 border border-white/10 p-4 rounded-sm">
+                    <div className="flex items-center gap-2 text-payload-muted mb-1">
+                      <Phone className="w-4 h-4" />
+                      <span className="font-mono text-xs uppercase">Mobile</span>
+                    </div>
+                    <p className="font-mono text-sm text-payload-text">{selectedUser.mobile || 'N/A'}</p>
+                  </div>
+
+                  {/* Date of Birth */}
+                  <div className="bg-black/30 border border-white/10 p-4 rounded-sm">
+                    <div className="flex items-center gap-2 text-payload-muted mb-1">
+                      <Calendar className="w-4 h-4" />
+                      <span className="font-mono text-xs uppercase">Date of Birth</span>
+                    </div>
+                    <p className="font-mono text-sm text-payload-text">{selectedUser.date_of_birth ? new Date(selectedUser.date_of_birth).toLocaleDateString() : 'N/A'}</p>
+                  </div>
+
+                  {/* Address */}
+                  <div className="bg-black/30 border border-white/10 p-4 rounded-sm sm:col-span-2">
+                    <div className="flex items-center gap-2 text-payload-muted mb-1">
+                      <MapPin className="w-4 h-4" />
+                      <span className="font-mono text-xs uppercase">Address</span>
+                    </div>
+                    <p className="font-mono text-sm text-payload-text">{selectedUser.address || 'Not provided'}</p>
+                  </div>
+
+                  {/* Credit Score */}
+                  <div className="bg-black/30 border border-white/10 p-4 rounded-sm">
+                    <div className="flex items-center gap-2 text-payload-muted mb-1">
+                      <CreditCard className="w-4 h-4" />
+                      <span className="font-mono text-xs uppercase">Credit Score</span>
+                    </div>
+                    <p className={`font-mono text-sm ${selectedUser.credit_score ? 'text-payload-neon' : 'text-payload-muted'}`}>{selectedUser.credit_score || 'Not set'}</p>
+                  </div>
+
+                  {/* Tier */}
+                  <div className="bg-black/30 border border-white/10 p-4 rounded-sm">
+                    <div className="flex items-center gap-2 text-payload-muted mb-1">
+                      <Award className="w-4 h-4" />
+                      <span className="font-mono text-xs uppercase">Member Tier</span>
+                    </div>
+                    <p className={`font-mono text-sm ${TIER_CONFIG[selectedUser.tier]?.color || 'text-gray-400'}`}>
+                      {TIER_CONFIG[selectedUser.tier]?.icon} {TIER_CONFIG[selectedUser.tier]?.label || 'JUNIOR RECRUIT'}
+                    </p>
+                  </div>
+
+                  {/* Referral Code */}
+                  <div className="bg-black/30 border border-white/10 p-4 rounded-sm">
+                    <div className="flex items-center gap-2 text-payload-muted mb-1">
+                      <Hash className="w-4 h-4" />
+                      <span className="font-mono text-xs uppercase">Referral Code</span>
+                    </div>
+                    <p className="font-mono text-sm text-payload-cyan">{selectedUser.own_referral_code || 'N/A'}</p>
+                  </div>
+
+                  {/* Joined Date */}
+                  <div className="bg-black/30 border border-white/10 p-4 rounded-sm">
+                    <div className="flex items-center gap-2 text-payload-muted mb-1">
+                      <Clock className="w-4 h-4" />
+                      <span className="font-mono text-xs uppercase">Joined</span>
+                    </div>
+                    <p className="font-mono text-sm text-payload-text">{selectedUser.created_at ? new Date(selectedUser.created_at).toLocaleDateString() : 'N/A'}</p>
+                  </div>
+
+                  {/* Status */}
+                  <div className="bg-black/30 border border-white/10 p-4 rounded-sm">
+                    <div className="flex items-center gap-2 text-payload-muted mb-1">
+                      <CheckCircle className="w-4 h-4" />
+                      <span className="font-mono text-xs uppercase">Status</span>
+                    </div>
+                    <p className={`font-mono text-sm uppercase ${selectedUser.status === 'approved' ? 'text-payload-neon' : selectedUser.status === 'locked' ? 'text-red-500' : 'text-payload-alert'}`}>
+                      {selectedUser.status || 'N/A'}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Footer */}
+              <div className="border-t border-white/10 p-4 flex justify-end">
+                <button onClick={() => setShowProfileModal(false)} className="font-mono text-xs border border-white/20 px-6 py-2 hover:bg-white/10 transition-colors">
+                  CLOSE
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    );
+  };
+
   return (
     <div className="min-h-screen bg-payload-bg text-payload-text">
       <nav className="border-b border-payload-border bg-payload-surface">
