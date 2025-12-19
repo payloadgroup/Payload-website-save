@@ -122,13 +122,19 @@ const RegisterPage = () => {
             <div className="relative">
               <label className="font-mono text-xs uppercase tracking-widest text-payload-muted block mb-2">DATE OF BIRTH</label>
               <div className="flex gap-2">
-                <input data-testid="register-dob-input" type="date" value={formData.date_of_birth} onChange={(e) => setFormData({ ...formData, date_of_birth: e.target.value })} className={`flex-1 bg-black border-b ${errors.date_of_birth ? 'border-red-500' : 'border-white/20'} focus:border-payload-neon focus:outline-none py-3 px-0 font-mono text-payload-text transition-colors`} />
+                <input data-testid="register-dob-input" type="text" inputMode="numeric" value={formData.date_of_birth} onChange={(e) => {
+                  let value = e.target.value.replace(/[^0-9]/g, '');
+                  if (value.length >= 2) value = value.slice(0, 2) + '/' + value.slice(2);
+                  if (value.length >= 5) value = value.slice(0, 5) + '/' + value.slice(5);
+                  if (value.length > 10) value = value.slice(0, 10);
+                  setFormData({ ...formData, date_of_birth: value });
+                }} className={`flex-1 bg-black border-b ${errors.date_of_birth ? 'border-red-500' : 'border-white/20'} focus:border-payload-neon focus:outline-none py-3 px-0 font-mono text-payload-text placeholder:text-white/30 transition-colors`} placeholder="DD/MM/YYYY" />
                 <button type="button" onClick={() => setShowCalendar(!showCalendar)} className="px-3 border border-white/20 hover:border-payload-neon text-payload-muted hover:text-payload-neon transition-colors">
                   <Calendar className="w-5 h-5" />
                 </button>
               </div>
               {errors.date_of_birth && <p className="text-red-500 text-xs font-mono mt-1">{errors.date_of_birth}</p>}
-              <p className="text-payload-muted text-xs font-mono mt-1">Must be 19 years or older</p>
+              <p className="text-payload-muted text-xs font-mono mt-1">Must be 19 years or older (DD/MM/YYYY)</p>
 
               {showCalendar && (
                 <div className="absolute top-full left-0 right-0 mt-2 bg-payload-surface border border-white/20 p-4 z-50 shadow-xl">
