@@ -403,7 +403,7 @@ const AdminPanel = () => {
                     <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-2">
-                          <h3 className="font-rajdhani font-bold text-lg uppercase text-red-500 truncate">{user.name}</h3>
+                          <h3 onClick={() => openProfileModal(user)} className="font-rajdhani font-bold text-lg uppercase text-red-500 truncate cursor-pointer hover:text-red-300 transition-colors">{user.name}</h3>
                           <span className="font-mono text-[10px] bg-red-500/20 text-red-500 px-2 py-0.5">LOCKED</span>
                         </div>
                         <div className="space-y-1 font-mono text-xs">
