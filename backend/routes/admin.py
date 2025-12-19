@@ -99,6 +99,21 @@ async def delete_user(user_id: str, admin_user: User = Depends(get_admin_user)):
         raise HTTPException(status_code=404, detail="User not found")
     if user.get("role") == UserRole.ADMIN:
         raise HTTPException(status_code=400, detail="Cannot delete admin accounts")
+    # Soft delete - change status to DELETED instead of removing
+    from datetime import datetime, timezone
+    await db.users.update_one(
+        {"id": user_id}, 
+        {"$set": {"status": UserStatus.DELETED, "deleted_at": datetime.now(timezone.utc).isoformat()}}
+    )
+    return {"message": "User account marked as deleted"}
+
+@router.delete("/permanent-delete-user/{user_id}")
+async def permanent_delete_user(user_id: str, admin_user: User = Depends(get_admin_user)):
+    user = await db.users.find_one({"id": user_id}, {"_id": 0})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    if user.get("role") == UserRole.ADMIN:
+        raise HTTPException(status_code=400, detail="Cannot delete admin accounts")
     await db.payloads.delete_many({"assigned_to": user_id})
     await db.missions.delete_many({"assigned_to": user_id})
     await db.transactions.delete_many({"user_id": user_id})
@@ -107,7 +122,20 @@ async def delete_user(user_id: str, admin_user: User = Depends(get_admin_user)):
     result = await db.users.delete_one({"id": user_id})
     if result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Failed to delete user")
-    return {"message": "User account and related data deleted successfully"}
+    return {"message": "User account and related data permanently deleted"}
+
+@router.post("/restore-user/{user_id}")
+async def restore_user(user_id: str, admin_user: User = Depends(get_admin_user)):
+    user = await db.users.find_one({"id": user_id}, {"_id": 0})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    if user.get("status") not in [UserStatus.DELETED, UserStatus.DENIED]:
+        raise HTTPException(status_code=400, detail="User is not deleted or denied")
+    await db.users.update_one(
+        {"id": user_id}, 
+        {"$set": {"status": UserStatus.PENDING}, "$unset": {"deleted_at": ""}}
+    )
+    return {"message": "User restored to pending status"}
 
 @router.post("/update-user-status")
 async def update_user_status(request: UserApprovalRequest, admin_user: User = Depends(get_admin_user)):
