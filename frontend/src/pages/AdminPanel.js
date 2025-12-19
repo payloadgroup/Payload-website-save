@@ -380,7 +380,7 @@ const AdminPanel = () => {
                     <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                       <div className="flex-1 min-w-0">
                         <div className="flex flex-wrap items-center gap-2 mb-2">
-                          <h3 className="font-rajdhani font-bold text-lg uppercase text-payload-neon truncate">{member.name}</h3>
+                          <h3 onClick={() => openProfileModal(member)} className="font-rajdhani font-bold text-lg uppercase text-payload-neon truncate cursor-pointer hover:text-white transition-colors">{member.name}</h3>
                           {member.credit_score && <span className="font-mono text-xs bg-payload-neon/20 text-payload-neon px-2 py-0.5">CS: {member.credit_score}</span>}
                           <span className="font-mono text-[10px] px-2 py-0.5 rounded-sm bg-white/10">{TIER_CONFIG[member.tier]?.icon} {TIER_CONFIG[member.tier]?.label || 'JUNIOR'}</span>
                         </div>
