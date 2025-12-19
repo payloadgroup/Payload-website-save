@@ -293,7 +293,7 @@ const AdminPanel = () => {
                       <CheckCircle className="w-4 h-4" />
                       <span className="font-mono text-xs uppercase">Status</span>
                     </div>
-                    <p className={`font-mono text-sm uppercase ${selectedUser.status === 'approved' ? 'text-payload-neon' : selectedUser.status === 'locked' ? 'text-red-500' : 'text-payload-alert'}`}>
+                    <p className={`font-mono text-sm uppercase ${selectedUser.status === 'approved' ? 'text-payload-neon' : selectedUser.status === 'locked' ? 'text-red-500' : selectedUser.status === 'denied' ? 'text-orange-500' : selectedUser.status === 'deleted' ? 'text-gray-500' : 'text-payload-alert'}`}>
                       {selectedUser.status || 'N/A'}
                     </p>
                   </div>
