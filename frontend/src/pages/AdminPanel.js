@@ -64,6 +64,20 @@ const AdminPanel = () => {
     } catch (error) { console.error('Failed to fetch locked users:', error); }
   };
 
+  const fetchDeniedUsers = async () => {
+    try {
+      const response = await axios.get(`${API}/admin/denied-users`, { headers: { Authorization: `Bearer ${token}` } });
+      setDeniedUsers(response.data);
+    } catch (error) { console.error('Failed to fetch denied users:', error); }
+  };
+
+  const fetchDeletedUsers = async () => {
+    try {
+      const response = await axios.get(`${API}/admin/deleted-users`, { headers: { Authorization: `Bearer ${token}` } });
+      setDeletedUsers(response.data);
+    } catch (error) { console.error('Failed to fetch deleted users:', error); }
+  };
+
   const handleUpdateStatus = async (userId, status) => {
     try {
       await axios.post(`${API}/admin/update-user-status`, { user_id: userId, status }, { headers: { Authorization: `Bearer ${token}` } });
