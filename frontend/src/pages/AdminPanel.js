@@ -39,7 +39,7 @@ const AdminPanel = () => {
 
   const fetchAllData = async () => {
     setLoading(true);
-    await Promise.all([fetchPendingUsers(), fetchAllMembers(), fetchLockedUsers()]);
+    await Promise.all([fetchPendingUsers(), fetchAllMembers(), fetchLockedUsers(), fetchDeniedUsers(), fetchDeletedUsers()]);
     setLoading(false);
   };
 
