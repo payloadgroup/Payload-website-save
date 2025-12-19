@@ -434,7 +434,7 @@ const AdminPanel = () => {
                 ))}
               </div>
             )
-          ) : (
+          ) : activeTab === 'locked' ? (
             lockedUsers.length === 0 ? <div className="bg-payload-surface border border-white/10 p-12 text-center"><ShieldOff className="w-16 h-16 text-payload-muted mx-auto mb-4" /><p className="font-mono text-payload-muted">NO LOCKED ACCOUNTS</p></div> : (
               <div className="space-y-4">
                 {lockedUsers.map((user, index) => (
@@ -453,6 +453,56 @@ const AdminPanel = () => {
                       <div className="flex gap-2">
                         <button onClick={() => handleUnlockUser(user.id)} className="flex-1 sm:flex-initial flex items-center justify-center gap-1 font-mono text-xs border border-payload-neon text-payload-neon px-3 py-2 hover:bg-payload-neon hover:text-black"><Unlock className="w-3 h-3" />UNLOCK</button>
                         <button onClick={() => handleDeleteUser(user.id, user.name)} className="flex-1 sm:flex-initial flex items-center justify-center gap-1 font-mono text-xs border border-red-500 text-red-500 px-3 py-2 hover:bg-red-500 hover:text-white"><Trash2 className="w-3 h-3" />DELETE</button>
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            )
+          ) : activeTab === 'denied' ? (
+            deniedUsers.length === 0 ? <div className="bg-payload-surface border border-white/10 p-12 text-center"><Ban className="w-16 h-16 text-payload-muted mx-auto mb-4" /><p className="font-mono text-payload-muted">NO DENIED APPLICATIONS</p></div> : (
+              <div className="space-y-4">
+                {deniedUsers.map((user, index) => (
+                  <motion.div key={user.id} initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: index * 0.05 }} className="bg-payload-surface border border-orange-500/30 p-4 sm:p-6 rounded-sm">
+                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-2">
+                          <h3 onClick={() => openProfileModal(user)} className="font-rajdhani font-bold text-lg uppercase text-orange-500 truncate cursor-pointer hover:text-orange-300 transition-colors">{user.name}</h3>
+                          <span className="font-mono text-[10px] bg-orange-500/20 text-orange-500 px-2 py-0.5">DENIED</span>
+                        </div>
+                        <div className="space-y-1 font-mono text-xs">
+                          <div><span className="text-payload-muted">EMAIL: </span><span className="break-all">{user.email}</span></div>
+                          <div><span className="text-payload-muted">APPLIED: </span>{new Date(user.created_at).toLocaleDateString()}</div>
+                        </div>
+                      </div>
+                      <div className="flex gap-2">
+                        <button onClick={() => handleRestoreUser(user.id)} className="flex-1 sm:flex-initial flex items-center justify-center gap-1 font-mono text-xs border border-payload-neon text-payload-neon px-3 py-2 hover:bg-payload-neon hover:text-black"><RotateCcw className="w-3 h-3" />RESTORE</button>
+                        <button onClick={() => handleDeleteUser(user.id, user.name)} className="flex-1 sm:flex-initial flex items-center justify-center gap-1 font-mono text-xs border border-red-500 text-red-500 px-3 py-2 hover:bg-red-500 hover:text-white"><Trash2 className="w-3 h-3" />DELETE</button>
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            )
+          ) : (
+            deletedUsers.length === 0 ? <div className="bg-payload-surface border border-white/10 p-12 text-center"><UserX className="w-16 h-16 text-payload-muted mx-auto mb-4" /><p className="font-mono text-payload-muted">NO DELETED ACCOUNTS</p></div> : (
+              <div className="space-y-4">
+                {deletedUsers.map((user, index) => (
+                  <motion.div key={user.id} initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: index * 0.05 }} className="bg-payload-surface border border-gray-500/30 p-4 sm:p-6 rounded-sm">
+                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-2">
+                          <h3 onClick={() => openProfileModal(user)} className="font-rajdhani font-bold text-lg uppercase text-gray-500 truncate cursor-pointer hover:text-gray-300 transition-colors">{user.name}</h3>
+                          <span className="font-mono text-[10px] bg-gray-500/20 text-gray-500 px-2 py-0.5">DELETED</span>
+                        </div>
+                        <div className="space-y-1 font-mono text-xs">
+                          <div><span className="text-payload-muted">EMAIL: </span><span className="break-all">{user.email}</span></div>
+                          <div><span className="text-payload-muted">JOINED: </span>{new Date(user.created_at).toLocaleDateString()}</div>
+                        </div>
+                      </div>
+                      <div className="flex gap-2">
+                        <button onClick={() => handleRestoreUser(user.id)} className="flex-1 sm:flex-initial flex items-center justify-center gap-1 font-mono text-xs border border-payload-neon text-payload-neon px-3 py-2 hover:bg-payload-neon hover:text-black"><RotateCcw className="w-3 h-3" />RESTORE</button>
+                        <button onClick={() => handlePermanentDelete(user.id, user.name)} className="flex-1 sm:flex-initial flex items-center justify-center gap-1 font-mono text-xs border border-red-500 text-red-500 px-3 py-2 hover:bg-red-500 hover:text-white"><Trash2 className="w-3 h-3" />PERMANENT</button>
                       </div>
                     </div>
                   </motion.div>
