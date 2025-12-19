@@ -24,6 +24,8 @@ const AdminPanel = () => {
   const [pendingUsers, setPendingUsers] = useState([]);
   const [allMembers, setAllMembers] = useState([]);
   const [lockedUsers, setLockedUsers] = useState([]);
+  const [deniedUsers, setDeniedUsers] = useState([]);
+  const [deletedUsers, setDeletedUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('pending');
   const [showCreateForm, setShowCreateForm] = useState(false);
