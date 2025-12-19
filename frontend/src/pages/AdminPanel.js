@@ -356,7 +356,7 @@ const AdminPanel = () => {
                   <motion.div key={user.id} initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: index * 0.1 }} className="bg-payload-surface border border-white/10 p-4 sm:p-6 rounded-sm">
                     <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                       <div className="flex-1 min-w-0">
-                        <h3 className="font-rajdhani font-bold text-lg uppercase mb-2 truncate">{user.name}</h3>
+                        <h3 onClick={() => openProfileModal(user)} className="font-rajdhani font-bold text-lg uppercase mb-2 truncate cursor-pointer hover:text-payload-neon transition-colors">{user.name}</h3>
                         <div className="space-y-1 font-mono text-xs">
                           <div><span className="text-payload-muted">EMAIL: </span><span className="break-all">{user.email}</span></div>
                           {user.referral_code && <div><span className="text-payload-muted">REFERRAL: </span><span className="text-payload-neon">{user.referral_code}</span></div>}
