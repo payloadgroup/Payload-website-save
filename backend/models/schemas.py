@@ -31,11 +31,13 @@ class StationStatus(str, Enum):
     ACTIVE = "active"
     INACTIVE = "inactive"
 
+# Intelligence-based tiers
 class MemberTier(str, Enum):
-    CADET = "cadet"
-    LIEUTENANT = "lieutenant"
-    COMMANDER = "commander"
-    ADMIRAL = "admiral"
+    JUNIOR_RECRUIT = "junior_recruit"
+    FRONT_LINE = "front_line"
+    MID_LEVEL_MANAGER = "mid_level_manager"
+    SENIOR_MANAGER = "senior_manager"
+    TOP_LEADERSHIP = "top_leadership"
 
 class AnnouncementPriority(str, Enum):
     LOW = "low"
@@ -65,7 +67,7 @@ class User(BaseModel):
     date_of_birth: Optional[str] = None
     role: UserRole
     status: UserStatus
-    tier: Optional[MemberTier] = MemberTier.CADET
+    tier: Optional[MemberTier] = MemberTier.JUNIOR_RECRUIT
     referral_code: Optional[str] = None
     own_referral_code: Optional[str] = None
     referred_by: Optional[str] = None
@@ -73,6 +75,7 @@ class User(BaseModel):
     last_login: Optional[str] = None
     login_count: int = 0
     created_at: str
+    credit_score: Optional[str] = None
 
 class Token(BaseModel):
     access_token: str
@@ -86,6 +89,14 @@ class UserApprovalRequest(BaseModel):
 class UpdateTierRequest(BaseModel):
     user_id: str
     tier: MemberTier
+
+class CreateMemberRequest(BaseModel):
+    name: str
+    email: EmailStr
+    password: str
+    mobile: Optional[str] = None
+    date_of_birth: Optional[str] = None
+    tier: MemberTier = MemberTier.JUNIOR_RECRUIT
 
 # Announcement Models
 class AnnouncementCreate(BaseModel):
