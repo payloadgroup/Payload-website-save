@@ -34,13 +34,33 @@ const RegisterPage = () => {
     return emailPattern.test(email);
   };
 
+  const parseDOB = (dob) => {
+    // Parse DD/MM/YYYY format
+    const parts = dob.split('/');
+    if (parts.length !== 3) return null;
+    const [day, month, year] = parts;
+    if (day.length !== 2 || month.length !== 2 || year.length !== 4) return null;
+    const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+    if (isNaN(date.getTime())) return null;
+    return date;
+  };
+
   const calculateAge = (dob) => {
-    const birthDate = new Date(dob);
+    const birthDate = parseDOB(dob);
+    if (!birthDate) return 0;
     const today = new Date();
     let age = today.getFullYear() - birthDate.getFullYear();
     const monthDiff = today.getMonth() - birthDate.getMonth();
     if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) age--;
     return age;
+  };
+
+  const convertToISO = (dob) => {
+    // Convert DD/MM/YYYY to YYYY-MM-DD for backend
+    const parts = dob.split('/');
+    if (parts.length !== 3) return dob;
+    const [day, month, year] = parts;
+    return `${year}-${month}-${day}`;
   };
 
   const validateForm = () => {
@@ -50,8 +70,12 @@ const RegisterPage = () => {
     if (!validateEmail(formData.email)) newErrors.email = 'Please enter a valid email address';
     if (!validateAustralianMobile(formData.mobile)) newErrors.mobile = 'Please enter a valid Australian mobile (+61 4XX XXX XXX or 04XX XXX XXX)';
     if (formData.date_of_birth) {
-      const age = calculateAge(formData.date_of_birth);
-      if (age < 19) newErrors.date_of_birth = 'You must be at least 19 years old to apply';
+      if (formData.date_of_birth.length !== 10 || !parseDOB(formData.date_of_birth)) {
+        newErrors.date_of_birth = 'Please enter a valid date (DD/MM/YYYY)';
+      } else {
+        const age = calculateAge(formData.date_of_birth);
+        if (age < 19) newErrors.date_of_birth = 'You must be at least 19 years old to apply';
+      }
     } else {
       newErrors.date_of_birth = 'Please enter your date of birth';
     }
@@ -65,7 +89,8 @@ const RegisterPage = () => {
     if (!validateForm()) return;
     setLoading(true);
     try {
-      await register(formData.name, formData.email, formData.password, formData.mobile, formData.date_of_birth, formData.referral_code || null);
+      const dobISO = convertToISO(formData.date_of_birth);
+      await register(formData.name, formData.email, formData.password, formData.mobile, dobISO, formData.referral_code || null);
       toast.success('Registration submitted! Awaiting admin approval.');
       setTimeout(() => navigate('/login'), 2000);
     } catch (error) {
