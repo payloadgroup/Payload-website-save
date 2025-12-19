@@ -1,15 +1,17 @@
 from fastapi import APIRouter, Depends, HTTPException
 from typing import List
 from datetime import datetime, timezone, timedelta
+import uuid
 
 from models.schemas import (
     User, UserRole, UserStatus, UserApprovalRequest,
-    UpdateTierRequest, MemberTier,
+    UpdateTierRequest, MemberTier, CreateMemberRequest,
     AnnouncementCreate, AnnouncementUpdate, AnnouncementResponse,
     PayloadStatus, MissionStatus
 )
 from utils.dependencies import get_admin_user
 from utils.database import db
+from utils.auth import hash_password, generate_referral_code
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 
@@ -17,27 +19,50 @@ router = APIRouter(prefix="/admin", tags=["admin"])
 
 @router.get("/pending-users", response_model=List[User])
 async def get_pending_users(admin_user: User = Depends(get_admin_user)):
-    pending_users = await db.users.find(
-        {"status": UserStatus.PENDING},
-        {"_id": 0, "password": 0}
-    ).to_list(1000)
+    pending_users = await db.users.find({"status": UserStatus.PENDING}, {"_id": 0, "password": 0}).to_list(1000)
     return [User(**user) for user in pending_users]
 
 @router.get("/members", response_model=List[User])
 async def get_all_members(admin_user: User = Depends(get_admin_user)):
-    members = await db.users.find(
-        {"role": UserRole.MEMBER, "status": UserStatus.APPROVED},
-        {"_id": 0, "password": 0}
-    ).to_list(1000)
+    members = await db.users.find({"role": UserRole.MEMBER, "status": UserStatus.APPROVED}, {"_id": 0, "password": 0}).to_list(1000)
     return [User(**user) for user in members]
 
 @router.get("/locked-users", response_model=List[User])
 async def get_locked_users(admin_user: User = Depends(get_admin_user)):
-    locked_users = await db.users.find(
-        {"status": UserStatus.LOCKED},
-        {"_id": 0, "password": 0}
-    ).to_list(1000)
+    locked_users = await db.users.find({"status": UserStatus.LOCKED}, {"_id": 0, "password": 0}).to_list(1000)
     return [User(**user) for user in locked_users]
+
+@router.post("/create-member", response_model=User)
+async def create_member(member_data: CreateMemberRequest, admin_user: User = Depends(get_admin_user)):
+    existing = await db.users.find_one({"email": member_data.email})
+    if existing:
+        raise HTTPException(status_code=400, detail="Email already registered")
+    
+    user_id = str(uuid.uuid4())
+    own_referral_code = generate_referral_code(member_data.name)
+    
+    new_user = {
+        "id": user_id,
+        "name": member_data.name,
+        "email": member_data.email,
+        "password": hash_password(member_data.password),
+        "mobile": member_data.mobile,
+        "date_of_birth": member_data.date_of_birth,
+        "role": UserRole.MEMBER,
+        "status": UserStatus.APPROVED,
+        "tier": member_data.tier,
+        "referral_code": None,
+        "own_referral_code": own_referral_code,
+        "referred_by": None,
+        "referral_count": 0,
+        "last_login": None,
+        "login_count": 0,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "onboarding_complete": False
+    }
+    await db.users.insert_one(new_user)
+    new_user.pop("password")
+    return User(**new_user)
 
 @router.post("/lock-user/{user_id}")
 async def lock_user(user_id: str, admin_user: User = Depends(get_admin_user)):
@@ -98,17 +123,13 @@ async def update_member_tier(request: UpdateTierRequest, admin_user: User = Depe
 
 @router.get("/members-by-tier/{tier}", response_model=List[User])
 async def get_members_by_tier(tier: MemberTier, admin_user: User = Depends(get_admin_user)):
-    members = await db.users.find(
-        {"role": UserRole.MEMBER, "status": UserStatus.APPROVED, "tier": tier},
-        {"_id": 0, "password": 0}
-    ).to_list(1000)
+    members = await db.users.find({"role": UserRole.MEMBER, "status": UserStatus.APPROVED, "tier": tier}, {"_id": 0, "password": 0}).to_list(1000)
     return [User(**user) for user in members]
 
 # ============ ANNOUNCEMENTS ============
 
 @router.post("/announcements", response_model=AnnouncementResponse)
 async def create_announcement(announcement: AnnouncementCreate, admin_user: User = Depends(get_admin_user)):
-    import uuid
     announcement_id = str(uuid.uuid4())
     new_announcement = {
         "id": announcement_id,
@@ -158,12 +179,8 @@ async def get_activity_stats(admin_user: User = Depends(get_admin_user)):
     thirty_days_ago = (now - timedelta(days=30)).isoformat()
     
     total_members = await db.users.count_documents({"role": UserRole.MEMBER, "status": UserStatus.APPROVED})
-    active_7 = await db.users.count_documents({
-        "role": UserRole.MEMBER, "status": UserStatus.APPROVED, "last_login": {"$gte": seven_days_ago}
-    })
-    active_30 = await db.users.count_documents({
-        "role": UserRole.MEMBER, "status": UserStatus.APPROVED, "last_login": {"$gte": thirty_days_ago}
-    })
+    active_7 = await db.users.count_documents({"role": UserRole.MEMBER, "status": UserStatus.APPROVED, "last_login": {"$gte": seven_days_ago}})
+    active_30 = await db.users.count_documents({"role": UserRole.MEMBER, "status": UserStatus.APPROVED, "last_login": {"$gte": thirty_days_ago}})
     inactive = total_members - active_30
     
     tier_distribution = {}
@@ -171,10 +188,7 @@ async def get_activity_stats(admin_user: User = Depends(get_admin_user)):
         count = await db.users.count_documents({"role": UserRole.MEMBER, "status": UserStatus.APPROVED, "tier": tier})
         tier_distribution[tier.value] = count
     
-    recent_logins = await db.users.find(
-        {"role": UserRole.MEMBER, "last_login": {"$ne": None}},
-        {"_id": 0, "password": 0}
-    ).sort("last_login", -1).to_list(20)
+    recent_logins = await db.users.find({"role": UserRole.MEMBER, "last_login": {"$ne": None}}, {"_id": 0, "password": 0}).sort("last_login", -1).to_list(20)
     
     return {
         "total_members": total_members,
@@ -188,14 +202,7 @@ async def get_activity_stats(admin_user: User = Depends(get_admin_user)):
 @router.get("/inactive-members", response_model=List[User])
 async def get_inactive_members(days: int = 30, admin_user: User = Depends(get_admin_user)):
     cutoff = (datetime.now(timezone.utc) - timedelta(days=days)).isoformat()
-    inactive = await db.users.find(
-        {
-            "role": UserRole.MEMBER,
-            "status": UserStatus.APPROVED,
-            "$or": [{"last_login": {"$lt": cutoff}}, {"last_login": None}]
-        },
-        {"_id": 0, "password": 0}
-    ).to_list(1000)
+    inactive = await db.users.find({"role": UserRole.MEMBER, "status": UserStatus.APPROVED, "$or": [{"last_login": {"$lt": cutoff}}, {"last_login": None}]}, {"_id": 0, "password": 0}).to_list(1000)
     return [User(**u) for u in inactive]
 
 # ============ REFERRAL MANAGEMENT ============

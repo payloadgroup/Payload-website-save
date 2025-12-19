@@ -4,11 +4,19 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import axios from 'axios';
 import { toast } from 'sonner';
-import { ArrowLeft, CheckCircle, XCircle, Clock, BarChart3, Lock, Unlock, Trash2, Users, ShieldOff, Crown, Bell } from 'lucide-react';
+import { ArrowLeft, CheckCircle, XCircle, Clock, BarChart3, Lock, Unlock, Trash2, Users, ShieldOff, Crown, Bell, UserPlus, Eye, EyeOff } from 'lucide-react';
 import PayloadLogo from '@/components/PayloadLogo';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
+
+const TIER_CONFIG = {
+  junior_recruit: { label: 'JUNIOR RECRUIT', color: 'text-gray-400', icon: '📝' },
+  front_line: { label: 'FRONT-LINE', color: 'text-blue-400', icon: '🕵️' },
+  mid_level_manager: { label: 'MID-LEVEL MANAGER', color: 'text-purple-400', icon: '📊' },
+  senior_manager: { label: 'SENIOR MANAGER', color: 'text-orange-400', icon: '🎯' },
+  top_leadership: { label: 'TOP LEADERSHIP', color: 'text-yellow-400', icon: '👑' }
+};
 
 const AdminPanel = () => {
   const navigate = useNavigate();
@@ -18,285 +26,172 @@ const AdminPanel = () => {
   const [lockedUsers, setLockedUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('pending');
+  const [showCreateForm, setShowCreateForm] = useState(false);
+  const [createForm, setCreateForm] = useState({ name: '', email: '', password: '', mobile: '', date_of_birth: '', tier: 'junior_recruit' });
+  const [showPassword, setShowPassword] = useState(false);
+  const [creating, setCreating] = useState(false);
 
-  useEffect(() => {
-    fetchAllData();
-  }, []);
+  useEffect(() => { fetchAllData(); }, []);
 
   const fetchAllData = async () => {
     setLoading(true);
-    await Promise.all([
-      fetchPendingUsers(),
-      fetchAllMembers(),
-      fetchLockedUsers()
-    ]);
+    await Promise.all([fetchPendingUsers(), fetchAllMembers(), fetchLockedUsers()]);
     setLoading(false);
   };
 
   const fetchPendingUsers = async () => {
     try {
-      const response = await axios.get(`${API}/admin/pending-users`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const response = await axios.get(`${API}/admin/pending-users`, { headers: { Authorization: `Bearer ${token}` } });
       setPendingUsers(response.data);
-    } catch (error) {
-      console.error('Failed to fetch pending users:', error);
-    }
+    } catch (error) { console.error('Failed to fetch pending users:', error); }
   };
 
   const fetchAllMembers = async () => {
     try {
-      const response = await axios.get(`${API}/admin/members`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const response = await axios.get(`${API}/admin/members`, { headers: { Authorization: `Bearer ${token}` } });
       setAllMembers(response.data);
-    } catch (error) {
-      console.error('Failed to fetch members:', error);
-    }
+    } catch (error) { console.error('Failed to fetch members:', error); }
   };
 
   const fetchLockedUsers = async () => {
     try {
-      const response = await axios.get(`${API}/admin/locked-users`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const response = await axios.get(`${API}/admin/locked-users`, { headers: { Authorization: `Bearer ${token}` } });
       setLockedUsers(response.data);
-    } catch (error) {
-      console.error('Failed to fetch locked users:', error);
-    }
+    } catch (error) { console.error('Failed to fetch locked users:', error); }
   };
 
   const handleUpdateStatus = async (userId, status) => {
     try {
-      await axios.post(
-        `${API}/admin/update-user-status`,
-        { user_id: userId, status },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      await axios.post(`${API}/admin/update-user-status`, { user_id: userId, status }, { headers: { Authorization: `Bearer ${token}` } });
       toast.success(`User ${status}`);
       fetchAllData();
-    } catch (error) {
-      console.error('Failed to update user status:', error);
-      toast.error('Failed to update user status');
-    }
+    } catch (error) { toast.error('Failed to update user status'); }
   };
 
   const handleLockUser = async (userId) => {
-    if (!window.confirm('Are you sure you want to lock this account? The member will no longer be able to log in.')) {
-      return;
-    }
+    if (!window.confirm('Lock this account?')) return;
     try {
-      await axios.post(
-        `${API}/admin/lock-user/${userId}`,
-        {},
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      toast.success('Account locked successfully');
+      await axios.post(`${API}/admin/lock-user/${userId}`, {}, { headers: { Authorization: `Bearer ${token}` } });
+      toast.success('Account locked');
       fetchAllData();
-    } catch (error) {
-      console.error('Failed to lock user:', error);
-      toast.error(error.response?.data?.detail || 'Failed to lock account');
-    }
+    } catch (error) { toast.error(error.response?.data?.detail || 'Failed to lock'); }
   };
 
   const handleUnlockUser = async (userId) => {
     try {
-      await axios.post(
-        `${API}/admin/unlock-user/${userId}`,
-        {},
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      toast.success('Account unlocked successfully');
+      await axios.post(`${API}/admin/unlock-user/${userId}`, {}, { headers: { Authorization: `Bearer ${token}` } });
+      toast.success('Account unlocked');
       fetchAllData();
-    } catch (error) {
-      console.error('Failed to unlock user:', error);
-      toast.error(error.response?.data?.detail || 'Failed to unlock account');
-    }
+    } catch (error) { toast.error(error.response?.data?.detail || 'Failed to unlock'); }
   };
 
   const handleDeleteUser = async (userId, userName) => {
-    if (!window.confirm(`Are you sure you want to permanently delete ${userName}'s account? This action cannot be undone and will remove all their data.`)) {
-      return;
-    }
+    if (!window.confirm(`Delete ${userName}'s account permanently?`)) return;
     try {
-      await axios.delete(
-        `${API}/admin/delete-user/${userId}`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      toast.success('Account deleted permanently');
+      await axios.delete(`${API}/admin/delete-user/${userId}`, { headers: { Authorization: `Bearer ${token}` } });
+      toast.success('Account deleted');
       fetchAllData();
-    } catch (error) {
-      console.error('Failed to delete user:', error);
-      toast.error(error.response?.data?.detail || 'Failed to delete account');
-    }
+    } catch (error) { toast.error(error.response?.data?.detail || 'Failed to delete'); }
+  };
+
+  const handleCreateMember = async (e) => {
+    e.preventDefault();
+    setCreating(true);
+    try {
+      await axios.post(`${API}/admin/create-member`, createForm, { headers: { Authorization: `Bearer ${token}` } });
+      toast.success('Member created successfully');
+      setShowCreateForm(false);
+      setCreateForm({ name: '', email: '', password: '', mobile: '', date_of_birth: '', tier: 'junior_recruit' });
+      fetchAllData();
+    } catch (error) { toast.error(error.response?.data?.detail || 'Failed to create member'); }
+    setCreating(false);
   };
 
   return (
     <div className="min-h-screen bg-payload-bg text-payload-text">
       <nav className="border-b border-payload-border bg-payload-surface">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4">
-          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 sm:gap-0">
-            <button
-              data-testid="logo-home-btn"
-              onClick={() => navigate('/dashboard')}
-              className="flex items-center gap-2 sm:gap-3 hover:opacity-80 transition-opacity"
-            >
+          <div className="flex justify-between items-center">
+            <button data-testid="logo-home-btn" onClick={() => navigate('/dashboard')} className="flex items-center gap-2 sm:gap-3 hover:opacity-80">
               <PayloadLogo size="default" />
-              <div className="font-rajdhani font-bold text-xl sm:text-2xl tracking-widest text-payload-neon">
-                PAYLOAD
-              </div>
+              <div className="font-rajdhani font-bold text-lg sm:text-2xl tracking-widest text-payload-neon">PAYLOAD</div>
             </button>
-            
-            <div className="flex items-center gap-2 sm:gap-3">
-              <button
-                data-testid="goto-management-btn"
-                onClick={() => navigate('/admin/management')}
-                className="flex items-center gap-1 sm:gap-2 font-mono text-xs sm:text-sm border border-payload-neon text-payload-neon px-2 sm:px-4 py-1.5 sm:py-2 rounded-none hover:bg-payload-neon hover:text-black transition-all duration-300"
-              >
-                <Crown className="w-3 h-3 sm:w-4 sm:h-4" />
-                <span>MANAGE</span>
-              </button>
-              <button
-                data-testid="goto-notifications-btn"
-                onClick={() => navigate('/notifications')}
-                className="flex items-center gap-1 sm:gap-2 font-mono text-xs sm:text-sm border border-green-500 text-green-500 px-2 sm:px-4 py-1.5 sm:py-2 rounded-none hover:bg-green-500 hover:text-black transition-all duration-300"
-              >
-                <Bell className="w-3 h-3 sm:w-4 sm:h-4" />
-                <span>ALERTS</span>
-              </button>
-              <button
-                data-testid="goto-analytics-btn"
-                onClick={() => navigate('/analytics')}
-                className="flex items-center gap-1 sm:gap-2 font-mono text-xs sm:text-sm border border-payload-cyan text-payload-cyan px-2 sm:px-4 py-1.5 sm:py-2 rounded-none hover:bg-payload-cyan hover:text-black transition-all duration-300"
-              >
-                <BarChart3 className="w-3 h-3 sm:w-4 sm:h-4" />
-                <span>ANALYTICS</span>
-              </button>
-              <button
-                data-testid="back-to-dashboard-btn"
-                onClick={() => navigate('/dashboard')}
-                className="flex items-center gap-1 sm:gap-2 font-mono text-xs sm:text-sm border border-white/20 px-2 sm:px-4 py-1.5 sm:py-2 rounded-none hover:border-white hover:bg-white/5 transition-all duration-300"
-              >
-                <ArrowLeft className="w-3 h-3 sm:w-4 sm:h-4" />
-                <span>DASHBOARD</span>
-              </button>
+            <div className="flex items-center gap-1 sm:gap-2 overflow-x-auto">
+              <button onClick={() => navigate('/admin/management')} className="flex items-center gap-1 font-mono text-[10px] sm:text-xs border border-payload-neon text-payload-neon px-2 py-1.5 hover:bg-payload-neon hover:text-black transition-all"><Crown className="w-3 h-3" /><span className="hidden sm:inline">MANAGE</span></button>
+              <button onClick={() => navigate('/notifications')} className="flex items-center gap-1 font-mono text-[10px] sm:text-xs border border-green-500 text-green-500 px-2 py-1.5 hover:bg-green-500 hover:text-black transition-all"><Bell className="w-3 h-3" /><span className="hidden sm:inline">ALERTS</span></button>
+              <button onClick={() => navigate('/analytics')} className="flex items-center gap-1 font-mono text-[10px] sm:text-xs border border-payload-cyan text-payload-cyan px-2 py-1.5 hover:bg-payload-cyan hover:text-black transition-all"><BarChart3 className="w-3 h-3" /><span className="hidden sm:inline">ANALYTICS</span></button>
+              <button onClick={() => navigate('/dashboard')} className="flex items-center gap-1 font-mono text-[10px] sm:text-xs border border-white/20 px-2 py-1.5 hover:border-white hover:bg-white/5 transition-all"><ArrowLeft className="w-3 h-3" /><span className="hidden sm:inline">DASHBOARD</span></button>
             </div>
           </div>
         </div>
       </nav>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <div className="mb-6 sm:mb-8">
-            <h1 className="font-rajdhani font-bold text-2xl sm:text-4xl uppercase tracking-wide mb-2">
-              ADMIN CONTROL
-            </h1>
-            <p className="font-mono text-xs sm:text-sm text-payload-alert uppercase tracking-widest">
-              MEMBERSHIP MANAGEMENT
-            </p>
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+            <div>
+              <h1 className="font-rajdhani font-bold text-2xl sm:text-4xl uppercase tracking-wide mb-2">ADMIN CONTROL</h1>
+              <p className="font-mono text-xs sm:text-sm text-payload-alert uppercase tracking-widest">MEMBERSHIP MANAGEMENT</p>
+            </div>
+            <button onClick={() => setShowCreateForm(true)} className="flex items-center gap-2 font-mono text-xs border border-payload-neon text-payload-neon px-4 py-2 hover:bg-payload-neon hover:text-black transition-all">
+              <UserPlus className="w-4 h-4" /> CREATE MEMBER
+            </button>
           </div>
+
+          {/* Create Member Form */}
+          {showCreateForm && (
+            <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="bg-payload-surface border border-payload-neon/50 p-6 rounded-sm mb-6">
+              <h3 className="font-rajdhani font-bold text-xl mb-4">CREATE NEW MEMBER</h3>
+              <form onSubmit={handleCreateMember} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <input required placeholder="Full Name" value={createForm.name} onChange={(e) => setCreateForm({...createForm, name: e.target.value})} className="bg-black border border-white/20 p-3 font-mono text-sm" />
+                <input required type="email" placeholder="Email" value={createForm.email} onChange={(e) => setCreateForm({...createForm, email: e.target.value})} className="bg-black border border-white/20 p-3 font-mono text-sm" />
+                <div className="relative">
+                  <input required type={showPassword ? 'text' : 'password'} placeholder="Password" value={createForm.password} onChange={(e) => setCreateForm({...createForm, password: e.target.value})} className="w-full bg-black border border-white/20 p-3 pr-10 font-mono text-sm" />
+                  <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-3 text-payload-muted">{showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}</button>
+                </div>
+                <input placeholder="Mobile (+61...)" value={createForm.mobile} onChange={(e) => setCreateForm({...createForm, mobile: e.target.value})} className="bg-black border border-white/20 p-3 font-mono text-sm" />
+                <input type="date" placeholder="Date of Birth" value={createForm.date_of_birth} onChange={(e) => setCreateForm({...createForm, date_of_birth: e.target.value})} className="bg-black border border-white/20 p-3 font-mono text-sm" />
+                <select value={createForm.tier} onChange={(e) => setCreateForm({...createForm, tier: e.target.value})} className="bg-black border border-white/20 p-3 font-mono text-sm">
+                  {Object.entries(TIER_CONFIG).map(([t, c]) => <option key={t} value={t}>{c.label}</option>)}
+                </select>
+                <div className="sm:col-span-2 flex gap-2">
+                  <button type="submit" disabled={creating} className="font-mono text-sm bg-payload-neon text-black px-6 py-2 disabled:opacity-50">{creating ? 'CREATING...' : 'CREATE'}</button>
+                  <button type="button" onClick={() => setShowCreateForm(false)} className="font-mono text-sm border border-white/20 px-6 py-2">CANCEL</button>
+                </div>
+              </form>
+            </motion.div>
+          )}
 
           {/* Tabs */}
-          <div className="flex gap-1 sm:gap-4 mb-6 sm:mb-8 border-b border-white/10 overflow-x-auto">
-            <button
-              onClick={() => setActiveTab('pending')}
-              className={`font-mono text-[10px] sm:text-sm uppercase tracking-widest pb-3 sm:pb-4 px-2 sm:px-6 transition-all whitespace-nowrap flex items-center gap-1 sm:gap-2 ${
-                activeTab === 'pending'
-                  ? 'text-payload-alert border-b-2 border-payload-alert'
-                  : 'text-payload-muted hover:text-payload-text'
-              }`}
-            >
-              <Clock className="w-3 h-3 sm:w-4 sm:h-4" />
-              <span>PENDING</span> ({pendingUsers.length})
+          <div className="flex gap-1 sm:gap-4 mb-6 border-b border-white/10 overflow-x-auto">
+            <button onClick={() => setActiveTab('pending')} className={`font-mono text-[10px] sm:text-sm uppercase pb-3 px-2 sm:px-6 flex items-center gap-1 sm:gap-2 whitespace-nowrap ${activeTab === 'pending' ? 'text-payload-alert border-b-2 border-payload-alert' : 'text-payload-muted hover:text-payload-text'}`}>
+              <Clock className="w-3 h-3 sm:w-4 sm:h-4" /><span>PENDING</span> ({pendingUsers.length})
             </button>
-            <button
-              onClick={() => setActiveTab('members')}
-              className={`font-mono text-[10px] sm:text-sm uppercase tracking-widest pb-3 sm:pb-4 px-2 sm:px-6 transition-all whitespace-nowrap flex items-center gap-1 sm:gap-2 ${
-                activeTab === 'members'
-                  ? 'text-payload-neon border-b-2 border-payload-neon'
-                  : 'text-payload-muted hover:text-payload-text'
-              }`}
-            >
-              <Users className="w-3 h-3 sm:w-4 sm:h-4" />
-              <span>MEMBERS</span> ({allMembers.length})
+            <button onClick={() => setActiveTab('members')} className={`font-mono text-[10px] sm:text-sm uppercase pb-3 px-2 sm:px-6 flex items-center gap-1 sm:gap-2 whitespace-nowrap ${activeTab === 'members' ? 'text-payload-neon border-b-2 border-payload-neon' : 'text-payload-muted hover:text-payload-text'}`}>
+              <Users className="w-3 h-3 sm:w-4 sm:h-4" /><span>MEMBERS</span> ({allMembers.length})
             </button>
-            <button
-              onClick={() => setActiveTab('locked')}
-              className={`font-mono text-[10px] sm:text-sm uppercase tracking-widest pb-3 sm:pb-4 px-2 sm:px-6 transition-all whitespace-nowrap flex items-center gap-1 sm:gap-2 ${
-                activeTab === 'locked'
-                  ? 'text-red-500 border-b-2 border-red-500'
-                  : 'text-payload-muted hover:text-payload-text'
-              }`}
-            >
-              <ShieldOff className="w-3 h-3 sm:w-4 sm:h-4" />
-              <span>LOCKED</span> ({lockedUsers.length})
+            <button onClick={() => setActiveTab('locked')} className={`font-mono text-[10px] sm:text-sm uppercase pb-3 px-2 sm:px-6 flex items-center gap-1 sm:gap-2 whitespace-nowrap ${activeTab === 'locked' ? 'text-red-500 border-b-2 border-red-500' : 'text-payload-muted hover:text-payload-text'}`}>
+              <ShieldOff className="w-3 h-3 sm:w-4 sm:h-4" /><span>LOCKED</span> ({lockedUsers.length})
             </button>
           </div>
 
-          {loading ? (
-            <div className="text-center font-mono text-payload-muted">LOADING...</div>
-          ) : activeTab === 'pending' ? (
-            /* Pending Users Tab */
-            pendingUsers.length === 0 ? (
-              <div className="bg-payload-surface border border-white/10 p-12 rounded-sm text-center">
-                <Clock className="w-16 h-16 text-payload-muted mx-auto mb-4" />
-                <p className="font-mono text-payload-muted">NO PENDING APPLICATIONS</p>
-              </div>
-            ) : (
+          {loading ? <div className="text-center font-mono text-payload-muted">LOADING...</div> : activeTab === 'pending' ? (
+            pendingUsers.length === 0 ? <div className="bg-payload-surface border border-white/10 p-12 text-center"><Clock className="w-16 h-16 text-payload-muted mx-auto mb-4" /><p className="font-mono text-payload-muted">NO PENDING APPLICATIONS</p></div> : (
               <div className="space-y-4">
                 {pendingUsers.map((user, index) => (
-                  <motion.div
-                    key={user.id}
-                    data-testid={`pending-user-${index}`}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.1 }}
-                    className="bg-payload-surface border border-white/10 p-4 sm:p-6 rounded-sm hover:border-white/20 transition-all"
-                  >
+                  <motion.div key={user.id} initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: index * 0.1 }} className="bg-payload-surface border border-white/10 p-4 sm:p-6 rounded-sm">
                     <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                       <div className="flex-1 min-w-0">
-                        <h3 className="font-rajdhani font-bold text-lg sm:text-xl uppercase tracking-wide mb-2 truncate">
-                          {user.name}
-                        </h3>
-                        <div className="space-y-1 font-mono text-xs sm:text-sm">
-                          <div className="flex flex-col xs:flex-row xs:items-center gap-1 xs:gap-2">
-                            <span className="text-payload-muted uppercase tracking-widest">EMAIL:</span>
-                            <span className="text-payload-text break-all">{user.email}</span>
-                          </div>
-                          {user.referral_code && (
-                            <div className="flex items-center gap-2">
-                              <span className="text-payload-muted uppercase tracking-widest">REFERRAL:</span>
-                              <span className="text-payload-neon">{user.referral_code}</span>
-                            </div>
-                          )}
-                          <div className="flex items-center gap-2">
-                            <span className="text-payload-muted uppercase tracking-widest">APPLIED:</span>
-                            <span className="text-payload-text">{new Date(user.created_at).toLocaleDateString()}</span>
-                          </div>
+                        <h3 className="font-rajdhani font-bold text-lg uppercase mb-2 truncate">{user.name}</h3>
+                        <div className="space-y-1 font-mono text-xs">
+                          <div><span className="text-payload-muted">EMAIL: </span><span className="break-all">{user.email}</span></div>
+                          {user.referral_code && <div><span className="text-payload-muted">REFERRAL: </span><span className="text-payload-neon">{user.referral_code}</span></div>}
+                          <div><span className="text-payload-muted">APPLIED: </span>{new Date(user.created_at).toLocaleDateString()}</div>
                         </div>
                       </div>
-
-                      <div className="flex flex-row gap-2 sm:gap-3 w-full sm:w-auto">
-                        <button
-                          data-testid={`approve-btn-${index}`}
-                          onClick={() => handleUpdateStatus(user.id, 'approved')}
-                          className="flex-1 sm:flex-initial flex items-center justify-center gap-1 sm:gap-2 font-mono text-xs sm:text-sm border border-payload-neon text-payload-neon px-3 sm:px-4 py-2 rounded-none hover:bg-payload-neon hover:text-black transition-all duration-300"
-                        >
-                          <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4" />
-                          APPROVE
-                        </button>
-                        <button
-                          data-testid={`deny-btn-${index}`}
-                          onClick={() => handleUpdateStatus(user.id, 'denied')}
-                          className="flex-1 sm:flex-initial flex items-center justify-center gap-1 sm:gap-2 font-mono text-xs sm:text-sm border border-red-500 text-red-500 px-3 sm:px-4 py-2 rounded-none hover:bg-red-500 hover:text-black transition-all duration-300"
-                        >
-                          <XCircle className="w-3 h-3 sm:w-4 sm:h-4" />
-                          DENY
-                        </button>
+                      <div className="flex gap-2">
+                        <button onClick={() => handleUpdateStatus(user.id, 'approved')} className="flex-1 sm:flex-initial flex items-center justify-center gap-1 font-mono text-xs border border-payload-neon text-payload-neon px-3 py-2 hover:bg-payload-neon hover:text-black"><CheckCircle className="w-3 h-3" />APPROVE</button>
+                        <button onClick={() => handleUpdateStatus(user.id, 'denied')} className="flex-1 sm:flex-initial flex items-center justify-center gap-1 font-mono text-xs border border-red-500 text-red-500 px-3 py-2 hover:bg-red-500 hover:text-black"><XCircle className="w-3 h-3" />DENY</button>
                       </div>
                     </div>
                   </motion.div>
@@ -304,137 +199,47 @@ const AdminPanel = () => {
               </div>
             )
           ) : activeTab === 'members' ? (
-            /* All Members Tab */
-            allMembers.length === 0 ? (
-              <div className="bg-payload-surface border border-white/10 p-12 rounded-sm text-center">
-                <Users className="w-16 h-16 text-payload-muted mx-auto mb-4" />
-                <p className="font-mono text-payload-muted">NO APPROVED MEMBERS</p>
-              </div>
-            ) : (
+            allMembers.length === 0 ? <div className="bg-payload-surface border border-white/10 p-12 text-center"><Users className="w-16 h-16 text-payload-muted mx-auto mb-4" /><p className="font-mono text-payload-muted">NO APPROVED MEMBERS</p></div> : (
               <div className="space-y-4">
                 {allMembers.map((member, index) => (
-                  <motion.div
-                    key={member.id}
-                    data-testid={`member-item-${index}`}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.05 }}
-                    className="bg-payload-surface border border-white/10 p-4 sm:p-6 rounded-sm hover:border-white/20 transition-all"
-                  >
-                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4">
+                  <motion.div key={member.id} initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: index * 0.05 }} className="bg-payload-surface border border-white/10 p-4 sm:p-6 rounded-sm">
+                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-3 mb-2">
-                          <h3 className="font-rajdhani font-bold text-lg sm:text-xl uppercase tracking-wide text-payload-neon truncate">
-                            {member.name}
-                          </h3>
-                          {member.credit_score && (
-                            <span className="font-mono text-xs bg-payload-neon/20 text-payload-neon px-2 py-0.5 rounded-sm">
-                              CS: {member.credit_score}
-                            </span>
-                          )}
+                        <div className="flex flex-wrap items-center gap-2 mb-2">
+                          <h3 className="font-rajdhani font-bold text-lg uppercase text-payload-neon truncate">{member.name}</h3>
+                          {member.credit_score && <span className="font-mono text-xs bg-payload-neon/20 text-payload-neon px-2 py-0.5">CS: {member.credit_score}</span>}
+                          <span className="font-mono text-[10px] px-2 py-0.5 rounded-sm bg-white/10">{TIER_CONFIG[member.tier]?.icon} {TIER_CONFIG[member.tier]?.label || 'JUNIOR'}</span>
                         </div>
-                        <div className="space-y-1 font-mono text-xs sm:text-sm">
-                          <div className="flex flex-col xs:flex-row xs:items-center gap-1 xs:gap-2">
-                            <span className="text-payload-muted uppercase tracking-widest">EMAIL:</span>
-                            <span className="text-payload-text break-all">{member.email}</span>
-                          </div>
-                          {member.referral_code && (
-                            <div className="flex items-center gap-2">
-                              <span className="text-payload-muted uppercase tracking-widest">REFERRAL:</span>
-                              <span className="text-payload-neon">{member.referral_code}</span>
-                            </div>
-                          )}
-                          <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
-                            <div className="flex items-center gap-2">
-                              <span className="text-payload-muted uppercase tracking-widest">JOINED:</span>
-                              <span className="text-payload-text">{new Date(member.created_at).toLocaleDateString()}</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <span className="text-payload-muted uppercase tracking-widest">STATUS:</span>
-                              <span className="text-payload-neon uppercase">{member.status}</span>
-                            </div>
-                          </div>
+                        <div className="space-y-1 font-mono text-xs">
+                          <div><span className="text-payload-muted">EMAIL: </span><span className="break-all">{member.email}</span></div>
+                          <div><span className="text-payload-muted">JOINED: </span>{new Date(member.created_at).toLocaleDateString()}</div>
                         </div>
                       </div>
-
-                      {/* Lock Button */}
-                      <button
-                        data-testid={`lock-btn-${index}`}
-                        onClick={() => handleLockUser(member.id)}
-                        className="flex items-center justify-center gap-1 sm:gap-2 font-mono text-xs sm:text-sm border border-payload-alert text-payload-alert px-3 sm:px-4 py-2 rounded-none hover:bg-payload-alert hover:text-black transition-all duration-300 w-full sm:w-auto"
-                      >
-                        <Lock className="w-3 h-3 sm:w-4 sm:h-4" />
-                        LOCK
-                      </button>
+                      <button onClick={() => handleLockUser(member.id)} className="flex items-center justify-center gap-1 font-mono text-xs border border-payload-alert text-payload-alert px-3 py-2 hover:bg-payload-alert hover:text-black"><Lock className="w-3 h-3" />LOCK</button>
                     </div>
                   </motion.div>
                 ))}
               </div>
             )
           ) : (
-            /* Locked Accounts Tab */
-            lockedUsers.length === 0 ? (
-              <div className="bg-payload-surface border border-white/10 p-12 rounded-sm text-center">
-                <ShieldOff className="w-16 h-16 text-payload-muted mx-auto mb-4" />
-                <p className="font-mono text-payload-muted">NO LOCKED ACCOUNTS</p>
-              </div>
-            ) : (
+            lockedUsers.length === 0 ? <div className="bg-payload-surface border border-white/10 p-12 text-center"><ShieldOff className="w-16 h-16 text-payload-muted mx-auto mb-4" /><p className="font-mono text-payload-muted">NO LOCKED ACCOUNTS</p></div> : (
               <div className="space-y-4">
                 {lockedUsers.map((user, index) => (
-                  <motion.div
-                    key={user.id}
-                    data-testid={`locked-user-${index}`}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.05 }}
-                    className="bg-payload-surface border border-red-500/30 p-4 sm:p-6 rounded-sm hover:border-red-500/50 transition-all"
-                  >
+                  <motion.div key={user.id} initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: index * 0.05 }} className="bg-payload-surface border border-red-500/30 p-4 sm:p-6 rounded-sm">
                     <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-2">
-                          <h3 className="font-rajdhani font-bold text-lg sm:text-xl uppercase tracking-wide text-red-500 truncate">
-                            {user.name}
-                          </h3>
-                          <span className="font-mono text-[10px] sm:text-xs bg-red-500/20 text-red-500 px-2 py-0.5 rounded-sm">
-                            LOCKED
-                          </span>
+                          <h3 className="font-rajdhani font-bold text-lg uppercase text-red-500 truncate">{user.name}</h3>
+                          <span className="font-mono text-[10px] bg-red-500/20 text-red-500 px-2 py-0.5">LOCKED</span>
                         </div>
-                        <div className="space-y-1 font-mono text-xs sm:text-sm">
-                          <div className="flex flex-col xs:flex-row xs:items-center gap-1 xs:gap-2">
-                            <span className="text-payload-muted uppercase tracking-widest">EMAIL:</span>
-                            <span className="text-payload-text break-all">{user.email}</span>
-                          </div>
-                          {user.referral_code && (
-                            <div className="flex items-center gap-2">
-                              <span className="text-payload-muted uppercase tracking-widest">REFERRAL:</span>
-                              <span className="text-payload-neon">{user.referral_code}</span>
-                            </div>
-                          )}
-                          <div className="flex items-center gap-2">
-                            <span className="text-payload-muted uppercase tracking-widest">JOINED:</span>
-                            <span className="text-payload-text">{new Date(user.created_at).toLocaleDateString()}</span>
-                          </div>
+                        <div className="space-y-1 font-mono text-xs">
+                          <div><span className="text-payload-muted">EMAIL: </span><span className="break-all">{user.email}</span></div>
+                          <div><span className="text-payload-muted">JOINED: </span>{new Date(user.created_at).toLocaleDateString()}</div>
                         </div>
                       </div>
-
-                      {/* Unlock and Delete Buttons */}
-                      <div className="flex flex-row gap-2 sm:gap-3 w-full sm:w-auto">
-                        <button
-                          data-testid={`unlock-btn-${index}`}
-                          onClick={() => handleUnlockUser(user.id)}
-                          className="flex-1 sm:flex-initial flex items-center justify-center gap-1 sm:gap-2 font-mono text-xs sm:text-sm border border-payload-neon text-payload-neon px-3 sm:px-4 py-2 rounded-none hover:bg-payload-neon hover:text-black transition-all duration-300"
-                        >
-                          <Unlock className="w-3 h-3 sm:w-4 sm:h-4" />
-                          UNLOCK
-                        </button>
-                        <button
-                          data-testid={`delete-btn-${index}`}
-                          onClick={() => handleDeleteUser(user.id, user.name)}
-                          className="flex-1 sm:flex-initial flex items-center justify-center gap-1 sm:gap-2 font-mono text-xs sm:text-sm border border-red-500 text-red-500 px-3 sm:px-4 py-2 rounded-none hover:bg-red-500 hover:text-white transition-all duration-300"
-                        >
-                          <Trash2 className="w-3 h-3 sm:w-4 sm:h-4" />
-                          DELETE
-                        </button>
+                      <div className="flex gap-2">
+                        <button onClick={() => handleUnlockUser(user.id)} className="flex-1 sm:flex-initial flex items-center justify-center gap-1 font-mono text-xs border border-payload-neon text-payload-neon px-3 py-2 hover:bg-payload-neon hover:text-black"><Unlock className="w-3 h-3" />UNLOCK</button>
+                        <button onClick={() => handleDeleteUser(user.id, user.name)} className="flex-1 sm:flex-initial flex items-center justify-center gap-1 font-mono text-xs border border-red-500 text-red-500 px-3 py-2 hover:bg-red-500 hover:text-white"><Trash2 className="w-3 h-3" />DELETE</button>
                       </div>
                     </div>
                   </motion.div>
