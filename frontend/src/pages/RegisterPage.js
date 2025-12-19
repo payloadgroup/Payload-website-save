@@ -106,7 +106,7 @@ const RegisterPage = () => {
   const getDaysInMonth = (year, month) => new Date(year, month + 1, 0).getDate();
 
   const selectDate = (day) => {
-    const dateStr = `${calendarDate.year}-${String(calendarDate.month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    const dateStr = `${String(day).padStart(2, '0')}/${String(calendarDate.month + 1).padStart(2, '0')}/${calendarDate.year}`;
     setFormData({ ...formData, date_of_birth: dateStr });
     setShowCalendar(false);
   };
