@@ -32,6 +32,16 @@ async def get_locked_users(admin_user: User = Depends(get_admin_user)):
     locked_users = await db.users.find({"status": UserStatus.LOCKED}, {"_id": 0, "password": 0}).to_list(1000)
     return [User(**user) for user in locked_users]
 
+@router.get("/denied-users", response_model=List[User])
+async def get_denied_users(admin_user: User = Depends(get_admin_user)):
+    denied_users = await db.users.find({"status": UserStatus.DENIED}, {"_id": 0, "password": 0}).to_list(1000)
+    return [User(**user) for user in denied_users]
+
+@router.get("/deleted-users", response_model=List[User])
+async def get_deleted_users(admin_user: User = Depends(get_admin_user)):
+    deleted_users = await db.users.find({"status": UserStatus.DELETED}, {"_id": 0, "password": 0}).to_list(1000)
+    return [User(**user) for user in deleted_users]
+
 @router.post("/create-member", response_model=User)
 async def create_member(member_data: CreateMemberRequest, admin_user: User = Depends(get_admin_user)):
     existing = await db.users.find_one({"email": member_data.email})
