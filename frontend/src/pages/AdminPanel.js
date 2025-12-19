@@ -30,6 +30,8 @@ const AdminPanel = () => {
   const [createForm, setCreateForm] = useState({ name: '', email: '', password: '', mobile: '', date_of_birth: '', tier: 'junior_recruit' });
   const [showPassword, setShowPassword] = useState(false);
   const [creating, setCreating] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [showProfileModal, setShowProfileModal] = useState(false);
 
   useEffect(() => { fetchAllData(); }, []);
 
