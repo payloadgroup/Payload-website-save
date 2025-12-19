@@ -11,6 +11,7 @@ class UserStatus(str, Enum):
     APPROVED = "approved"
     DENIED = "denied"
     LOCKED = "locked"
+    DELETED = "deleted"
 
 class PayloadStatus(str, Enum):
     ACTIVE = "active"
