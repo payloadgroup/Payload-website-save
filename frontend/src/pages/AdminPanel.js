@@ -282,6 +282,7 @@ const AdminPanel = () => {
 
   return (
     <div className="min-h-screen bg-payload-bg text-payload-text">
+      <ProfileModal />
       <nav className="border-b border-payload-border bg-payload-surface">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4">
           <div className="flex justify-between items-center">
