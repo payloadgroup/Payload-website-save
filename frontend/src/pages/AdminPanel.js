@@ -380,6 +380,12 @@ const AdminPanel = () => {
             <button onClick={() => setActiveTab('locked')} className={`font-mono text-[10px] sm:text-sm uppercase pb-3 px-2 sm:px-6 flex items-center gap-1 sm:gap-2 whitespace-nowrap ${activeTab === 'locked' ? 'text-red-500 border-b-2 border-red-500' : 'text-payload-muted hover:text-payload-text'}`}>
               <ShieldOff className="w-3 h-3 sm:w-4 sm:h-4" /><span>LOCKED</span> ({lockedUsers.length})
             </button>
+            <button onClick={() => setActiveTab('denied')} className={`font-mono text-[10px] sm:text-sm uppercase pb-3 px-2 sm:px-6 flex items-center gap-1 sm:gap-2 whitespace-nowrap ${activeTab === 'denied' ? 'text-orange-500 border-b-2 border-orange-500' : 'text-payload-muted hover:text-payload-text'}`}>
+              <Ban className="w-3 h-3 sm:w-4 sm:h-4" /><span>DENIED</span> ({deniedUsers.length})
+            </button>
+            <button onClick={() => setActiveTab('deleted')} className={`font-mono text-[10px] sm:text-sm uppercase pb-3 px-2 sm:px-6 flex items-center gap-1 sm:gap-2 whitespace-nowrap ${activeTab === 'deleted' ? 'text-gray-500 border-b-2 border-gray-500' : 'text-payload-muted hover:text-payload-text'}`}>
+              <UserX className="w-3 h-3 sm:w-4 sm:h-4" /><span>DELETED</span> ({deletedUsers.length})
+            </button>
           </div>
 
           {loading ? <div className="text-center font-mono text-payload-muted">LOADING...</div> : activeTab === 'pending' ? (
