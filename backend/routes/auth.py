@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException, BackgroundTasks
 from datetime import datetime, timezone, timedelta
 import uuid
+import base64
 
 from models.schemas import (
     UserRegister, UserLogin, User, Token,
