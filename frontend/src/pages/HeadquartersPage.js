@@ -232,30 +232,47 @@ const HeadquartersPage = () => {
 
           {/* Rooms Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {ROOMS.map((room, index) => (
-              <motion.div
-                key={room.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.05 }}
-                onClick={() => setSelectedRoom(room)}
-                className={`bg-payload-surface border ${room.borderColor} p-4 sm:p-5 rounded-sm cursor-pointer hover:scale-[1.02] transition-all duration-200 ${room.bgColor}`}
-              >
-                <div className="flex items-start justify-between mb-3">
-                  <room.icon className={`w-6 h-6 sm:w-8 sm:h-8 ${room.color}`} />
-                  <span className={`font-mono text-[10px] px-2 py-0.5 rounded-sm ${getTypeColor(room.type)}`}>
-                    {room.type}
-                  </span>
-                </div>
-                <div className="font-mono text-[10px] text-payload-muted mb-1">ROOM {room.id}</div>
-                <h3 className="font-rajdhani font-bold text-base sm:text-lg uppercase tracking-wide mb-2 line-clamp-1">
-                  {room.name}
-                </h3>
-                <p className="font-inter text-xs text-payload-muted line-clamp-2">
-                  {room.description}
-                </p>
-              </motion.div>
-            ))}
+            {ROOMS.map((room, index) => {
+              const unlocked = isRoomUnlocked(room.id);
+              return (
+                <motion.div
+                  key={room.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.05 }}
+                  onClick={() => handleRoomClick(room)}
+                  className={`relative bg-payload-surface border ${room.borderColor} p-4 sm:p-5 rounded-sm transition-all duration-200 ${
+                    unlocked 
+                      ? `cursor-pointer hover:scale-[1.02] ${room.bgColor}` 
+                      : 'cursor-not-allowed opacity-60 grayscale'
+                  }`}
+                >
+                  {/* Lock Overlay for locked rooms */}
+                  {!unlocked && (
+                    <div className="absolute inset-0 bg-black/50 backdrop-blur-[1px] flex flex-col items-center justify-center z-10 rounded-sm">
+                      <Lock className="w-8 h-8 text-payload-muted mb-2" />
+                      <span className="font-mono text-[10px] text-payload-muted text-center px-2">
+                        REQUIRES {getRequiredTierForRoom(room.id)}
+                      </span>
+                    </div>
+                  )}
+                  
+                  <div className="flex items-start justify-between mb-3">
+                    <room.icon className={`w-6 h-6 sm:w-8 sm:h-8 ${room.color}`} />
+                    <span className={`font-mono text-[10px] px-2 py-0.5 rounded-sm ${getTypeColor(room.type)}`}>
+                      {room.type}
+                    </span>
+                  </div>
+                  <div className="font-mono text-[10px] text-payload-muted mb-1">ROOM {room.id}</div>
+                  <h3 className="font-rajdhani font-bold text-base sm:text-lg uppercase tracking-wide mb-2 line-clamp-1">
+                    {room.name}
+                  </h3>
+                  <p className="font-inter text-xs text-payload-muted line-clamp-2">
+                    {room.description}
+                  </p>
+                </motion.div>
+              );
+            })}
           </div>
         </motion.div>
       </div>
