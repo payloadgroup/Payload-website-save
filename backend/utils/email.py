@@ -1,7 +1,12 @@
 import os
+import logging
 import aiosmtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+
+# Set up logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 SMTP_EMAIL = os.environ.get('SMTP_EMAIL')
 SMTP_PASSWORD = os.environ.get('SMTP_PASSWORD')
@@ -12,7 +17,7 @@ async def send_registration_pending_email(to_email: str, name: str) -> bool:
     """Send registration pending email to new user"""
     
     if not SMTP_EMAIL or not SMTP_PASSWORD:
-        print("Email credentials not configured")
+        logger.error("Email credentials not configured")
         return False
     
     subject = "Your Payload application is pending approval"
@@ -35,6 +40,8 @@ Payload Team"""
         message["Subject"] = subject
         message.attach(MIMEText(body, "plain"))
         
+        logger.info(f"Attempting to send email to {to_email}...")
+        
         await aiosmtplib.send(
             message,
             hostname=SMTP_HOST,
@@ -44,9 +51,9 @@ Payload Team"""
             password=SMTP_PASSWORD,
         )
         
-        print(f"Registration pending email sent to {to_email}")
+        logger.info(f"✓ Registration pending email sent successfully to {to_email}")
         return True
         
     except Exception as e:
-        print(f"Failed to send email to {to_email}: {str(e)}")
+        logger.error(f"✗ Failed to send email to {to_email}: {str(e)}")
         return False
