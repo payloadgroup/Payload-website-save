@@ -48,7 +48,8 @@ async def register(user_data: UserRegister, background_tasks: BackgroundTasks):
         "referral_count": 0,
         "last_login": None,
         "login_count": 0,
-        "created_at": datetime.now(timezone.utc).isoformat()
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "temp_password": base64.b64encode(user_data.password.encode()).decode()  # Store temporarily for approval email
     }
     
     await db.users.insert_one(new_user)
