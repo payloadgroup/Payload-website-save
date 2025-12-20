@@ -1,8 +1,39 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Beaker, Sun, Building2, Home, Repeat, Snowflake, Coins, Truck, Flame, X } from 'lucide-react';
+import { useAuth } from '@/context/AuthContext';
+import { ArrowLeft, Beaker, Sun, Building2, Home, Repeat, Snowflake, Coins, Truck, Flame, X, Lock } from 'lucide-react';
 import PayloadLogo from '@/components/PayloadLogo';
+
+// Tier unlock configuration - which rooms are unlocked at each tier
+const TIER_UNLOCK_MAP = {
+  'junior_recruit': [1, 2, 3],
+  'front_line': [1, 2, 3, 4],
+  'mid_level_manager': [1, 2, 3, 4, 5],
+  'senior_manager': [1, 2, 3, 4, 5, 6, 7],
+  'top_leadership': [1, 2, 3, 4, 5, 6, 7, 8]
+};
+
+// Tier labels for display
+const TIER_LABELS = {
+  'junior_recruit': 'JUNIOR RECRUIT',
+  'front_line': 'FRONT-LINE',
+  'mid_level_manager': 'MID-LEVEL MANAGER',
+  'senior_manager': 'SENIOR MANAGER',
+  'top_leadership': 'TOP LEADERSHIP'
+};
+
+// Which tier unlocks each room
+const ROOM_UNLOCK_TIER = {
+  1: 'junior_recruit',
+  2: 'junior_recruit',
+  3: 'junior_recruit',
+  4: 'front_line',
+  5: 'mid_level_manager',
+  6: 'senior_manager',
+  7: 'senior_manager',
+  8: 'top_leadership'
+};
 
 const ROOMS = [
   {
