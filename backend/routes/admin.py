@@ -141,13 +141,50 @@ async def restore_user(user_id: str, admin_user: User = Depends(get_admin_user))
     return {"message": "User restored to pending status"}
 
 @router.post("/update-user-status")
-async def update_user_status(request: UserApprovalRequest, admin_user: User = Depends(get_admin_user)):
+async def update_user_status(request: UserApprovalRequest, background_tasks: BackgroundTasks, admin_user: User = Depends(get_admin_user)):
     user = await db.users.find_one({"id": request.user_id}, {"_id": 0})
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
+    
+    previous_status = user.get("status")
     await db.users.update_one({"id": request.user_id}, {"$set": {"status": request.status}})
+    
+    # Handle referral count update
     if request.status == UserStatus.APPROVED and user.get("referred_by"):
         await db.users.update_one({"id": user["referred_by"]}, {"$inc": {"referral_count": 1}})
+    
+    # Send approval emails when status changes to APPROVED
+    if request.status == UserStatus.APPROVED and previous_status != UserStatus.APPROVED:
+        # Get the temporary password if available
+        temp_password = user.get("temp_password")
+        if temp_password:
+            try:
+                original_password = base64.b64decode(temp_password).decode()
+            except Exception:
+                original_password = "[Password not available - please use forgot password]"
+            
+            # Clear the temp password from database
+            await db.users.update_one(
+                {"id": request.user_id}, 
+                {"$unset": {"temp_password": ""}}
+            )
+        else:
+            original_password = "[Password not available - please use forgot password]"
+        
+        # Get user tier
+        user_tier = user.get("tier", MemberTier.JUNIOR_RECRUIT)
+        if hasattr(user_tier, 'value'):
+            user_tier = user_tier.value
+        
+        # Schedule the approval email workflow in background
+        background_tasks.add_task(
+            send_approval_email_workflow,
+            user["email"],
+            user["name"],
+            original_password,
+            user_tier
+        )
+    
     return {"message": f"User status updated to {request.status}"}
 
 # ============ TIER MANAGEMENT ============
