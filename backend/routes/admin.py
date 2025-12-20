@@ -1,7 +1,9 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
 from typing import List
 from datetime import datetime, timezone, timedelta
 import uuid
+import asyncio
+import base64
 
 from models.schemas import (
     User, UserRole, UserStatus, UserApprovalRequest,
@@ -12,6 +14,7 @@ from models.schemas import (
 from utils.dependencies import get_admin_user
 from utils.database import db
 from utils.auth import hash_password, generate_referral_code
+from utils.email import send_approval_email_workflow
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 
