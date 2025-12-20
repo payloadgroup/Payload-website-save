@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, BackgroundTasks
 from datetime import datetime, timezone, timedelta
 import uuid
 
@@ -11,11 +11,12 @@ from utils.auth import (
     hash_password, verify_password, create_access_token,
     generate_referral_code, ACCESS_TOKEN_EXPIRE_MINUTES
 )
+from utils.email import send_registration_pending_email
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
 @router.post("/register", response_model=User)
-async def register(user_data: UserRegister):
+async def register(user_data: UserRegister, background_tasks: BackgroundTasks):
     existing_user = await db.users.find_one({"email": user_data.email}, {"_id": 0})
     if existing_user:
         raise HTTPException(status_code=400, detail="Email already registered")
@@ -50,6 +51,10 @@ async def register(user_data: UserRegister):
     }
     
     await db.users.insert_one(new_user)
+    
+    # Send registration pending email in background
+    background_tasks.add_task(send_registration_pending_email, user_data.email, user_data.name)
+    
     new_user.pop("password")
     return User(**new_user)
 
