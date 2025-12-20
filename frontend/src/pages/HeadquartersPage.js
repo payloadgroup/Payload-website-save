@@ -7,18 +7,30 @@ import PayloadLogo from '@/components/PayloadLogo';
 const ROOMS = [
   {
     id: 1,
-    name: 'Depobond',
-    type: 'R&D',
-    icon: Beaker,
-    color: 'text-purple-400',
-    borderColor: 'border-purple-500/30',
-    bgColor: 'bg-purple-500/10',
-    description: 'A bond-based business structured by using our members as guarantors.',
-    focus: 'Development of the underlying technology platform.',
+    name: 'Censored Referrals',
+    type: 'OPERATIONAL',
+    icon: Home,
+    color: 'text-blue-400',
+    borderColor: 'border-blue-500/30',
+    bgColor: 'bg-blue-500/10',
+    description: 'Member referral tracking and social media content guidance program.',
+    focus: 'Grow the community through referrals and boost your member tier.',
     details: null
   },
   {
     id: 2,
+    name: 'Guaranteed Flips',
+    type: 'OPERATIONAL',
+    icon: Repeat,
+    color: 'text-green-400',
+    borderColor: 'border-green-500/30',
+    bgColor: 'bg-green-500/10',
+    description: 'Sourcing and executing on unique property deal opportunities brought by members with exclusive market positioning.',
+    focus: null,
+    details: null
+  },
+  {
+    id: 3,
     name: 'SolarHex',
     type: 'R&D',
     icon: Sun,
@@ -38,31 +50,7 @@ const ROOMS = [
     }
   },
   {
-    id: 3,
-    name: 'Censored Referrals',
-    type: 'OPERATIONAL',
-    icon: Home,
-    color: 'text-blue-400',
-    borderColor: 'border-blue-500/30',
-    bgColor: 'bg-blue-500/10',
-    description: 'Member referral tracking and social media content guidance program.',
-    focus: 'Grow the community through referrals and boost your member tier.',
-    details: null
-  },
-  {
     id: 4,
-    name: 'Guaranteed Flips',
-    type: 'OPERATIONAL',
-    icon: Repeat,
-    color: 'text-green-400',
-    borderColor: 'border-green-500/30',
-    bgColor: 'bg-green-500/10',
-    description: 'Sourcing and executing on unique property deal opportunities brought by members with exclusive market positioning.',
-    focus: null,
-    details: null
-  },
-  {
-    id: 5,
     name: 'Iceberg Technologies',
     type: 'R&D',
     icon: Snowflake,
@@ -78,8 +66,20 @@ const ROOMS = [
     }
   },
   {
+    id: 5,
+    name: 'CPDD',
+    type: 'OPERATIONAL',
+    icon: Truck,
+    color: 'text-orange-400',
+    borderColor: 'border-orange-500/30',
+    bgColor: 'bg-orange-500/10',
+    description: 'Care Package Dispatch & Delivery',
+    focus: 'Operates as an Amazon Delivery Service Partner (DSP).',
+    details: null
+  },
+  {
     id: 6,
-    name: 'Payload Finance Platform',
+    name: 'Payload Fintech',
     type: 'R&D',
     icon: Coins,
     color: 'text-amber-400',
@@ -93,14 +93,14 @@ const ROOMS = [
   },
   {
     id: 7,
-    name: 'CPDD',
-    type: 'OPERATIONAL',
-    icon: Truck,
-    color: 'text-orange-400',
-    borderColor: 'border-orange-500/30',
-    bgColor: 'bg-orange-500/10',
-    description: 'Care Package Dispatch & Delivery',
-    focus: 'Operates as an Amazon Delivery Service Partner (DSP).',
+    name: 'Paybond',
+    type: 'R&D',
+    icon: Beaker,
+    color: 'text-purple-400',
+    borderColor: 'border-purple-500/30',
+    bgColor: 'bg-purple-500/10',
+    description: 'A bond-based business structured by using our members as guarantors.',
+    focus: 'Development of the underlying technology platform.',
     details: null
   },
   {
