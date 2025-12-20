@@ -211,33 +211,33 @@ const Dashboard = () => {
             </div>
           )}
 
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-            <motion.div data-testid="payloads-card" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }} onClick={() => setActiveModal('payloads')} className="bg-payload-surface border border-white/10 p-4 sm:p-6 rounded-sm hover:border-payload-neon/50 transition-all cursor-pointer">
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+            <motion.div data-testid="headquarters-card" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }} onClick={() => navigate('/headquarters')} className="bg-payload-surface border border-white/10 p-4 sm:p-6 rounded-sm hover:border-white/30 transition-all cursor-pointer">
+              <div className="flex items-start justify-between gap-2 mb-3"><Building className="w-6 h-6 sm:w-8 sm:h-8 text-white" /><span className="font-mono text-[8px] sm:text-xs text-payload-muted uppercase">8 ROOMS</span></div>
+              <h3 className="font-rajdhani font-bold text-base sm:text-xl uppercase mb-1">HQ</h3>
+              <p className="font-inter text-[10px] sm:text-xs text-payload-muted mb-2">Business Operations</p>
+              <div className="font-mono text-xs sm:text-sm text-white">VIEW ROOMS</div>
+            </motion.div>
+
+            <motion.div data-testid="payloads-card" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }} onClick={() => setActiveModal('payloads')} className="bg-payload-surface border border-white/10 p-4 sm:p-6 rounded-sm hover:border-payload-neon/50 transition-all cursor-pointer">
               <div className="flex items-start justify-between gap-2 mb-3"><Rocket className="w-6 h-6 sm:w-8 sm:h-8 text-payload-neon" /><span className="font-mono text-[8px] sm:text-xs text-payload-muted uppercase">ACTIVE</span></div>
               <h3 className="font-rajdhani font-bold text-base sm:text-xl uppercase mb-1">PAYLOADS</h3>
               <p className="font-inter text-[10px] sm:text-xs text-payload-muted mb-2">Ventures & projects</p>
               <div className="font-mono text-xl sm:text-2xl text-payload-neon">{dashboardData?.payloads_count || 0}</div>
             </motion.div>
 
-            <motion.div data-testid="missions-card" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }} onClick={() => setActiveModal('missions')} className="bg-payload-surface border border-white/10 p-4 sm:p-6 rounded-sm hover:border-payload-cyan/50 transition-all cursor-pointer">
+            <motion.div data-testid="missions-card" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }} onClick={() => setActiveModal('missions')} className="bg-payload-surface border border-white/10 p-4 sm:p-6 rounded-sm hover:border-payload-cyan/50 transition-all cursor-pointer">
               <div className="flex items-start justify-between gap-2 mb-3"><Target className="w-6 h-6 sm:w-8 sm:h-8 text-payload-cyan" /><span className="font-mono text-[8px] sm:text-xs text-payload-muted uppercase">PROGRESS</span></div>
               <h3 className="font-rajdhani font-bold text-base sm:text-xl uppercase mb-1">MISSIONS</h3>
               <p className="font-inter text-[10px] sm:text-xs text-payload-muted mb-2">Tasks & objectives</p>
               <div className="font-mono text-xl sm:text-2xl text-payload-cyan">{dashboardData?.missions_count || 0}</div>
             </motion.div>
 
-            <motion.div data-testid="bank-card" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }} onClick={() => setActiveModal('bank')} className="bg-payload-surface border border-white/10 p-4 sm:p-6 rounded-sm hover:border-payload-alert/50 transition-all cursor-pointer">
+            <motion.div data-testid="bank-card" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }} onClick={() => setActiveModal('bank')} className="bg-payload-surface border border-white/10 p-4 sm:p-6 rounded-sm hover:border-payload-alert/50 transition-all cursor-pointer">
               <div className="flex items-start justify-between gap-2 mb-3"><DollarSign className="w-6 h-6 sm:w-8 sm:h-8 text-payload-alert" /><span className="font-mono text-[8px] sm:text-xs text-payload-muted uppercase">BALANCE</span></div>
               <h3 className="font-rajdhani font-bold text-base sm:text-xl uppercase mb-1">BANK</h3>
               <p className="font-inter text-[10px] sm:text-xs text-payload-muted mb-2">Financial resources</p>
               <div className="font-mono text-lg sm:text-2xl text-payload-alert">${(dashboardData?.balance || 0).toFixed(2)}</div>
-            </motion.div>
-
-            <motion.div data-testid="headquarters-card" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }} onClick={() => navigate('/headquarters')} className="bg-payload-surface border border-white/10 p-4 sm:p-6 rounded-sm hover:border-white/30 transition-all cursor-pointer">
-              <div className="flex items-start justify-between gap-2 mb-3"><Building className="w-6 h-6 sm:w-8 sm:h-8 text-white" /><span className="font-mono text-[8px] sm:text-xs text-payload-muted uppercase">8 ROOMS</span></div>
-              <h3 className="font-rajdhani font-bold text-base sm:text-xl uppercase mb-1">HQ</h3>
-              <p className="font-inter text-[10px] sm:text-xs text-payload-muted mb-2">Business Operations</p>
-              <div className="font-mono text-xs sm:text-sm text-white">VIEW ROOMS</div>
             </motion.div>
 
             <motion.div data-testid="stations-card" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }} onClick={() => setActiveModal('stations')} className="bg-payload-surface border border-white/10 p-4 sm:p-6 rounded-sm hover:border-white/30 transition-all cursor-pointer">
@@ -252,13 +252,6 @@ const Dashboard = () => {
               <h3 className="font-rajdhani font-bold text-base sm:text-xl uppercase mb-1">BASECAMP</h3>
               <p className="font-inter text-[10px] sm:text-xs text-payload-muted mb-2">Resources & training</p>
               <div className="font-mono text-xs sm:text-sm text-white">ACCESS</div>
-            </motion.div>
-
-            <motion.div data-testid="referrals-card" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.7 }} onClick={() => navigate('/referrals')} className="bg-payload-surface border border-purple-500/30 p-4 sm:p-6 rounded-sm hover:border-purple-500/50 transition-all cursor-pointer col-span-2">
-              <div className="flex items-start justify-between gap-2 mb-3"><Gift className="w-6 h-6 sm:w-8 sm:h-8 text-purple-400" /><span className="font-mono text-[8px] sm:text-xs text-purple-400 uppercase">GROW</span></div>
-              <h3 className="font-rajdhani font-bold text-base sm:text-xl uppercase mb-1">CENSORED REFERRALS</h3>
-              <p className="font-inter text-[10px] sm:text-xs text-payload-muted mb-2">Track referrals & boost your tier</p>
-              <div className="font-mono text-xs sm:text-sm text-purple-400">VIEW REFERRALS</div>
             </motion.div>
           </div>
 
