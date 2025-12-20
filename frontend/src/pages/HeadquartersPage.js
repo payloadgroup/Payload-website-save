@@ -150,7 +150,26 @@ const ROOMS = [
 
 const HeadquartersPage = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [selectedRoom, setSelectedRoom] = useState(null);
+
+  // Get unlocked rooms based on user tier (admin sees all)
+  const userTier = user?.tier || 'junior_recruit';
+  const isAdmin = user?.role === 'admin';
+  const unlockedRooms = isAdmin ? [1, 2, 3, 4, 5, 6, 7, 8] : (TIER_UNLOCK_MAP[userTier] || [1, 2, 3]);
+
+  const isRoomUnlocked = (roomId) => unlockedRooms.includes(roomId);
+
+  const getRequiredTierForRoom = (roomId) => {
+    const tier = ROOM_UNLOCK_TIER[roomId];
+    return TIER_LABELS[tier] || 'UNKNOWN';
+  };
+
+  const handleRoomClick = (room) => {
+    if (isRoomUnlocked(room.id)) {
+      setSelectedRoom(room);
+    }
+  };
 
   const getTypeColor = (type) => {
     switch (type) {
