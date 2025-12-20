@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import axios from 'axios';
-import { LogOut, Rocket, Target, DollarSign, Building, MapPin, BookOpen, Shield, Megaphone, Pin, X, Gift, CreditCard } from 'lucide-react';
+import { LogOut, Rocket, Target, DollarSign, Building, MapPin, BookOpen, Shield, Megaphone, Pin, X, Gift, CreditCard, Award } from 'lucide-react';
 import PayloadLogo from '@/components/PayloadLogo';
 import SettingsDropdown from '@/components/SettingsDropdown';
 import PayloadsModal from '@/components/modules/PayloadsModal';
@@ -20,6 +20,14 @@ const PRIORITY_COLORS = {
   normal: 'border-blue-500/30',
   high: 'border-orange-500/30',
   urgent: 'border-red-500/50 bg-red-500/5'
+};
+
+const TIER_CONFIG = {
+  junior_recruit: { label: 'JUNIOR RECRUIT', icon: '📝' },
+  front_line: { label: 'FRONT-LINE', icon: '🕵️' },
+  mid_level_manager: { label: 'MID-LEVEL MGR', icon: '📊' },
+  senior_manager: { label: 'SENIOR MGR', icon: '🎯' },
+  top_leadership: { label: 'TOP LEADER', icon: '👑' }
 };
 
 const Dashboard = () => {
