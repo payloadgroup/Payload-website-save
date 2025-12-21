@@ -46,6 +46,34 @@ class AnnouncementPriority(str, Enum):
     HIGH = "high"
     URGENT = "urgent"
 
+# Guaranteed Flips Models
+class FlipSectionType(str, Enum):
+    PROPERTY = "property"
+    BUSINESS = "business"
+    UNIQUE = "unique"
+    ARBITRAGE = "arbitrage"
+    TOP_SECRET = "top_secret"
+
+class FlipTierAccess(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    section: FlipSectionType
+    required_tier: MemberTier
+
+class OpportunitySubmission(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str
+    user_id: str
+    user_name: str
+    user_email: str
+    content: str
+    attachments: List[dict] = []
+    status: str = "pending"  # pending, reviewed, archived
+    submitted_at: str
+    reviewed_at: Optional[str] = None
+
+class OpportunitySubmitRequest(BaseModel):
+    content: str
+
 # User Models
 class UserRegister(BaseModel):
     name: str
