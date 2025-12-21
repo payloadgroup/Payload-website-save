@@ -34,7 +34,10 @@ class GuaranteedFlipsAPITester:
             if method == 'GET':
                 response = requests.get(url, headers=default_headers)
             elif method == 'POST':
-                if files:
+                if files is not None:  # Multipart form data
+                    # Remove Content-Type to let requests set it automatically
+                    if 'Content-Type' in default_headers:
+                        del default_headers['Content-Type']
                     response = requests.post(url, data=data, files=files, headers=default_headers)
                 else:
                     response = requests.post(url, json=data, headers=default_headers)
