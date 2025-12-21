@@ -128,6 +128,14 @@ function App() {
                 </ProtectedRoute>
               }
             />
+            <Route
+              path="/workzone"
+              element={
+                <ProtectedRoute>
+                  <WorkZonePage />
+                </ProtectedRoute>
+              }
+            />
           </Routes>
         </BrowserRouter>
         <Toaster position="top-right" theme="dark" />
