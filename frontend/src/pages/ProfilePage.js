@@ -125,6 +125,15 @@ const ProfilePage = () => {
                       <div className="font-mono text-sm">{profile?.date_of_birth || 'Not set'}</div>
                     </div>
                   </div>
+                  {profile?.gmail_account && (
+                    <div className="flex items-center gap-3 sm:col-span-2">
+                      <Briefcase className="w-5 h-5 text-payload-alert" />
+                      <div>
+                        <div className="font-mono text-xs text-payload-muted">WORK ZONE GMAIL</div>
+                        <div className="font-mono text-sm text-[#00ff00]">{profile.gmail_account}</div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
 
