@@ -332,7 +332,7 @@ class GuaranteedFlipsAPITester:
             "Submit Opportunity (Empty Content)",
             "POST",
             "flips/submit-opportunity",
-            400,  # Should fail
+            422,  # FastAPI returns 422 for validation errors
             data=data,
             headers=headers,
             files={}
