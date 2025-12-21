@@ -15,6 +15,7 @@ import OnboardingPage from "@/pages/OnboardingPage";
 import ReferralsPage from "@/pages/ReferralsPage";
 import NotificationSettingsPage from "@/pages/NotificationSettingsPage";
 import WorkZonePage from "@/pages/WorkZonePage";
+import GuaranteedFlipsPage from "@/pages/GuaranteedFlipsPage";
 import { AuthProvider, useAuth } from "@/context/AuthContext";
 
 const ProtectedRoute = ({ children, adminOnly = false }) => {
