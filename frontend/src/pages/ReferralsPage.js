@@ -90,8 +90,25 @@ const ReferralsPage = () => {
               <div className="space-y-6">
                 <div className="bg-payload-surface border border-payload-neon/30 p-6 rounded-sm">
                   <div className="flex items-center gap-3 mb-4"><Gift className="w-6 h-6 text-payload-neon" /><h3 className="font-rajdhani font-bold text-xl">YOUR REFERRAL CODE</h3></div>
-                  <div className="flex items-center gap-3 bg-black p-4 border border-white/20"><span className="font-mono text-2xl text-payload-neon flex-1">{referralData?.own_referral_code}</span><button onClick={copyCode} className="p-2 hover:bg-white/10 rounded-sm"><Copy className="w-5 h-5" /></button></div>
+                  <div className="flex items-center gap-3 bg-black p-4 border border-white/20"><span className="font-mono text-2xl text-payload-neon flex-1">{referralData?.own_referral_code}</span><button onClick={copyCode} className="p-2 hover:bg-white/10 rounded-sm" title="Copy code"><Copy className="w-5 h-5" /></button></div>
                   <p className="font-mono text-xs text-payload-muted mt-3">Share this code with potential members</p>
+                </div>
+
+                {/* Shareable Referral Link */}
+                <div className="bg-payload-surface border border-payload-cyan/30 p-6 rounded-sm">
+                  <div className="flex items-center gap-3 mb-4"><Link className="w-6 h-6 text-payload-cyan" /><h3 className="font-rajdhani font-bold text-xl">YOUR REFERRAL LINK</h3></div>
+                  <div className="bg-black p-4 border border-white/20 mb-3">
+                    <p className="font-mono text-sm text-payload-cyan break-all">{getReferralLink()}</p>
+                  </div>
+                  <div className="flex gap-3">
+                    <button onClick={copyLink} className="flex-1 flex items-center justify-center gap-2 bg-payload-cyan/10 border border-payload-cyan/30 py-3 px-4 font-mono text-sm text-payload-cyan hover:bg-payload-cyan/20 transition-colors">
+                      <Copy className="w-4 h-4" /> COPY LINK
+                    </button>
+                    <button onClick={shareLink} className="flex-1 flex items-center justify-center gap-2 bg-payload-neon/10 border border-payload-neon/30 py-3 px-4 font-mono text-sm text-payload-neon hover:bg-payload-neon/20 transition-colors">
+                      <Share2 className="w-4 h-4" /> SHARE
+                    </button>
+                  </div>
+                  <p className="font-mono text-xs text-payload-muted mt-3">When someone signs up using this link, they'll automatically be tracked as your referral</p>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
