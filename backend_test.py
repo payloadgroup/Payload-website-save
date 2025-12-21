@@ -1355,164 +1355,98 @@ class WorkZoneAPITester:
         return success
 
 def main():
-    print("🚀 Starting Payload Phase 2 API Testing...")
-    tester = AdminFeaturesAPITester()
+    print("🚀 Starting Work Zone API Tests...")
+    print("=" * 50)
     
-    # Test user registration flow
-    print("\n" + "="*50)
-    print("TESTING USER REGISTRATION FLOW")
-    print("="*50)
+    # Setup
+    tester = WorkZoneAPITester()
     
-    reg_success, user_data = tester.test_user_registration()
-    if not reg_success:
-        print("❌ Registration failed, stopping tests")
-        return 1
-    
-    # Test duplicate registration
-    tester.test_duplicate_registration(user_data)
-    
-    # Test pending user login (should fail)
-    tester.test_pending_user_login(user_data)
-    
-    # Test admin functionality
-    print("\n" + "="*50)
-    print("TESTING ADMIN FUNCTIONALITY")
-    print("="*50)
+    # Login tests
+    print("\n📋 AUTHENTICATION TESTS")
+    print("-" * 30)
     
     if not tester.test_admin_login():
-        print("❌ Admin login failed, stopping admin tests")
+        print("❌ Admin login failed, stopping tests")
         return 1
     
-    tester.test_get_pending_users()
+    if not tester.test_member_login():
+        print("❌ Member login failed, stopping tests")
+        return 1
+
+    # Admin Work Zone Tests
+    print("\n👑 ADMIN WORK ZONE TESTS")
+    print("-" * 30)
     
-    if not tester.test_approve_user():
-        print("❌ User approval failed")
+    # Test getting initial settings
+    admin_get_success, initial_settings = tester.test_admin_get_settings()
+    if not admin_get_success:
+        print("❌ Failed to get admin settings")
         return 1
     
-    # Test approved user login
-    print("\n" + "="*50)
-    print("TESTING APPROVED USER ACCESS")
-    print("="*50)
-    
-    if not tester.test_approved_user_login(user_data):
-        print("❌ Approved user login failed")
+    # Test updating admin settings
+    test_google_email = "admin.test@gmail.com"
+    admin_update_success, update_response = tester.test_admin_update_settings(test_google_email)
+    if not admin_update_success:
+        print("❌ Failed to update admin settings")
         return 1
     
-    tester.test_get_user_profile()
-    tester.test_dashboard_access()
+    # Verify the update worked
+    admin_verify_success, updated_settings = tester.test_admin_get_settings()
+    if admin_verify_success and updated_settings.get('admin_google_email') == test_google_email:
+        print("✅ Admin Google email update verified")
+        tester.tests_passed += 1
+    else:
+        print("❌ Admin Google email update verification failed")
+    tester.tests_run += 1
+
+    # Member Work Zone Tests
+    print("\n👤 MEMBER WORK ZONE TESTS")
+    print("-" * 30)
     
-    # Test Phase 2 Modules
-    print("\n" + "="*60)
-    print("TESTING PAYLOADS MODULE (CRUD)")
-    print("="*60)
+    # Test getting initial Gmail (should be None initially)
+    member_get_success, initial_gmail = tester.test_member_get_gmail()
+    if not member_get_success:
+        print("❌ Failed to get member Gmail")
+        return 1
     
-    tester.test_create_payload()
-    tester.test_get_payloads()
-    tester.test_update_payload()
-    # Don't delete payload yet, we'll use it for dashboard testing
+    # Test submitting invalid email
+    invalid_emails = ["test@yahoo.com", "invalid-email", "test@hotmail.com"]
+    for invalid_email in invalid_emails:
+        invalid_success, _ = tester.test_member_submit_gmail_invalid(invalid_email)
+        if not invalid_success:
+            print(f"❌ Invalid email validation failed for: {invalid_email}")
     
-    print("\n" + "="*60)
-    print("TESTING MISSIONS MODULE (CRUD)")
-    print("="*60)
+    # Test submitting valid Gmail
+    test_gmail = "member.test@gmail.com"
+    member_submit_success, submit_response = tester.test_member_submit_gmail_valid(test_gmail)
+    if not member_submit_success:
+        print("❌ Failed to submit valid Gmail")
+        return 1
     
-    tester.test_create_mission()
-    tester.test_get_missions()
-    tester.test_update_mission()
-    # Don't delete mission yet, we'll use it for dashboard testing
+    # Verify the Gmail was saved
+    member_verify_success, updated_gmail = tester.test_member_get_gmail()
+    if member_verify_success and updated_gmail.get('gmail_account') == test_gmail:
+        print("✅ Member Gmail submission verified")
+        tester.tests_passed += 1
+    else:
+        print("❌ Member Gmail submission verification failed")
+    tester.tests_run += 1
+
+    # Security Tests
+    print("\n🔒 SECURITY TESTS")
+    print("-" * 30)
     
-    print("\n" + "="*60)
-    print("TESTING BUSINESS BANK MODULE")
-    print("="*60)
+    # Test unauthorized access
+    if not tester.test_unauthorized_workzone_access():
+        print("❌ Unauthorized access test failed")
     
-    tester.test_create_transaction()
-    tester.test_create_withdrawal()
-    tester.test_get_transactions()
-    tester.test_get_balance()
-    
-    print("\n" + "="*60)
-    print("TESTING HEADQUARTERS MODULE")
-    print("="*60)
-    
-    tester.test_create_headquarters()
-    tester.test_get_headquarters()
-    tester.test_update_headquarters()
-    
-    print("\n" + "="*60)
-    print("TESTING STATIONS MODULE (CRUD)")
-    print("="*60)
-    
-    tester.test_create_station()
-    tester.test_get_stations()
-    tester.test_update_station()
-    # Don't delete station yet, we'll use it for dashboard testing
-    
-    print("\n" + "="*60)
-    print("TESTING BASECAMP MODULE")
-    print("="*60)
-    
-    tester.test_create_resource()
-    tester.test_get_resources()
-    tester.test_user_create_resource_forbidden()
-    
-    print("\n" + "="*60)
-    print("TESTING ADMIN ANALYTICS")
-    print("="*60)
-    
-    tester.test_admin_analytics()
-    tester.test_user_analytics_forbidden()
-    
-    # Test security
-    print("\n" + "="*50)
-    print("TESTING SECURITY & ACCESS CONTROL")
-    print("="*50)
-    
-    tester.test_unauthorized_access()
-    tester.test_non_admin_access()
-    
-    # Test account locking feature
-    print("\n" + "="*60)
-    print("TESTING ACCOUNT LOCKING FEATURE")
-    print("="*60)
-    
-    tester.test_get_members()
-    tester.test_get_locked_users()
-    
-    # Create test user for locking operations
-    if tester.test_create_test_user_for_locking():
-        tester.test_lock_user_account()
-        tester.test_locked_user_login_blocked()
-        tester.test_unlock_user_account()
-        tester.test_delete_locked_user()
-    
-    # Test admin protection and unauthorized access
-    tester.test_admin_protection_from_locking()
-    tester.test_member_unauthorized_admin_access()
-    
-    # Test new admin features
-    print("\n" + "="*60)
-    print("TESTING NEW ADMIN FEATURES")
-    print("="*60)
-    
-    tester.test_member_tiers()
-    tester.test_announcements_system()
-    tester.test_activity_monitoring()
-    tester.test_referral_management()
-    tester.test_admin_access_control()
-    
-    # Clean up - delete created items
-    print("\n" + "="*50)
-    print("CLEANUP - DELETING TEST DATA")
-    print("="*50)
-    
-    tester.test_delete_payload()
-    tester.test_delete_mission()
-    tester.test_delete_station()
-    
+    # Test member accessing admin endpoint
+    if not tester.test_member_access_admin_endpoint():
+        print("❌ Member access to admin endpoint test failed")
+
     # Print final results
-    print("\n" + "="*50)
-    print("TEST RESULTS")
-    print("="*50)
-    print(f"📊 Tests passed: {tester.tests_passed}/{tester.tests_run}")
+    print("\n" + "=" * 50)
+    print(f"📊 FINAL RESULTS: {tester.tests_passed}/{tester.tests_run} tests passed")
     
     if tester.failed_tests:
         print("\n❌ Failed tests:")
@@ -1522,7 +1456,12 @@ def main():
     success_rate = (tester.tests_passed / tester.tests_run) * 100 if tester.tests_run > 0 else 0
     print(f"📈 Success rate: {success_rate:.1f}%")
     
-    return 0 if tester.tests_passed == tester.tests_run else 1
+    if tester.tests_passed == tester.tests_run:
+        print("🎉 All tests passed!")
+        return 0
+    else:
+        print(f"⚠️  {tester.tests_run - tester.tests_passed} tests failed")
+        return 1
 
 if __name__ == "__main__":
     sys.exit(main())
