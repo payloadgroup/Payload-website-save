@@ -4,13 +4,14 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import axios from 'axios';
 import { toast } from 'sonner';
-import { ArrowLeft, Briefcase, ExternalLink, Mail, Check, AlertCircle, Edit2, Clock, CheckCircle, XCircle, Users } from 'lucide-react';
+import { ArrowLeft, Briefcase, ExternalLink, Mail, Check, AlertCircle, Edit2, Clock, CheckCircle, XCircle, Users, UserCheck } from 'lucide-react';
 import PayloadLogo from '@/components/PayloadLogo';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
 const GOOGLE_WORKSPACE_URL = "https://workspace.google.com/";
+const GOOGLE_DRIVE_URL = "https://drive.google.com/";
 
 const WorkZonePage = () => {
   const navigate = useNavigate();
@@ -24,7 +25,9 @@ const WorkZonePage = () => {
   const [loadingSettings, setLoadingSettings] = useState(true);
   const [savingSettings, setSavingSettings] = useState(false);
   const [pendingRequests, setPendingRequests] = useState([]);
+  const [approvedMembers, setApprovedMembers] = useState([]);
   const [loadingRequests, setLoadingRequests] = useState(true);
+  const [loadingApproved, setLoadingApproved] = useState(true);
   const [processingUser, setProcessingUser] = useState(null);
 
   // Member state
@@ -39,6 +42,7 @@ const WorkZonePage = () => {
     if (isAdmin) {
       fetchAdminSettings();
       fetchPendingRequests();
+      fetchApprovedMembers();
     } else {
       fetchMyStatus();
     }
