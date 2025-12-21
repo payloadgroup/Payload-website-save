@@ -160,15 +160,15 @@ const Dashboard = () => {
                 <h1 className="font-rajdhani font-bold text-2xl sm:text-4xl uppercase tracking-wide mb-2">MISSION CONTROL</h1>
                 <p className="font-mono text-xs sm:text-sm text-payload-neon uppercase tracking-widest">{dashboardData?.status || 'SYSTEMS ONLINE'}</p>
               </div>
-              <div className="flex flex-wrap items-center gap-3">
+              <div className="flex flex-row items-center gap-2 sm:gap-3">
                 {/* Member Tier Badge */}
                 {user?.role === 'member' && profile?.tier && (
-                  <div className="bg-black border-2 border-amber-500 rounded-sm px-4 py-2 shadow-[0_0_15px_rgba(245,158,11,0.3)]">
-                    <div className="flex items-center gap-2">
-                      <Award className="w-5 h-5 text-amber-500" />
+                  <div className="bg-black border border-amber-500 sm:border-2 rounded-sm px-2 py-1 sm:px-4 sm:py-2 shadow-[0_0_10px_rgba(245,158,11,0.2)] sm:shadow-[0_0_15px_rgba(245,158,11,0.3)]">
+                    <div className="flex items-center gap-1 sm:gap-2">
+                      <Award className="w-3 h-3 sm:w-5 sm:h-5 text-amber-500" />
                       <div>
-                        <div className="font-mono text-[10px] text-payload-muted uppercase">MEMBER TIER</div>
-                        <div className="font-mono text-lg sm:text-xl text-amber-500 font-bold">
+                        <div className="font-mono text-[8px] sm:text-[10px] text-payload-muted uppercase">TIER</div>
+                        <div className="font-mono text-xs sm:text-xl text-amber-500 font-bold">
                           {TIER_CONFIG[profile.tier]?.icon} {TIER_CONFIG[profile.tier]?.label || 'RECRUIT'}
                         </div>
                       </div>
@@ -177,12 +177,12 @@ const Dashboard = () => {
                 )}
                 {/* Credit Score Badge */}
                 {profile?.credit_score && (
-                  <div className="bg-black border-2 border-payload-neon rounded-sm px-4 py-2 shadow-[0_0_15px_rgba(0,255,170,0.3)]">
-                    <div className="flex items-center gap-2">
-                      <CreditCard className="w-5 h-5 text-payload-neon" />
+                  <div className="bg-black border border-payload-neon sm:border-2 rounded-sm px-2 py-1 sm:px-4 sm:py-2 shadow-[0_0_10px_rgba(0,255,170,0.2)] sm:shadow-[0_0_15px_rgba(0,255,170,0.3)]">
+                    <div className="flex items-center gap-1 sm:gap-2">
+                      <CreditCard className="w-3 h-3 sm:w-5 sm:h-5 text-payload-neon" />
                       <div>
-                        <div className="font-mono text-[10px] text-payload-muted uppercase">CREDIT SCORE</div>
-                        <div className="font-mono text-2xl text-payload-neon font-bold">{profile.credit_score}</div>
+                        <div className="font-mono text-[8px] sm:text-[10px] text-payload-muted uppercase">CREDIT</div>
+                        <div className="font-mono text-xs sm:text-2xl text-payload-neon font-bold">{profile.credit_score}</div>
                       </div>
                     </div>
                   </div>
