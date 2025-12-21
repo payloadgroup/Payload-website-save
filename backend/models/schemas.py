@@ -77,6 +77,19 @@ class User(BaseModel):
     login_count: int = 0
     created_at: str
     credit_score: Optional[str] = None
+    gmail_account: Optional[str] = None
+
+# Work Zone Models
+class WorkZoneSettingsUpdate(BaseModel):
+    admin_google_email: str
+
+class WorkZoneSettingsResponse(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    admin_google_email: Optional[str] = None
+    updated_at: Optional[str] = None
+
+class GmailAccountUpdate(BaseModel):
+    gmail_account: str
 
 class Token(BaseModel):
     access_token: str
