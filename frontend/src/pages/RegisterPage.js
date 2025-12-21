@@ -1,12 +1,13 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { toast } from 'sonner';
-import { ArrowLeft, Eye, EyeOff, Calendar, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ArrowLeft, Eye, EyeOff, Calendar, ChevronLeft, ChevronRight, UserPlus } from 'lucide-react';
 
 const RegisterPage = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { register } = useAuth();
   const [formData, setFormData] = useState({
     name: '',
@@ -21,6 +22,16 @@ const RegisterPage = () => {
   const [errors, setErrors] = useState({});
   const [showCalendar, setShowCalendar] = useState(false);
   const [calendarDate, setCalendarDate] = useState({ year: 2000, month: 0 });
+  const [referredByLink, setReferredByLink] = useState(false);
+
+  // Capture referral code from URL on mount
+  useEffect(() => {
+    const refCode = searchParams.get('ref');
+    if (refCode) {
+      setFormData(prev => ({ ...prev, referral_code: refCode }));
+      setReferredByLink(true);
+    }
+  }, [searchParams]);
 
   const validateAustralianMobile = (mobile) => {
     const cleaned = mobile.replace(/[\s\-()]/g, '');
