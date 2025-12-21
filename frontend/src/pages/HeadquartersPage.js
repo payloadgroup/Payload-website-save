@@ -56,7 +56,7 @@ const ROOMS = [
     color: 'text-green-400',
     borderColor: 'border-green-500/30',
     bgColor: 'bg-green-500/10',
-    description: 'Sourcing and executing on unique property deal opportunities brought by members with exclusive market positioning.',
+    description: 'Sourcing and executing on unique deal opportunities brought by members and Payload with exclusive market positioning.',
     focus: null,
     details: null
   },
