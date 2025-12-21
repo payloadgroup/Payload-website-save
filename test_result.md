@@ -1,48 +1,47 @@
 # Test Results for Payload Application
 
 ## Current Testing Focus
-Testing the REFERRAL SYSTEM with automatic tier upgrades:
-1. User registration with a referral code
-2. Referral count incrementing when referred user is approved
-3. Automatic tier upgrade based on referral count thresholds:
-   - 1+ referrals = FRONT_LINE
-   - 3+ referrals = MID_LEVEL_MANAGER
-   - 5+ referrals = SENIOR_MANAGER
-   - 10+ referrals = TOP_LEADERSHIP
-4. Referrals page showing correct data
-5. Admin recalculate referral tiers endpoint
+Testing the REFERRAL LINK feature:
+1. Referrals page shows shareable referral link with member's code
+2. Copy Link and Share buttons work
+3. Visiting /register?ref=CODE auto-fills the referral code field
+4. User registering via referral link has the code saved
+5. After admin approval, referrer's count and tier update correctly
 
 ## Test Credentials
 - Admin: admin@payload.com / admin123
 - Member: member@payload.com / member123
 
 ## Files Changed
-- /app/backend/routes/admin.py - Added automatic tier upgrade logic in update-user-status, added recalculate-referral-tiers endpoint, added get_tier_for_referral_count helper function
+- /app/frontend/src/pages/ReferralsPage.js - Added shareable referral link section with Copy Link and Share buttons
+- /app/frontend/src/pages/RegisterPage.js - Added URL query param capture for ?ref= parameter, auto-fills referral code field
 
 ## Key Test Scenarios
-### Scenario 1: New user registers with referral code
-- Referrer: member@payload.com (get their referral code first)
-- Register a new user using that referral code
-- Verify the new user has `referred_by` set to member's ID
+### Scenario 1: Referral link on Referrals page
+- Login as member
+- Navigate to /referrals
+- Verify "YOUR REFERRAL LINK" section shows the correct link format: {origin}/register?ref={CODE}
+- Verify COPY LINK and SHARE buttons are present
 
-### Scenario 2: Admin approves referred user, tier upgrades
+### Scenario 2: Auto-fill referral code from URL
+- Visit /register?ref=TESTDC81C9
+- Verify referral_code field is auto-filled with TESTDC81C9
+- Verify "(AUTO-FILLED FROM LINK)" label appears
+- Verify "You were referred by a Payload member!" message appears
+- Verify field is read-only when auto-filled
+
+### Scenario 3: Complete referral flow via link
+- Get member's referral code
+- Register new user via /register?ref={CODE}
 - Admin approves the new user
-- Verify referrer's `referral_count` increments
-- Verify referrer's `tier` upgrades appropriately
-
-### Scenario 3: Test tier threshold boundaries
-- Test that 1 referral = FRONT_LINE
-- Test that 3 referrals = MID_LEVEL_MANAGER
-- Test that 5 referrals = SENIOR_MANAGER
-- Test that 10 referrals = TOP_LEADERSHIP
+- Verify member's referral_count increments
+- Verify member's tier upgrades if threshold met
 
 ## API Endpoints to Test
-- GET /api/users/my-referral-code - Get user's referral code and count
-- GET /api/users/my-referrals - Get list of users referred by current user
-- GET /api/admin/referral-stats - Admin view referral statistics
-- POST /api/admin/recalculate-referral-tiers - Recalculate all tiers based on referrals
-- POST /api/auth/register - Register with referral_code
-- POST /api/admin/update-user-status - Approve user (triggers referral count + tier)
+- GET /api/users/my-referral-code - Returns member's own_referral_code
+- POST /api/auth/register - Accepts referral_code from form
+- POST /api/admin/update-user-status - Triggers referral count + tier upgrade
 
 ## Incorporate User Feedback
-- Test that referrals trigger tier rank to upgrade appropriately
+- Referral link should automatically capture which member the referral belongs to
+- Signup using referral link should be recognized and update referrals page
