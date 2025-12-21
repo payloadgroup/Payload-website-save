@@ -9,16 +9,10 @@ class WorkZoneAPITester:
         self.base_url = base_url
         self.api_url = f"{base_url}/api"
         self.admin_token = None
-        self.user_token = None
-        self.test_user_id = None
+        self.member_token = None
         self.tests_run = 0
         self.tests_passed = 0
         self.failed_tests = []
-        # Store created IDs for cleanup and testing
-        self.created_payload_id = None
-        self.created_mission_id = None
-        self.created_station_id = None
-        self.created_resource_id = None
 
     def run_test(self, name, method, endpoint, expected_status, data=None, headers=None):
         """Run a single API test"""
