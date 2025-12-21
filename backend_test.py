@@ -131,6 +131,143 @@ class WorkZoneAPITester:
             return True
         return False
 
+    def test_member_login(self):
+        """Test member login"""
+        success, response = self.run_test(
+            "Member Login",
+            "POST",
+            "auth/login",
+            200,
+            data={"email": "member@payload.com", "password": "member123"}
+        )
+        
+        if success and 'access_token' in response:
+            self.member_token = response['access_token']
+            print(f"   Member token obtained")
+            return True
+        return False
+
+    # ===== WORK ZONE API TESTING =====
+    def test_admin_get_settings(self):
+        """Test GET /api/workzone/settings"""
+        if not self.admin_token:
+            print("❌ No admin token available")
+            return False
+            
+        headers = {'Authorization': f'Bearer {self.admin_token}'}
+        success, response = self.run_test(
+            "Admin Get Work Zone Settings",
+            "GET",
+            "workzone/settings",
+            200,
+            headers=headers
+        )
+        return success, response
+
+    def test_admin_update_settings(self, google_email):
+        """Test POST /api/workzone/settings"""
+        if not self.admin_token:
+            print("❌ No admin token available")
+            return False
+            
+        headers = {'Authorization': f'Bearer {self.admin_token}'}
+        success, response = self.run_test(
+            "Admin Update Work Zone Settings",
+            "POST",
+            "workzone/settings",
+            200,
+            data={"admin_google_email": google_email},
+            headers=headers
+        )
+        return success, response
+
+    def test_member_get_gmail(self):
+        """Test GET /api/workzone/my-gmail"""
+        if not self.member_token:
+            print("❌ No member token available")
+            return False
+            
+        headers = {'Authorization': f'Bearer {self.member_token}'}
+        success, response = self.run_test(
+            "Member Get My Gmail",
+            "GET",
+            "workzone/my-gmail",
+            200,
+            headers=headers
+        )
+        return success, response
+
+    def test_member_submit_gmail_valid(self, gmail):
+        """Test POST /api/workzone/request-access with valid Gmail"""
+        if not self.member_token:
+            print("❌ No member token available")
+            return False
+            
+        headers = {'Authorization': f'Bearer {self.member_token}'}
+        success, response = self.run_test(
+            "Member Submit Valid Gmail",
+            "POST",
+            "workzone/request-access",
+            200,
+            data={"gmail_account": gmail},
+            headers=headers
+        )
+        return success, response
+
+    def test_member_submit_gmail_invalid(self, invalid_email):
+        """Test POST /api/workzone/request-access with invalid email"""
+        if not self.member_token:
+            print("❌ No member token available")
+            return False
+            
+        headers = {'Authorization': f'Bearer {self.member_token}'}
+        success, response = self.run_test(
+            "Member Submit Invalid Email",
+            "POST",
+            "workzone/request-access",
+            400,  # Should fail with 400
+            data={"gmail_account": invalid_email},
+            headers=headers
+        )
+        return success, response
+
+    def test_unauthorized_workzone_access(self):
+        """Test endpoints without authentication"""
+        print("\n🔒 Testing Unauthorized Work Zone Access...")
+        
+        # Test admin endpoints without token
+        success1, _ = self.run_test(
+            "Admin Settings Without Auth",
+            "GET",
+            "workzone/settings",
+            401  # Should be unauthorized
+        )
+        
+        success2, _ = self.run_test(
+            "Member Gmail Without Auth",
+            "GET",
+            "workzone/my-gmail",
+            401  # Should be unauthorized
+        )
+        
+        return success1 and success2
+
+    def test_member_access_admin_endpoint(self):
+        """Test member trying to access admin-only endpoint"""
+        if not self.member_token:
+            print("❌ No member token available")
+            return False
+            
+        headers = {'Authorization': f'Bearer {self.member_token}'}
+        success, _ = self.run_test(
+            "Member Access Admin Endpoint",
+            "GET",
+            "workzone/settings",
+            403,  # Should be forbidden
+            headers=headers
+        )
+        return success
+
     def test_get_pending_users(self):
         """Test getting pending users (admin only)"""
         if not self.admin_token:
