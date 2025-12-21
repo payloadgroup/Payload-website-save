@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import axios from 'axios';
 import { toast } from 'sonner';
-import { ArrowLeft, Gift, Copy, Users, CheckCircle, Clock, Instagram, Facebook, Twitter, MessageCircle, Lightbulb, Star } from 'lucide-react';
+import { ArrowLeft, Gift, Copy, Users, CheckCircle, Clock, Instagram, Facebook, Twitter, MessageCircle, Lightbulb, Star, Link, Share2 } from 'lucide-react';
 import PayloadLogo from '@/components/PayloadLogo';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
@@ -17,6 +17,12 @@ const ReferralsPage = () => {
   const [myReferrals, setMyReferrals] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // Generate referral link using the current domain
+  const getReferralLink = () => {
+    const baseUrl = window.location.origin;
+    return `${baseUrl}/register?ref=${referralData?.own_referral_code}`;
+  };
+
   useEffect(() => { fetchReferralData(); }, []);
 
   const fetchReferralData = async () => {
@@ -27,7 +33,26 @@ const ReferralsPage = () => {
     setLoading(false);
   };
 
-  const copyCode = () => { navigator.clipboard.writeText(referralData?.own_referral_code); toast.success('Copied!'); };
+  const copyCode = () => { navigator.clipboard.writeText(referralData?.own_referral_code); toast.success('Code copied!'); };
+  
+  const copyLink = () => { navigator.clipboard.writeText(getReferralLink()); toast.success('Referral link copied!'); };
+  
+  const shareLink = async () => {
+    const referralLink = getReferralLink();
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: 'Join Payload',
+          text: 'Join the exclusive Payload business club using my referral link!',
+          url: referralLink
+        });
+      } catch (err) {
+        if (err.name !== 'AbortError') copyLink();
+      }
+    } else {
+      copyLink();
+    }
+  };
 
   const contentTips = [
     { icon: Instagram, title: 'Instagram Stories', tip: 'Share your Payload journey. Use hashtags like #PayloadClub #ExclusiveAccess' },
