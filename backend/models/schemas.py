@@ -91,6 +91,20 @@ class WorkZoneSettingsResponse(BaseModel):
 class GmailAccountUpdate(BaseModel):
     gmail_account: str
 
+class WorkZoneAccessStatus(str, Enum):
+    NONE = "none"
+    PENDING = "pending"
+    APPROVED = "approved"
+
+class WorkZoneAccessRequest(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    user_id: str
+    user_name: str
+    user_email: str
+    gmail_account: str
+    requested_at: str
+    status: WorkZoneAccessStatus = WorkZoneAccessStatus.PENDING
+
 class Token(BaseModel):
     access_token: str
     token_type: str
