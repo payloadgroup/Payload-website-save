@@ -399,7 +399,7 @@ const WorkZonePage = () => {
                   {/* Access Payload Drive Work Zone Card */}
                   <motion.div
                     whileHover={{ scale: 1.01 }}
-                    onClick={() => window.open(GOOGLE_WORKSPACE_URL, '_blank')}
+                    onClick={() => window.open(GOOGLE_DRIVE_URL, '_blank')}
                     className="bg-gradient-to-br from-payload-surface to-black border-2 border-payload-cyan/50 p-6 rounded-sm cursor-pointer hover:border-payload-cyan hover:shadow-[0_0_20px_rgba(0,255,255,0.2)] transition-all"
                   >
                     <div className="flex items-center justify-between">
@@ -412,7 +412,7 @@ const WorkZonePage = () => {
                             ACCESS PAYLOAD DRIVE WORK ZONE
                           </h3>
                           <p className="font-mono text-xs text-payload-muted mt-1">
-                            Open Google Workspace to access shared Payload documents
+                            Open Google Drive to access shared Payload documents
                           </p>
                         </div>
                       </div>
