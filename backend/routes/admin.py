@@ -140,6 +140,18 @@ async def restore_user(user_id: str, admin_user: User = Depends(get_admin_user))
     )
     return {"message": "User restored to pending status"}
 
+def get_tier_for_referral_count(count: int) -> MemberTier:
+    """Calculate the appropriate tier based on referral count"""
+    if count >= 10:
+        return MemberTier.TOP_LEADERSHIP
+    elif count >= 5:
+        return MemberTier.SENIOR_MANAGER
+    elif count >= 3:
+        return MemberTier.MID_LEVEL_MANAGER
+    elif count >= 1:
+        return MemberTier.FRONT_LINE
+    return MemberTier.JUNIOR_RECRUIT
+
 @router.post("/update-user-status")
 async def update_user_status(request: UserApprovalRequest, background_tasks: BackgroundTasks, admin_user: User = Depends(get_admin_user)):
     user = await db.users.find_one({"id": request.user_id}, {"_id": 0})
@@ -149,9 +161,23 @@ async def update_user_status(request: UserApprovalRequest, background_tasks: Bac
     previous_status = user.get("status")
     await db.users.update_one({"id": request.user_id}, {"$set": {"status": request.status}})
     
-    # Handle referral count update
+    # Handle referral count update and automatic tier upgrade
     if request.status == UserStatus.APPROVED and user.get("referred_by"):
-        await db.users.update_one({"id": user["referred_by"]}, {"$inc": {"referral_count": 1}})
+        referrer_id = user["referred_by"]
+        # Increment the referral count
+        await db.users.update_one({"id": referrer_id}, {"$inc": {"referral_count": 1}})
+        
+        # Get updated referrer data to calculate new tier
+        referrer = await db.users.find_one({"id": referrer_id}, {"_id": 0})
+        if referrer:
+            new_referral_count = referrer.get("referral_count", 0)
+            new_tier = get_tier_for_referral_count(new_referral_count)
+            current_tier = referrer.get("tier", MemberTier.JUNIOR_RECRUIT)
+            
+            # Only upgrade tier if the new tier is higher (compare by referral thresholds)
+            tier_order = [MemberTier.JUNIOR_RECRUIT, MemberTier.FRONT_LINE, MemberTier.MID_LEVEL_MANAGER, MemberTier.SENIOR_MANAGER, MemberTier.TOP_LEADERSHIP]
+            if tier_order.index(new_tier) > tier_order.index(current_tier if current_tier in tier_order else MemberTier.JUNIOR_RECRUIT):
+                await db.users.update_one({"id": referrer_id}, {"$set": {"tier": new_tier}})
     
     # Send approval emails when status changes to APPROVED
     if request.status == UserStatus.APPROVED and previous_status != UserStatus.APPROVED:
