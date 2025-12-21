@@ -15,6 +15,10 @@ const LoginPage = () => {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
+  const handleChange = (field) => (e) => {
+    setFormData(prev => ({ ...prev, [field]: e.target.value }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -33,21 +37,16 @@ const LoginPage = () => {
 
   return (
     <div className="min-h-screen bg-payload-bg text-payload-text flex items-center justify-center relative overflow-hidden">
-      <div 
-        className="absolute inset-0 opacity-20"
-        style={{
-          backgroundImage: 'url(https://images.unsplash.com/photo-1711560707076-d50fbf8a3a26?crop=entropy&cs=srgb&fm=jpg&q=85)',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center'
-        }}
-      />
+      {/* Simplified background - no external image */}
+      <div className="absolute inset-0 bg-gradient-to-br from-payload-bg via-payload-surface to-payload-bg opacity-50" />
       
-      <div className="absolute inset-0 grid-bg opacity-50" />
+      {/* Grid overlay with GPU acceleration */}
+      <div className="absolute inset-0 grid-bg opacity-30 pointer-events-none" style={{ willChange: 'auto' }} />
 
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
+        transition={{ duration: 0.3 }}
         className="relative z-10 w-full max-w-md mx-4"
       >
         <button
@@ -77,9 +76,10 @@ const LoginPage = () => {
                 type="email"
                 required
                 value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                onChange={handleChange('email')}
                 className="w-full bg-black border-b border-white/20 focus:border-payload-neon focus:outline-none py-3 px-0 font-mono text-payload-text placeholder:text-white/30 transition-colors"
                 placeholder="commander@payload.com"
+                autoComplete="email"
               />
             </div>
 
@@ -93,9 +93,10 @@ const LoginPage = () => {
                   type={showPassword ? "text" : "password"}
                   required
                   value={formData.password}
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                  onChange={handleChange('password')}
                   className="w-full bg-black border-b border-white/20 focus:border-payload-neon focus:outline-none py-3 pr-10 px-0 font-mono text-payload-text placeholder:text-white/30 transition-colors"
                   placeholder="Enter access code"
+                  autoComplete="current-password"
                 />
                 <button
                   data-testid="toggle-password-visibility"
