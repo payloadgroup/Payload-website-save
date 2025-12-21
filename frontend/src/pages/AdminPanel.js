@@ -278,6 +278,17 @@ const AdminPanel = () => {
                     <p className="font-mono text-sm text-payload-cyan">{selectedUser.own_referral_code || 'N/A'}</p>
                   </div>
 
+                  {/* Gmail Account */}
+                  <div className="bg-black/30 border border-white/10 p-4 rounded-sm">
+                    <div className="flex items-center gap-2 text-payload-muted mb-1">
+                      <Mail className="w-4 h-4" />
+                      <span className="font-mono text-xs uppercase">Gmail Account</span>
+                    </div>
+                    <p className={`font-mono text-sm ${selectedUser.gmail_account ? 'text-[#00ff00]' : 'text-payload-muted italic'}`}>
+                      {selectedUser.gmail_account || 'Not provided'}
+                    </p>
+                  </div>
+
                   {/* Joined Date */}
                   <div className="bg-black/30 border border-white/10 p-4 rounded-sm">
                     <div className="flex items-center gap-2 text-payload-muted mb-1">
