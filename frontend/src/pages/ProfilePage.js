@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import axios from 'axios';
 import { toast } from 'sonner';
-import { ArrowLeft, User, Mail, Phone, Calendar, MapPin, CreditCard, Save } from 'lucide-react';
+import { ArrowLeft, User, Mail, Phone, Calendar, MapPin, CreditCard, Save, Briefcase } from 'lucide-react';
 import PayloadLogo from '@/components/PayloadLogo';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
