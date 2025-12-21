@@ -167,7 +167,12 @@ const HeadquartersPage = () => {
 
   const handleRoomClick = (room) => {
     if (isRoomUnlocked(room.id)) {
-      setSelectedRoom(room);
+      // Guaranteed Flips navigates to its dedicated page
+      if (room.name === 'Guaranteed Flips') {
+        navigate('/guaranteed-flips');
+      } else {
+        setSelectedRoom(room);
+      }
     }
   };
 
