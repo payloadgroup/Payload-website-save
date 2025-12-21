@@ -295,9 +295,9 @@ const Dashboard = () => {
             </motion.div>
 
             <motion.div data-testid="stations-card" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }} onClick={() => setActiveModal('stations')} className="bg-payload-surface border border-white/10 p-4 sm:p-6 rounded-sm hover:border-white/30 transition-all cursor-pointer">
-              <div className="flex items-start justify-between gap-2 mb-3"><MapPin className="w-6 h-6 sm:w-8 sm:h-8 text-white" /><span className="font-mono text-[8px] sm:text-xs text-payload-muted uppercase">LINKED</span></div>
+              <div className="flex items-start justify-between gap-2 mb-3"><Users className="w-6 h-6 sm:w-8 sm:h-8 text-purple-400" /><span className="font-mono text-[8px] sm:text-xs text-payload-muted uppercase">MEMBERS</span></div>
               <h3 className="font-rajdhani font-bold text-base sm:text-xl uppercase mb-1">CLUSTER SYNDICATE</h3>
-              <p className="font-inter text-[10px] sm:text-xs text-payload-muted mb-2">Locations & partners</p>
+              <p className="font-inter text-[10px] sm:text-xs text-payload-muted mb-2">Members in same business</p>
               <div className="font-mono text-xl sm:text-2xl text-white">{dashboardData?.stations_count || 0}</div>
             </motion.div>
 
