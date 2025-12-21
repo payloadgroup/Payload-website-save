@@ -231,8 +231,8 @@ class GuaranteedFlipsAPITester:
             'content': 'This is a test opportunity submission for the Guaranteed Flips feature. It contains detailed information about a potential investment opportunity.'
         }
         
-        # Create empty files list to trigger multipart/form-data
-        files = []
+        # Use empty dict for files to trigger multipart/form-data
+        files = {}
         
         success, response = self.run_test(
             "Submit Opportunity (Text Only)",
