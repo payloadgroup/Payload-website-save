@@ -211,6 +211,35 @@ const Dashboard = () => {
             </div>
           )}
 
+          {/* Work Zone Card - Prominent at top */}
+          <motion.div 
+            data-testid="workzone-card"
+            initial={{ opacity: 0, y: -10 }} 
+            animate={{ opacity: 1, y: 0 }} 
+            transition={{ delay: 0.05 }}
+            onClick={() => navigate('/workzone')} 
+            className="mb-6 bg-gradient-to-r from-payload-surface via-payload-surface to-black border-2 border-payload-alert/50 p-5 sm:p-6 rounded-sm hover:border-payload-alert hover:shadow-[0_0_20px_rgba(245,158,11,0.2)] transition-all cursor-pointer"
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 sm:w-14 sm:h-14 bg-payload-alert/20 rounded-sm flex items-center justify-center">
+                  <Briefcase className="w-7 h-7 sm:w-8 sm:h-8 text-payload-alert" />
+                </div>
+                <div>
+                  <h3 className="font-rajdhani font-bold text-xl sm:text-2xl uppercase text-payload-alert">WORK ZONE</h3>
+                  {user?.role === 'member' ? (
+                    <p className="font-mono text-xs text-payload-muted mt-1">REQUEST ACCESS TO WORK ZONE</p>
+                  ) : (
+                    <p className="font-mono text-xs text-payload-muted mt-1">MANAGE COLLABORATIVE WORKSPACE</p>
+                  )}
+                </div>
+              </div>
+              <div className="font-mono text-xs sm:text-sm text-payload-alert uppercase">
+                ENTER →
+              </div>
+            </div>
+          </motion.div>
+
           <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             <motion.div data-testid="headquarters-card" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }} onClick={() => navigate('/headquarters')} className="bg-payload-surface border border-white/10 p-4 sm:p-6 rounded-sm hover:border-white/30 transition-all cursor-pointer">
               <div className="flex items-start justify-between gap-2 mb-3"><Building className="w-6 h-6 sm:w-8 sm:h-8 text-white" /><span className="font-mono text-[8px] sm:text-xs text-payload-muted uppercase">8 ROOMS</span></div>
