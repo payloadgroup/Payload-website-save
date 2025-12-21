@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import axios from 'axios';
 import { toast } from 'sonner';
-import { ArrowLeft, Briefcase, ExternalLink, Mail, Check, AlertCircle, Edit2, Clock, CheckCircle, XCircle, Users, UserCheck } from 'lucide-react';
+import { ArrowLeft, Briefcase, ExternalLink, Mail, Check, AlertCircle, Edit2, Clock, CheckCircle, XCircle, Users, UserCheck, Search, RotateCcw, Ban, UserX } from 'lucide-react';
 import PayloadLogo from '@/components/PayloadLogo';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
@@ -24,11 +24,20 @@ const WorkZonePage = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [loadingSettings, setLoadingSettings] = useState(true);
   const [savingSettings, setSavingSettings] = useState(false);
+  
+  // Tabs and requests state
+  const [activeTab, setActiveTab] = useState('pending');
   const [pendingRequests, setPendingRequests] = useState([]);
+  const [rejectedRequests, setRejectedRequests] = useState([]);
+  const [allMembers, setAllMembers] = useState([]);
   const [approvedMembers, setApprovedMembers] = useState([]);
   const [loadingRequests, setLoadingRequests] = useState(true);
   const [loadingApproved, setLoadingApproved] = useState(true);
   const [processingUser, setProcessingUser] = useState(null);
+  
+  // Search state
+  const [searchQuery, setSearchQuery] = useState('');
+  const [approvedSearchQuery, setApprovedSearchQuery] = useState('');
 
   // Member state
   const [showRequestModal, setShowRequestModal] = useState(false);
@@ -41,12 +50,20 @@ const WorkZonePage = () => {
   useEffect(() => {
     if (isAdmin) {
       fetchAdminSettings();
-      fetchPendingRequests();
-      fetchApprovedMembers();
+      fetchAllData();
     } else {
       fetchMyStatus();
     }
   }, [isAdmin, token]);
+
+  const fetchAllData = async () => {
+    await Promise.all([
+      fetchPendingRequests(),
+      fetchRejectedRequests(),
+      fetchAllMembers(),
+      fetchApprovedMembers()
+    ]);
+  };
 
   // Admin functions
   const fetchAdminSettings = async () => {
@@ -62,9 +79,10 @@ const WorkZonePage = () => {
     setLoadingSettings(false);
   };
 
-  const fetchPendingRequests = async () => {
+  const fetchPendingRequests = async (search = '') => {
     try {
-      const response = await axios.get(`${API}/workzone/pending-requests`, {
+      const params = search ? `?search=${encodeURIComponent(search)}` : '';
+      const response = await axios.get(`${API}/workzone/pending-requests${params}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setPendingRequests(response.data);
@@ -74,9 +92,34 @@ const WorkZonePage = () => {
     setLoadingRequests(false);
   };
 
-  const fetchApprovedMembers = async () => {
+  const fetchRejectedRequests = async (search = '') => {
     try {
-      const response = await axios.get(`${API}/workzone/approved-members`, {
+      const params = search ? `?search=${encodeURIComponent(search)}` : '';
+      const response = await axios.get(`${API}/workzone/rejected-requests${params}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setRejectedRequests(response.data);
+    } catch (error) {
+      console.error('Failed to fetch rejected requests:', error);
+    }
+  };
+
+  const fetchAllMembers = async (search = '') => {
+    try {
+      const params = search ? `?search=${encodeURIComponent(search)}` : '';
+      const response = await axios.get(`${API}/workzone/all-members-status${params}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setAllMembers(response.data);
+    } catch (error) {
+      console.error('Failed to fetch all members:', error);
+    }
+  };
+
+  const fetchApprovedMembers = async (search = '') => {
+    try {
+      const params = search ? `?search=${encodeURIComponent(search)}` : '';
+      const response = await axios.get(`${API}/workzone/approved-members${params}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setApprovedMembers(response.data);
@@ -113,27 +156,66 @@ const WorkZonePage = () => {
         headers: { Authorization: `Bearer ${token}` }
       });
       toast.success(`Access granted to ${userName}`);
-      fetchPendingRequests();
-      fetchApprovedMembers();
+      fetchAllData();
     } catch (error) {
       toast.error(error.response?.data?.detail || 'Failed to approve access');
     }
     setProcessingUser(null);
   };
 
-  const handleRemoveRequest = async (userId, userName) => {
-    if (!window.confirm(`Remove Work Zone request from ${userName}?`)) return;
+  const handleRejectAccess = async (userId, userName) => {
     setProcessingUser(userId);
     try {
-      await axios.post(`${API}/workzone/remove-request/${userId}`, {}, {
+      await axios.post(`${API}/workzone/reject-access/${userId}`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      toast.success(`Request removed for ${userName}`);
-      fetchPendingRequests();
+      toast.success(`Access rejected for ${userName}`);
+      fetchAllData();
     } catch (error) {
-      toast.error(error.response?.data?.detail || 'Failed to remove request');
+      toast.error(error.response?.data?.detail || 'Failed to reject access');
     }
     setProcessingUser(null);
+  };
+
+  const handleRevokeAccess = async (userId, userName) => {
+    if (!window.confirm(`Revoke Work Zone access for ${userName}? They will be moved to Rejected.`)) return;
+    setProcessingUser(userId);
+    try {
+      await axios.post(`${API}/workzone/revoke-access/${userId}`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      toast.success(`Access revoked for ${userName}`);
+      fetchAllData();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Failed to revoke access');
+    }
+    setProcessingUser(null);
+  };
+
+  const handleReinstateAccess = async (userId, userName) => {
+    setProcessingUser(userId);
+    try {
+      await axios.post(`${API}/workzone/reinstate-access/${userId}`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      toast.success(`${userName} reinstated to pending`);
+      fetchAllData();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Failed to reinstate');
+    }
+    setProcessingUser(null);
+  };
+
+  const handleSearch = (query) => {
+    setSearchQuery(query);
+    if (activeTab === 'pending') fetchPendingRequests(query);
+    else if (activeTab === 'rejected') fetchRejectedRequests(query);
+    else if (activeTab === 'all') fetchAllMembers(query);
+  };
+
+  const handleApprovedSearch = (query) => {
+    setApprovedSearchQuery(query);
+    fetchApprovedMembers(query);
   };
 
   // Member functions
@@ -176,23 +258,31 @@ const WorkZonePage = () => {
     setSubmittingGmail(false);
   };
 
-  const handleAdminEmailChange = (e) => {
-    setAdminEmail(e.target.value);
+  const handleAdminEmailChange = (e) => setAdminEmail(e.target.value);
+  const handleGmailInputChange = (e) => setGmailInput(e.target.value);
+  const handleCancelEdit = () => { setIsEditing(false); setAdminEmail(savedAdminEmail || ''); };
+  const handleCloseModal = () => { setShowRequestModal(false); setGmailInput(''); };
+
+  const getStatusBadge = (status) => {
+    const badges = {
+      none: { bg: 'bg-gray-500/20', text: 'text-gray-400', label: 'NONE' },
+      pending: { bg: 'bg-payload-alert/20', text: 'text-payload-alert', label: 'PENDING' },
+      approved: { bg: 'bg-payload-neon/20', text: 'text-payload-neon', label: 'APPROVED' },
+      rejected: { bg: 'bg-red-500/20', text: 'text-red-400', label: 'REJECTED' }
+    };
+    const badge = badges[status] || badges.none;
+    return (
+      <span className={`${badge.bg} ${badge.text} px-2 py-1 rounded-sm font-mono text-[10px] uppercase`}>
+        {badge.label}
+      </span>
+    );
   };
 
-  const handleGmailInputChange = (e) => {
-    setGmailInput(e.target.value);
-  };
-
-  const handleCancelEdit = () => {
-    setIsEditing(false);
-    setAdminEmail(savedAdminEmail || '');
-  };
-
-  const handleCloseModal = () => {
-    setShowRequestModal(false);
-    setGmailInput('');
-  };
+  const tabs = [
+    { id: 'pending', label: 'PENDING', count: pendingRequests.length },
+    { id: 'rejected', label: 'REJECTED', count: rejectedRequests.length },
+    { id: 'all', label: 'ALL MEMBERS', count: allMembers.length }
+  ];
 
   return (
     <div className="min-h-screen bg-payload-bg text-payload-text">
@@ -242,128 +332,167 @@ const WorkZonePage = () => {
                         {savedAdminEmail}
                       </div>
                     </div>
-                    <button
-                      onClick={() => setIsEditing(true)}
-                      className="flex items-center gap-2 font-mono text-xs border border-white/20 px-4 py-2 hover:border-white hover:bg-white/5 transition-all"
-                    >
+                    <button onClick={() => setIsEditing(true)} className="flex items-center gap-2 font-mono text-xs border border-white/20 px-4 py-2 hover:border-white hover:bg-white/5 transition-all">
                       <Edit2 className="w-3 h-3" /> CHANGE ACCOUNT
                     </button>
                   </div>
                 ) : (
                   <div className="space-y-4">
                     <div>
-                      <label className="font-mono text-xs text-payload-muted block mb-2">
-                        GOOGLE ACCOUNT EMAIL
-                      </label>
-                      <input
-                        type="email"
-                        value={adminEmail}
-                        onChange={handleAdminEmailChange}
-                        placeholder="Enter your Google account email"
-                        className="w-full bg-black border border-white/20 p-3 font-mono text-sm focus:border-payload-neon outline-none"
-                        autoFocus
-                      />
+                      <label className="font-mono text-xs text-payload-muted block mb-2">GOOGLE ACCOUNT EMAIL</label>
+                      <input type="email" value={adminEmail} onChange={handleAdminEmailChange} placeholder="Enter your Google account email" className="w-full bg-black border border-white/20 p-3 font-mono text-sm focus:border-payload-neon outline-none" autoFocus />
                     </div>
                     <div className="flex gap-2">
-                      <button
-                        onClick={handleSaveAdminEmail}
-                        disabled={savingSettings}
-                        className="flex items-center gap-2 font-mono text-xs bg-payload-neon text-black px-6 py-2 hover:bg-payload-neon/80 disabled:opacity-50"
-                      >
+                      <button onClick={handleSaveAdminEmail} disabled={savingSettings} className="flex items-center gap-2 font-mono text-xs bg-payload-neon text-black px-6 py-2 hover:bg-payload-neon/80 disabled:opacity-50">
                         <Check className="w-3 h-3" /> {savingSettings ? 'SAVING...' : 'SAVE'}
                       </button>
                       {savedAdminEmail && (
-                        <button
-                          onClick={handleCancelEdit}
-                          className="font-mono text-xs border border-white/20 px-6 py-2 hover:border-white"
-                        >
-                          CANCEL
-                        </button>
+                        <button onClick={handleCancelEdit} className="font-mono text-xs border border-white/20 px-6 py-2 hover:border-white">CANCEL</button>
                       )}
                     </div>
                   </div>
                 )}
               </div>
 
-              {/* Pending Access Requests Section */}
+              {/* Member Access Requests Section with Tabs */}
               <div className="bg-payload-surface border border-white/10 p-6 rounded-sm">
                 <h3 className="font-rajdhani font-bold text-xl uppercase mb-4 flex items-center gap-2">
                   <Users className="w-5 h-5 text-payload-alert" />
                   MEMBER ACCESS REQUESTS
                 </h3>
-                
-                {loadingRequests ? (
-                  <div className="text-center font-mono text-payload-muted py-8">LOADING...</div>
-                ) : pendingRequests.length === 0 ? (
-                  <div className="text-center py-8">
-                    <Clock className="w-12 h-12 text-payload-muted mx-auto mb-3" />
-                    <p className="font-mono text-sm text-payload-muted">NO PENDING REQUESTS</p>
-                  </div>
-                ) : (
-                  <div className="space-y-3">
-                    {pendingRequests.map((request) => (
-                      <div 
-                        key={request.user_id} 
-                        className="bg-black/50 border border-payload-alert/30 p-4 rounded-sm"
-                      >
-                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                          <div className="flex-1 min-w-0">
-                            <div className="font-rajdhani font-bold text-lg text-payload-alert truncate">
-                              {request.user_name}
+
+                {/* Tabs */}
+                <div className="flex border-b border-white/10 mb-4">
+                  {tabs.map((tab) => (
+                    <button
+                      key={tab.id}
+                      onClick={() => { setActiveTab(tab.id); setSearchQuery(''); }}
+                      className={`px-4 py-2 font-mono text-xs transition-all ${
+                        activeTab === tab.id 
+                          ? 'border-b-2 border-payload-neon text-payload-neon' 
+                          : 'text-payload-muted hover:text-white'
+                      }`}
+                    >
+                      {tab.label} ({tab.count})
+                    </button>
+                  ))}
+                </div>
+
+                {/* Search Bar */}
+                <div className="relative mb-4">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-payload-muted" />
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => handleSearch(e.target.value)}
+                    placeholder="Search by name, email, or Gmail..."
+                    className="w-full bg-black border border-white/20 pl-10 pr-4 py-2 font-mono text-sm focus:border-payload-neon outline-none"
+                  />
+                </div>
+
+                {/* Pending Tab Content */}
+                {activeTab === 'pending' && (
+                  loadingRequests ? (
+                    <div className="text-center font-mono text-payload-muted py-8">LOADING...</div>
+                  ) : pendingRequests.length === 0 ? (
+                    <div className="text-center py-8">
+                      <Clock className="w-12 h-12 text-payload-muted mx-auto mb-3" />
+                      <p className="font-mono text-sm text-payload-muted">NO PENDING REQUESTS</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {pendingRequests.map((request) => (
+                        <div key={request.user_id} className="bg-black/50 border border-payload-alert/30 p-4 rounded-sm">
+                          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                            <div className="flex-1 min-w-0">
+                              <div className="font-rajdhani font-bold text-lg text-payload-alert truncate">{request.user_name}</div>
+                              <div className="font-mono text-xs text-payload-muted truncate">{request.user_email}</div>
+                              <div className="font-mono text-xs text-payload-cyan mt-1">Gmail: {request.gmail_account}</div>
+                              <div className="font-mono text-[10px] text-payload-muted mt-1">Requested: {new Date(request.requested_at).toLocaleDateString()}</div>
                             </div>
-                            <div className="font-mono text-xs text-payload-muted truncate">
-                              {request.user_email}
-                            </div>
-                            <div className="font-mono text-xs text-payload-cyan mt-1">
-                              Gmail: {request.gmail_account}
-                            </div>
-                            <div className="font-mono text-[10px] text-payload-muted mt-1">
-                              Requested: {new Date(request.requested_at).toLocaleDateString()}
+                            <div className="flex gap-2">
+                              <button onClick={() => handleApproveAccess(request.user_id, request.user_name)} disabled={processingUser === request.user_id} className="flex items-center gap-1 font-mono text-xs bg-payload-neon text-black px-4 py-2 hover:bg-payload-neon/80 disabled:opacity-50">
+                                <CheckCircle className="w-3 h-3" /> {processingUser === request.user_id ? '...' : 'APPROVE'}
+                              </button>
+                              <button onClick={() => handleRejectAccess(request.user_id, request.user_name)} disabled={processingUser === request.user_id} className="flex items-center gap-1 font-mono text-xs border border-red-500 text-red-500 px-4 py-2 hover:bg-red-500 hover:text-white disabled:opacity-50">
+                                <XCircle className="w-3 h-3" /> REJECT
+                              </button>
                             </div>
                           </div>
-                          <div className="flex gap-2">
-                            <button
-                              onClick={() => handleApproveAccess(request.user_id, request.user_name)}
-                              disabled={processingUser === request.user_id}
-                              className="flex items-center gap-1 font-mono text-xs bg-payload-neon text-black px-4 py-2 hover:bg-payload-neon/80 disabled:opacity-50"
-                            >
-                              <CheckCircle className="w-3 h-3" />
-                              {processingUser === request.user_id ? '...' : 'APPROVE'}
-                            </button>
-                            <button
-                              onClick={() => handleRemoveRequest(request.user_id, request.user_name)}
-                              disabled={processingUser === request.user_id}
-                              className="flex items-center gap-1 font-mono text-xs border border-red-500 text-red-500 px-4 py-2 hover:bg-red-500 hover:text-white disabled:opacity-50"
-                            >
-                              <XCircle className="w-3 h-3" />
-                              REMOVE
+                        </div>
+                      ))}
+                    </div>
+                  )
+                )}
+
+                {/* Rejected Tab Content */}
+                {activeTab === 'rejected' && (
+                  rejectedRequests.length === 0 ? (
+                    <div className="text-center py-8">
+                      <UserX className="w-12 h-12 text-payload-muted mx-auto mb-3" />
+                      <p className="font-mono text-sm text-payload-muted">NO REJECTED REQUESTS</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {rejectedRequests.map((request) => (
+                        <div key={request.user_id} className="bg-black/50 border border-red-500/30 p-4 rounded-sm">
+                          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                            <div className="flex-1 min-w-0">
+                              <div className="font-rajdhani font-bold text-lg text-red-400 truncate">{request.user_name}</div>
+                              <div className="font-mono text-xs text-payload-muted truncate">{request.user_email}</div>
+                              <div className="font-mono text-xs text-payload-cyan mt-1">Gmail: {request.gmail_account}</div>
+                              <div className="font-mono text-[10px] text-payload-muted mt-1">Rejected: {new Date(request.requested_at).toLocaleDateString()}</div>
+                            </div>
+                            <button onClick={() => handleReinstateAccess(request.user_id, request.user_name)} disabled={processingUser === request.user_id} className="flex items-center gap-1 font-mono text-xs border border-payload-cyan text-payload-cyan px-4 py-2 hover:bg-payload-cyan hover:text-black disabled:opacity-50">
+                              <RotateCcw className="w-3 h-3" /> {processingUser === request.user_id ? '...' : 'REINSTATE'}
                             </button>
                           </div>
                         </div>
-                      </div>
-                    ))}
-                  </div>
+                      ))}
+                    </div>
+                  )
+                )}
+
+                {/* All Members Tab Content */}
+                {activeTab === 'all' && (
+                  allMembers.length === 0 ? (
+                    <div className="text-center py-8">
+                      <Users className="w-12 h-12 text-payload-muted mx-auto mb-3" />
+                      <p className="font-mono text-sm text-payload-muted">NO MEMBERS FOUND</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {allMembers.map((member) => (
+                        <div key={member.user_id} className="bg-black/50 border border-white/10 p-4 rounded-sm">
+                          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2">
+                                <span className="font-rajdhani font-bold text-lg truncate">{member.user_name}</span>
+                                {getStatusBadge(member.workzone_status)}
+                              </div>
+                              <div className="font-mono text-xs text-payload-muted truncate">{member.user_email}</div>
+                              {member.gmail_account && (
+                                <div className="font-mono text-xs text-payload-cyan mt-1">Gmail: {member.gmail_account}</div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )
                 )}
               </div>
 
               {/* Access Payload Drive Card */}
-              <motion.div
-                whileHover={{ scale: 1.01 }}
-                onClick={() => window.open('https://drive.google.com', '_blank')}
-                className="bg-gradient-to-br from-payload-surface to-black border border-payload-cyan/30 p-6 rounded-sm cursor-pointer hover:border-payload-cyan/60 transition-all"
-              >
+              <motion.div whileHover={{ scale: 1.01 }} onClick={() => window.open('https://drive.google.com', '_blank')} className="bg-gradient-to-br from-payload-surface to-black border border-payload-cyan/30 p-6 rounded-sm cursor-pointer hover:border-payload-cyan/60 transition-all">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-4">
                     <div className="w-14 h-14 bg-payload-cyan/20 rounded-sm flex items-center justify-center">
                       <Briefcase className="w-8 h-8 text-payload-cyan" />
                     </div>
                     <div>
-                      <h3 className="font-rajdhani font-bold text-xl uppercase text-payload-cyan">
-                        ACCESS PAYLOAD DRIVE WORK ZONE
-                      </h3>
-                      <p className="font-mono text-xs text-payload-muted mt-1">
-                        Open Google Drive to manage shared Payload documents
-                      </p>
+                      <h3 className="font-rajdhani font-bold text-xl uppercase text-payload-cyan">ACCESS PAYLOAD DRIVE WORK ZONE</h3>
+                      <p className="font-mono text-xs text-payload-muted mt-1">Open Google Drive to manage shared Payload documents</p>
                     </div>
                   </div>
                   <ExternalLink className="w-6 h-6 text-payload-cyan" />
@@ -376,6 +505,18 @@ const WorkZonePage = () => {
                   <UserCheck className="w-5 h-5 text-payload-neon" />
                   APPROVED WORK ZONE MEMBERS
                 </h3>
+
+                {/* Search Bar for Approved */}
+                <div className="relative mb-4">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-payload-muted" />
+                  <input
+                    type="text"
+                    value={approvedSearchQuery}
+                    onChange={(e) => handleApprovedSearch(e.target.value)}
+                    placeholder="Search approved members..."
+                    className="w-full bg-black border border-white/20 pl-10 pr-4 py-2 font-mono text-sm focus:border-payload-neon outline-none"
+                  />
+                </div>
                 
                 {loadingApproved ? (
                   <div className="text-center font-mono text-payload-muted py-8">LOADING...</div>
@@ -387,30 +528,24 @@ const WorkZonePage = () => {
                 ) : (
                   <div className="space-y-3">
                     {approvedMembers.map((member) => (
-                      <div 
-                        key={member.user_id} 
-                        className="bg-black/50 border border-payload-neon/20 p-4 rounded-sm"
-                      >
-                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                      <div key={member.user_id} className="bg-black/50 border border-payload-neon/20 p-4 rounded-sm">
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2">
                               <CheckCircle className="w-4 h-4 text-payload-neon flex-shrink-0" />
-                              <span className="font-rajdhani font-bold text-lg text-payload-neon truncate">
-                                {member.user_name}
-                              </span>
+                              <span className="font-rajdhani font-bold text-lg text-payload-neon truncate">{member.user_name}</span>
                             </div>
-                            <div className="font-mono text-xs text-payload-muted truncate mt-1">
-                              {member.user_email}
-                            </div>
+                            <div className="font-mono text-xs text-payload-muted truncate mt-1">{member.user_email}</div>
+                            <div className="font-mono text-xs text-payload-cyan truncate">{member.gmail_account}</div>
+                            <div className="font-mono text-[10px] text-payload-muted mt-1">Approved: {new Date(member.requested_at).toLocaleDateString()}</div>
                           </div>
-                          <div className="text-right">
-                            <div className="font-mono text-xs text-payload-cyan truncate">
-                              {member.gmail_account}
-                            </div>
-                            <div className="font-mono text-[10px] text-payload-muted mt-1">
-                              Approved: {new Date(member.requested_at).toLocaleDateString()}
-                            </div>
-                          </div>
+                          <button
+                            onClick={() => handleRevokeAccess(member.user_id, member.user_name)}
+                            disabled={processingUser === member.user_id}
+                            className="flex items-center gap-1 font-mono text-xs border border-red-500 text-red-500 px-4 py-2 hover:bg-red-500 hover:text-white disabled:opacity-50"
+                          >
+                            <Ban className="w-3 h-3" /> {processingUser === member.user_id ? '...' : 'REVOKE'}
+                          </button>
                         </div>
                       </div>
                     ))}
@@ -427,7 +562,6 @@ const WorkZonePage = () => {
                 <div className="text-center font-mono text-payload-muted py-8">LOADING...</div>
               ) : accessStatus === 'approved' ? (
                 <>
-                  {/* Access Granted */}
                   <div className="bg-payload-surface border border-payload-neon/50 p-6 rounded-sm">
                     <div className="flex items-center gap-3 mb-4">
                       <div className="w-12 h-12 bg-payload-neon/20 rounded-full flex items-center justify-center">
@@ -443,25 +577,15 @@ const WorkZonePage = () => {
                       <div className="font-mono text-lg text-payload-neon">{savedGmail}</div>
                     </div>
                   </div>
-
-                  {/* Access Payload Drive Work Zone Card */}
-                  <motion.div
-                    whileHover={{ scale: 1.01 }}
-                    onClick={() => window.open(GOOGLE_DRIVE_URL, '_blank')}
-                    className="bg-gradient-to-br from-payload-surface to-black border-2 border-payload-cyan/50 p-6 rounded-sm cursor-pointer hover:border-payload-cyan hover:shadow-[0_0_20px_rgba(0,255,255,0.2)] transition-all"
-                  >
+                  <motion.div whileHover={{ scale: 1.01 }} onClick={() => window.open(GOOGLE_DRIVE_URL, '_blank')} className="bg-gradient-to-br from-payload-surface to-black border-2 border-payload-cyan/50 p-6 rounded-sm cursor-pointer hover:border-payload-cyan hover:shadow-[0_0_20px_rgba(0,255,255,0.2)] transition-all">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-4">
                         <div className="w-14 h-14 bg-payload-cyan/20 rounded-sm flex items-center justify-center">
                           <Briefcase className="w-8 h-8 text-payload-cyan" />
                         </div>
                         <div>
-                          <h3 className="font-rajdhani font-bold text-xl uppercase text-payload-cyan">
-                            ACCESS PAYLOAD DRIVE WORK ZONE
-                          </h3>
-                          <p className="font-mono text-xs text-payload-muted mt-1">
-                            Open Google Drive to access shared Payload documents
-                          </p>
+                          <h3 className="font-rajdhani font-bold text-xl uppercase text-payload-cyan">ACCESS PAYLOAD DRIVE WORK ZONE</h3>
+                          <p className="font-mono text-xs text-payload-muted mt-1">Open Google Drive to access shared Payload documents</p>
                         </div>
                       </div>
                       <ExternalLink className="w-6 h-6 text-payload-cyan" />
@@ -469,56 +593,36 @@ const WorkZonePage = () => {
                   </motion.div>
                 </>
               ) : accessStatus === 'pending' ? (
-                <>
-                  {/* Pending Approval Status */}
-                  <div className="bg-payload-surface border border-payload-alert/50 p-6 rounded-sm">
-                    <div className="flex items-center gap-3 mb-4">
-                      <div className="w-12 h-12 bg-payload-alert/20 rounded-full flex items-center justify-center animate-pulse">
-                        <Clock className="w-6 h-6 text-payload-alert" />
-                      </div>
-                      <div>
-                        <h3 className="font-rajdhani font-bold text-xl uppercase text-payload-alert">PENDING APPROVAL BY DIRECTOR</h3>
-                        <p className="font-mono text-xs text-payload-muted">Your request is being reviewed</p>
-                      </div>
+                <div className="bg-payload-surface border border-payload-alert/50 p-6 rounded-sm">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-12 h-12 bg-payload-alert/20 rounded-full flex items-center justify-center animate-pulse">
+                      <Clock className="w-6 h-6 text-payload-alert" />
                     </div>
-                    <div className="bg-black/50 border border-white/10 p-4 rounded-sm">
-                      <div className="font-mono text-xs text-payload-muted mb-1">YOUR GMAIL ACCOUNT</div>
-                      <div className="font-mono text-lg text-payload-neon">{savedGmail}</div>
+                    <div>
+                      <h3 className="font-rajdhani font-bold text-xl uppercase text-payload-alert">PENDING APPROVAL BY DIRECTOR</h3>
+                      <p className="font-mono text-xs text-payload-muted">Your request is being reviewed</p>
                     </div>
-                    <button
-                      onClick={() => setShowRequestModal(true)}
-                      className="mt-4 font-mono text-xs border border-white/20 px-4 py-2 hover:border-white hover:bg-white/5"
-                    >
-                      UPDATE GMAIL
-                    </button>
                   </div>
-                </>
+                  <div className="bg-black/50 border border-white/10 p-4 rounded-sm">
+                    <div className="font-mono text-xs text-payload-muted mb-1">YOUR GMAIL ACCOUNT</div>
+                    <div className="font-mono text-lg text-payload-neon">{savedGmail}</div>
+                  </div>
+                  <button onClick={() => setShowRequestModal(true)} className="mt-4 font-mono text-xs border border-white/20 px-4 py-2 hover:border-white hover:bg-white/5">UPDATE GMAIL</button>
+                </div>
               ) : (
-                <>
-                  {/* Request Access Card */}
-                  <motion.div
-                    whileHover={{ scale: 1.01 }}
-                    onClick={() => setShowRequestModal(true)}
-                    className="bg-payload-surface border border-payload-alert/30 p-6 rounded-sm cursor-pointer hover:border-payload-alert/60 transition-all"
-                  >
-                    <div className="flex items-center gap-4">
-                      <div className="w-14 h-14 bg-payload-alert/20 rounded-sm flex items-center justify-center">
-                        <Mail className="w-8 h-8 text-payload-alert" />
-                      </div>
-                      <div>
-                        <h3 className="font-rajdhani font-bold text-xl uppercase text-payload-alert">
-                          REQUEST ACCESS TO WORK ZONE
-                        </h3>
-                        <p className="font-mono text-xs text-payload-muted mt-1">
-                          Submit your Gmail to access shared Payload documents
-                        </p>
-                      </div>
+                <motion.div whileHover={{ scale: 1.01 }} onClick={() => setShowRequestModal(true)} className="bg-payload-surface border border-payload-alert/30 p-6 rounded-sm cursor-pointer hover:border-payload-alert/60 transition-all">
+                  <div className="flex items-center gap-4">
+                    <div className="w-14 h-14 bg-payload-alert/20 rounded-sm flex items-center justify-center">
+                      <Mail className="w-8 h-8 text-payload-alert" />
                     </div>
-                  </motion.div>
-                </>
+                    <div>
+                      <h3 className="font-rajdhani font-bold text-xl uppercase text-payload-alert">REQUEST ACCESS TO WORK ZONE</h3>
+                      <p className="font-mono text-xs text-payload-muted mt-1">Submit your Gmail to access shared Payload documents</p>
+                    </div>
+                  </div>
+                </motion.div>
               )}
 
-              {/* Info Card */}
               <div className="bg-payload-surface border border-white/10 p-6 rounded-sm">
                 <div className="flex items-start gap-3">
                   <AlertCircle className="w-5 h-5 text-payload-cyan flex-shrink-0 mt-0.5" />
@@ -534,71 +638,27 @@ const WorkZonePage = () => {
             </div>
           )}
 
-          {/* Request Access Modal - Outside of conditional rendering */}
+          {/* Request Access Modal */}
           <AnimatePresence>
             {showRequestModal && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-                onClick={handleCloseModal}
-              >
-                <motion.div
-                  initial={{ scale: 0.9, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  exit={{ scale: 0.9, opacity: 0 }}
-                  className="bg-payload-surface border border-payload-neon/50 rounded-sm w-full max-w-md"
-                  onClick={(e) => e.stopPropagation()}
-                >
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={handleCloseModal}>
+                <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="bg-payload-surface border border-payload-neon/50 rounded-sm w-full max-w-md" onClick={(e) => e.stopPropagation()}>
                   <div className="bg-payload-neon/10 border-b border-payload-neon/30 p-4">
-                    <h2 className="font-rajdhani font-bold text-xl uppercase text-payload-neon">
-                      {savedGmail ? 'UPDATE GMAIL' : 'REQUEST WORK ZONE ACCESS'}
-                    </h2>
+                    <h2 className="font-rajdhani font-bold text-xl uppercase text-payload-neon">{savedGmail ? 'UPDATE GMAIL' : 'REQUEST WORK ZONE ACCESS'}</h2>
                   </div>
-
                   <div className="p-6 space-y-4">
                     <div>
-                      <label className="font-mono text-xs text-payload-muted block mb-2">
-                        GMAIL ADDRESS *
-                      </label>
-                      <input
-                        type="email"
-                        value={gmailInput}
-                        onChange={handleGmailInputChange}
-                        placeholder="yourname@gmail.com"
-                        className="w-full bg-black border border-white/20 p-3 font-mono text-sm focus:border-payload-neon outline-none"
-                        autoFocus
-                      />
-                      <p className="font-mono text-[10px] text-payload-muted mt-2">
-                        Enter the Gmail account you will use to access shared Payload documents.
-                      </p>
+                      <label className="font-mono text-xs text-payload-muted block mb-2">GMAIL ADDRESS *</label>
+                      <input type="email" value={gmailInput} onChange={handleGmailInputChange} placeholder="yourname@gmail.com" className="w-full bg-black border border-white/20 p-3 font-mono text-sm focus:border-payload-neon outline-none" autoFocus />
+                      <p className="font-mono text-[10px] text-payload-muted mt-2">Enter the Gmail account you will use to access shared Payload documents.</p>
                     </div>
-
-                    <button
-                      type="button"
-                      onClick={() => window.open(GOOGLE_WORKSPACE_URL, '_blank')}
-                      className="w-full flex items-center justify-center gap-2 font-mono text-xs border border-payload-cyan/50 text-payload-cyan px-4 py-3 hover:bg-payload-cyan/10 transition-all"
-                    >
-                      <ExternalLink className="w-3 h-3" />
-                      IF YOU DON'T HAVE A GMAIL ACCOUNT, CLICK HERE TO CREATE ONE
+                    <button type="button" onClick={() => window.open(GOOGLE_WORKSPACE_URL, '_blank')} className="w-full flex items-center justify-center gap-2 font-mono text-xs border border-payload-cyan/50 text-payload-cyan px-4 py-3 hover:bg-payload-cyan/10 transition-all">
+                      <ExternalLink className="w-3 h-3" /> IF YOU DON'T HAVE A GMAIL ACCOUNT, CLICK HERE TO CREATE ONE
                     </button>
                   </div>
-
                   <div className="border-t border-white/10 p-4 flex gap-2">
-                    <button
-                      onClick={handleSubmitGmail}
-                      disabled={submittingGmail}
-                      className="flex-1 flex items-center justify-center gap-2 font-mono text-sm bg-payload-neon text-black py-2 hover:bg-payload-neon/80 disabled:opacity-50"
-                    >
-                      {submittingGmail ? 'SUBMITTING...' : 'SUBMIT'}
-                    </button>
-                    <button
-                      onClick={handleCloseModal}
-                      className="font-mono text-sm border border-white/20 px-6 py-2 hover:bg-white/10"
-                    >
-                      CANCEL
-                    </button>
+                    <button onClick={handleSubmitGmail} disabled={submittingGmail} className="flex-1 flex items-center justify-center gap-2 font-mono text-sm bg-payload-neon text-black py-2 hover:bg-payload-neon/80 disabled:opacity-50">{submittingGmail ? 'SUBMITTING...' : 'SUBMIT'}</button>
+                    <button onClick={handleCloseModal} className="font-mono text-sm border border-white/20 px-6 py-2 hover:bg-white/10">CANCEL</button>
                   </div>
                 </motion.div>
               </motion.div>
