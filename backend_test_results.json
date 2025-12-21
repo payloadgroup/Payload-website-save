@@ -1,0 +1,141 @@
+{
+  "summary": "27/27 tests passed",
+  "tests": [
+    {
+      "test": "Admin Login",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Member Login",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Get My Referral Code",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Referral Code Response - own_referral_code",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Referral Code Response - referral_count",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Get My Referrals",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "My Referrals Response Format",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Get Referral Code for Test",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Register with Referral Code",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Referral Code Processing",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Admin Referral Stats",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Referral Stats - total_referrals",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Referral Stats - successful_referrals",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Referral Stats - pending_referrals",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Referral Stats - top_referrers",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Recalculate Referral Tiers",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Tier Recalculation - message",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Tier Recalculation - upgraded_count",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Get Member Data Before Approval",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Approve Referred User",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Get Member Data After Approval",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Referral Count Increment",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Tier Logic - 0 referrals = JUNIOR_RECRUIT",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Tier Logic - 1 referrals = FRONT_LINE",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Tier Logic - 3 referrals = MID_LEVEL_MANAGER",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Tier Logic - 5 referrals = SENIOR_MANAGER",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Tier Logic - 10 referrals = TOP_LEADERSHIP",
+      "success": true,
+      "details": ""
+    }
+  ],
+  "timestamp": "2025-12-21T10:05:58.470845"
+}
