@@ -591,6 +591,19 @@ const WorkZonePage = () => {
                       <ExternalLink className="w-6 h-6 text-payload-cyan" />
                     </div>
                   </motion.div>
+
+                  {/* Notice for mobile users */}
+                  <div className="bg-payload-alert/10 border border-payload-alert/30 rounded-sm p-3 sm:p-4">
+                    <div className="flex items-start gap-2 sm:gap-3">
+                      <AlertCircle className="w-4 h-4 sm:w-5 sm:h-5 text-payload-alert flex-shrink-0 mt-0.5" />
+                      <div>
+                        <p className="font-mono text-[10px] sm:text-xs text-payload-alert font-bold uppercase mb-1">IMPORTANT</p>
+                        <p className="font-inter text-xs sm:text-sm text-payload-muted leading-relaxed">
+                          When on Google Drive, tap the <span className="text-payload-alert font-bold">"Shared"</span> tab at the bottom of the screen to view Payload shared documents.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
                 </>
               ) : accessStatus === 'pending' ? (
                 <div className="bg-payload-surface border border-payload-alert/50 p-6 rounded-sm">
