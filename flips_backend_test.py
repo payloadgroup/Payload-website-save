@@ -447,7 +447,7 @@ class GuaranteedFlipsAPITester:
         success, response = self.run_test(
             "Admin Get Attachment",
             "GET",
-            f"flips/admin/attachment/{self.test_submission_with_files_id}/test_document.txt",
+            f"flips/admin/attachment/{self.test_submission_with_files_id}/test_document.pdf",
             200,
             headers=headers
         )
