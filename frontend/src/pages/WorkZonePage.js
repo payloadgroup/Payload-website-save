@@ -74,6 +74,18 @@ const WorkZonePage = () => {
     setLoadingRequests(false);
   };
 
+  const fetchApprovedMembers = async () => {
+    try {
+      const response = await axios.get(`${API}/workzone/approved-members`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setApprovedMembers(response.data);
+    } catch (error) {
+      console.error('Failed to fetch approved members:', error);
+    }
+    setLoadingApproved(false);
+  };
+
   const handleSaveAdminEmail = async () => {
     if (!adminEmail.trim()) {
       toast.error('Please enter a Google account email');
@@ -102,6 +114,7 @@ const WorkZonePage = () => {
       });
       toast.success(`Access granted to ${userName}`);
       fetchPendingRequests();
+      fetchApprovedMembers();
     } catch (error) {
       toast.error(error.response?.data?.detail || 'Failed to approve access');
     }
