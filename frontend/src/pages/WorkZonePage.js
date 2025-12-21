@@ -369,6 +369,54 @@ const WorkZonePage = () => {
                   <ExternalLink className="w-6 h-6 text-payload-cyan" />
                 </div>
               </motion.div>
+
+              {/* Approved Members Section */}
+              <div className="bg-payload-surface border border-white/10 p-6 rounded-sm">
+                <h3 className="font-rajdhani font-bold text-xl uppercase mb-4 flex items-center gap-2">
+                  <UserCheck className="w-5 h-5 text-payload-neon" />
+                  APPROVED WORK ZONE MEMBERS
+                </h3>
+                
+                {loadingApproved ? (
+                  <div className="text-center font-mono text-payload-muted py-8">LOADING...</div>
+                ) : approvedMembers.length === 0 ? (
+                  <div className="text-center py-8">
+                    <UserCheck className="w-12 h-12 text-payload-muted mx-auto mb-3" />
+                    <p className="font-mono text-sm text-payload-muted">NO APPROVED MEMBERS YET</p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {approvedMembers.map((member) => (
+                      <div 
+                        key={member.user_id} 
+                        className="bg-black/50 border border-payload-neon/20 p-4 rounded-sm"
+                      >
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2">
+                              <CheckCircle className="w-4 h-4 text-payload-neon flex-shrink-0" />
+                              <span className="font-rajdhani font-bold text-lg text-payload-neon truncate">
+                                {member.user_name}
+                              </span>
+                            </div>
+                            <div className="font-mono text-xs text-payload-muted truncate mt-1">
+                              {member.user_email}
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <div className="font-mono text-xs text-payload-cyan truncate">
+                              {member.gmail_account}
+                            </div>
+                            <div className="font-mono text-[10px] text-payload-muted mt-1">
+                              Approved: {new Date(member.requested_at).toLocaleDateString()}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           )}
 
