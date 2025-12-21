@@ -336,7 +336,7 @@ class GuaranteedFlipsAPITester:
             400,  # Should fail
             data=data,
             headers=headers,
-            files=[]
+            files={}
         )
         
         return success, response
