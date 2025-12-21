@@ -329,6 +329,38 @@ async def get_user_referrals(user_id: str, admin_user: User = Depends(get_admin_
     referrals = await db.users.find({"referred_by": user_id}, {"_id": 0, "password": 0}).to_list(100)
     return [User(**u) for u in referrals]
 
+@router.post("/recalculate-referral-tiers")
+async def recalculate_referral_tiers(admin_user: User = Depends(get_admin_user)):
+    """
+    Recalculates and updates tiers for all members based on their referral count.
+    Only upgrades tiers - never downgrades.
+    """
+    members = await db.users.find(
+        {"role": UserRole.MEMBER, "status": UserStatus.APPROVED, "referral_count": {"$gt": 0}},
+        {"_id": 0}
+    ).to_list(1000)
+    
+    updated_count = 0
+    tier_order = [MemberTier.JUNIOR_RECRUIT, MemberTier.FRONT_LINE, MemberTier.MID_LEVEL_MANAGER, MemberTier.SENIOR_MANAGER, MemberTier.TOP_LEADERSHIP]
+    
+    for member in members:
+        referral_count = member.get("referral_count", 0)
+        current_tier = member.get("tier", MemberTier.JUNIOR_RECRUIT)
+        new_tier = get_tier_for_referral_count(referral_count)
+        
+        # Only upgrade, never downgrade
+        current_index = tier_order.index(current_tier) if current_tier in tier_order else 0
+        new_index = tier_order.index(new_tier)
+        
+        if new_index > current_index:
+            await db.users.update_one({"id": member["id"]}, {"$set": {"tier": new_tier}})
+            updated_count += 1
+    
+    return {
+        "message": f"Recalculated tiers for {len(members)} members with referrals",
+        "upgraded_count": updated_count
+    }
+
 # ============ ANALYTICS ============
 
 @router.get("/analytics")
