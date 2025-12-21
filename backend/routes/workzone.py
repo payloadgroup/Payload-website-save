@@ -121,6 +121,30 @@ async def get_pending_requests(admin_user: User = Depends(get_admin_user)):
     
     return requests
 
+@router.get("/approved-members", response_model=List[WorkZoneAccessRequest])
+async def get_approved_members(admin_user: User = Depends(get_admin_user)):
+    """Get all members with approved Work Zone access"""
+    approved_users = await db.users.find(
+        {
+            "workzone_access_status": WorkZoneAccessStatus.APPROVED,
+            "gmail_account": {"$ne": None}
+        },
+        {"_id": 0}
+    ).to_list(1000)
+    
+    members = []
+    for user in approved_users:
+        members.append(WorkZoneAccessRequest(
+            user_id=user["id"],
+            user_name=user.get("name", "Unknown"),
+            user_email=user.get("email", ""),
+            gmail_account=user.get("gmail_account", ""),
+            requested_at=user.get("workzone_approved_at", user.get("gmail_submitted_at", "")),
+            status=WorkZoneAccessStatus.APPROVED
+        ))
+    
+    return members
+
 @router.post("/approve-access/{user_id}")
 async def approve_workzone_access(user_id: str, admin_user: User = Depends(get_admin_user)):
     """Approve a member's Work Zone access request"""
