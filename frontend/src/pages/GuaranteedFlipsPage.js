@@ -349,7 +349,7 @@ const GuaranteedFlipsPage = () => {
                         ref={fileInputRef}
                         type="file"
                         multiple
-                        accept=".jpg,.jpeg,.png,.gif,.webp,.pdf,.doc,.docx"
+                        accept="image/*,.pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
                         onChange={handleFileSelect}
                         className="hidden"
                       />
