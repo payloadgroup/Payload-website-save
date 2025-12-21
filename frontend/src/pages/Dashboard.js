@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import axios from 'axios';
-import { LogOut, Rocket, Target, DollarSign, Building, MapPin, BookOpen, Shield, Megaphone, Pin, X, Gift, CreditCard, Award, Briefcase, TrendingUp } from 'lucide-react';
+import { LogOut, Rocket, Target, DollarSign, Building, Users, BookOpen, Shield, Megaphone, Pin, X, Gift, CreditCard, Award, Briefcase, TrendingUp } from 'lucide-react';
 import PayloadLogo from '@/components/PayloadLogo';
 import SettingsDropdown from '@/components/SettingsDropdown';
 import PayloadsModal from '@/components/modules/PayloadsModal';
