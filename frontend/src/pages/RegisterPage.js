@@ -205,8 +205,14 @@ const RegisterPage = () => {
             </div>
 
             <div>
-              <label className="font-mono text-xs uppercase tracking-widest text-payload-muted block mb-2">REFERRAL CODE (OPTIONAL)</label>
-              <input data-testid="register-referral-input" type="text" value={formData.referral_code} onChange={(e) => setFormData({ ...formData, referral_code: e.target.value })} className="w-full bg-black border-b border-white/20 focus:border-payload-neon focus:outline-none py-3 px-0 font-mono text-payload-text placeholder:text-white/30 transition-colors" placeholder="REF-XXXX" />
+              <label className="font-mono text-xs uppercase tracking-widest text-payload-muted block mb-2">
+                REFERRAL CODE {referredByLink ? <span className="text-payload-neon">(AUTO-FILLED FROM LINK)</span> : '(OPTIONAL)'}
+              </label>
+              <div className="relative">
+                <input data-testid="register-referral-input" type="text" value={formData.referral_code} onChange={(e) => setFormData({ ...formData, referral_code: e.target.value })} className={`w-full bg-black border-b ${referredByLink ? 'border-payload-neon/50' : 'border-white/20'} focus:border-payload-neon focus:outline-none py-3 px-0 font-mono text-payload-text placeholder:text-white/30 transition-colors ${referredByLink ? 'text-payload-neon' : ''}`} placeholder="REF-XXXX" readOnly={referredByLink} />
+                {referredByLink && <UserPlus className="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-4 text-payload-neon" />}
+              </div>
+              {referredByLink && <p className="text-payload-neon text-xs font-mono mt-1">You were referred by a Payload member!</p>}
             </div>
 
             <button data-testid="register-submit-btn" type="submit" disabled={loading} className="w-full font-rajdhani font-bold text-lg uppercase tracking-widest border-2 border-payload-neon text-payload-neon py-3 rounded-none hover:bg-payload-neon hover:text-black transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed">
