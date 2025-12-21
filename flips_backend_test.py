@@ -223,10 +223,13 @@ class GuaranteedFlipsAPITester:
             
         headers = {'Authorization': f'Bearer {self.member_token}'}
         
-        # Test with form data (multipart)
+        # Test with form data (multipart) - need to use files parameter for multipart
         data = {
             'content': 'This is a test opportunity submission for the Guaranteed Flips feature. It contains detailed information about a potential investment opportunity.'
         }
+        
+        # Create empty files list to trigger multipart/form-data
+        files = []
         
         success, response = self.run_test(
             "Submit Opportunity (Text Only)",
@@ -235,7 +238,7 @@ class GuaranteedFlipsAPITester:
             200,
             data=data,
             headers=headers,
-            files={}  # Empty files to trigger multipart
+            files=files
         )
         
         if success and 'submission_id' in response:
