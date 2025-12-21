@@ -137,6 +137,14 @@ function App() {
                 </ProtectedRoute>
               }
             />
+            <Route
+              path="/guaranteed-flips"
+              element={
+                <ProtectedRoute>
+                  <GuaranteedFlipsPage />
+                </ProtectedRoute>
+              }
+            />
           </Routes>
         </BrowserRouter>
         <Toaster position="top-right" theme="dark" />
