@@ -95,6 +95,7 @@ class WorkZoneAccessStatus(str, Enum):
     NONE = "none"
     PENDING = "pending"
     APPROVED = "approved"
+    REJECTED = "rejected"
 
 class WorkZoneAccessRequest(BaseModel):
     model_config = ConfigDict(extra="ignore")
@@ -104,6 +105,15 @@ class WorkZoneAccessRequest(BaseModel):
     gmail_account: str
     requested_at: str
     status: WorkZoneAccessStatus = WorkZoneAccessStatus.PENDING
+
+class WorkZoneMemberStatus(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    user_id: str
+    user_name: str
+    user_email: str
+    gmail_account: Optional[str] = None
+    workzone_status: WorkZoneAccessStatus = WorkZoneAccessStatus.NONE
+    requested_at: Optional[str] = None
 
 class Token(BaseModel):
     access_token: str
