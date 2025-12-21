@@ -464,10 +464,10 @@ class GuaranteedFlipsAPITester:
         print("\n🔒 Testing Unauthorized Access...")
         
         tests = [
-            ("Tier Access Without Auth", "GET", "flips/tier-access", 401),
-            ("My Access Without Auth", "GET", "flips/my-access", 401),
-            ("Submit Opportunity Without Auth", "POST", "flips/submit-opportunity", 401),
-            ("Admin Submissions Without Auth", "GET", "flips/admin/submissions", 401),
+            ("Tier Access Without Auth", "GET", "flips/tier-access", 403),
+            ("My Access Without Auth", "GET", "flips/my-access", 403),
+            ("Submit Opportunity Without Auth", "POST", "flips/submit-opportunity", 403),
+            ("Admin Submissions Without Auth", "GET", "flips/admin/submissions", 403),
         ]
         
         all_passed = True
