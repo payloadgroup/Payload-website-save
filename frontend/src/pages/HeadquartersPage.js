@@ -170,6 +170,8 @@ const HeadquartersPage = () => {
       // Guaranteed Flips navigates to its dedicated page
       if (room.name === 'Guaranteed Flips') {
         navigate('/guaranteed-flips');
+      } else if (room.name === 'Censored Referrals') {
+        navigate('/referrals');
       } else {
         setSelectedRoom(room);
       }
