@@ -7,7 +7,7 @@ import uuid
 import io
 
 class GuaranteedFlipsAPITester:
-    def __init__(self, base_url="https://member-hub-46.preview.emergentagent.com"):
+    def __init__(self, base_url="https://futuristic-biz-2.preview.emergentagent.com"):
         self.base_url = base_url
         self.api_url = f"{base_url}/api"
         self.admin_token = None
