@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import axios from 'axios';
 import { toast } from 'sonner';
-import { ArrowLeft, Briefcase, ExternalLink, Mail, Check, AlertCircle, Edit2 } from 'lucide-react';
+import { ArrowLeft, Briefcase, ExternalLink, Mail, Check, AlertCircle, Edit2, Clock, CheckCircle, XCircle, Users } from 'lucide-react';
 import PayloadLogo from '@/components/PayloadLogo';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
@@ -23,19 +23,24 @@ const WorkZonePage = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [loadingSettings, setLoadingSettings] = useState(true);
   const [savingSettings, setSavingSettings] = useState(false);
+  const [pendingRequests, setPendingRequests] = useState([]);
+  const [loadingRequests, setLoadingRequests] = useState(true);
+  const [processingUser, setProcessingUser] = useState(null);
 
   // Member state
   const [showRequestModal, setShowRequestModal] = useState(false);
   const [gmailInput, setGmailInput] = useState('');
   const [savedGmail, setSavedGmail] = useState(null);
-  const [loadingGmail, setLoadingGmail] = useState(true);
+  const [accessStatus, setAccessStatus] = useState('none');
+  const [loadingStatus, setLoadingStatus] = useState(true);
   const [submittingGmail, setSubmittingGmail] = useState(false);
 
   useEffect(() => {
     if (isAdmin) {
       fetchAdminSettings();
+      fetchPendingRequests();
     } else {
-      fetchMyGmail();
+      fetchMyStatus();
     }
   }, [isAdmin, token]);
 
@@ -51,6 +56,18 @@ const WorkZonePage = () => {
       console.error('Failed to fetch settings:', error);
     }
     setLoadingSettings(false);
+  };
+
+  const fetchPendingRequests = async () => {
+    try {
+      const response = await axios.get(`${API}/workzone/pending-requests`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setPendingRequests(response.data);
+    } catch (error) {
+      console.error('Failed to fetch pending requests:', error);
+    }
+    setLoadingRequests(false);
   };
 
   const handleSaveAdminEmail = async () => {
@@ -73,17 +90,47 @@ const WorkZonePage = () => {
     setSavingSettings(false);
   };
 
-  // Member functions
-  const fetchMyGmail = async () => {
+  const handleApproveAccess = async (userId, userName) => {
+    setProcessingUser(userId);
     try {
-      const response = await axios.get(`${API}/workzone/my-gmail`, {
+      await axios.post(`${API}/workzone/approve-access/${userId}`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      toast.success(`Access granted to ${userName}`);
+      fetchPendingRequests();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Failed to approve access');
+    }
+    setProcessingUser(null);
+  };
+
+  const handleRemoveRequest = async (userId, userName) => {
+    if (!window.confirm(`Remove Work Zone request from ${userName}?`)) return;
+    setProcessingUser(userId);
+    try {
+      await axios.post(`${API}/workzone/remove-request/${userId}`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      toast.success(`Request removed for ${userName}`);
+      fetchPendingRequests();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Failed to remove request');
+    }
+    setProcessingUser(null);
+  };
+
+  // Member functions
+  const fetchMyStatus = async () => {
+    try {
+      const response = await axios.get(`${API}/workzone/my-status`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setSavedGmail(response.data.gmail_account);
+      setAccessStatus(response.data.workzone_access_status || 'none');
     } catch (error) {
-      console.error('Failed to fetch gmail:', error);
+      console.error('Failed to fetch status:', error);
     }
-    setLoadingGmail(false);
+    setLoadingStatus(false);
   };
 
   const handleSubmitGmail = async () => {
@@ -102,9 +149,10 @@ const WorkZonePage = () => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setSavedGmail(response.data.gmail_account);
+      setAccessStatus(response.data.workzone_access_status || 'pending');
       setShowRequestModal(false);
       setGmailInput('');
-      toast.success(response.data.message);
+      toast.success('Gmail submitted. Awaiting Director approval.');
     } catch (error) {
       toast.error(error.response?.data?.detail || 'Failed to submit Gmail');
     }
@@ -220,6 +268,67 @@ const WorkZonePage = () => {
                 )}
               </div>
 
+              {/* Pending Access Requests Section */}
+              <div className="bg-payload-surface border border-white/10 p-6 rounded-sm">
+                <h3 className="font-rajdhani font-bold text-xl uppercase mb-4 flex items-center gap-2">
+                  <Users className="w-5 h-5 text-payload-alert" />
+                  MEMBER ACCESS REQUESTS
+                </h3>
+                
+                {loadingRequests ? (
+                  <div className="text-center font-mono text-payload-muted py-8">LOADING...</div>
+                ) : pendingRequests.length === 0 ? (
+                  <div className="text-center py-8">
+                    <Clock className="w-12 h-12 text-payload-muted mx-auto mb-3" />
+                    <p className="font-mono text-sm text-payload-muted">NO PENDING REQUESTS</p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {pendingRequests.map((request) => (
+                      <div 
+                        key={request.user_id} 
+                        className="bg-black/50 border border-payload-alert/30 p-4 rounded-sm"
+                      >
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                          <div className="flex-1 min-w-0">
+                            <div className="font-rajdhani font-bold text-lg text-payload-alert truncate">
+                              {request.user_name}
+                            </div>
+                            <div className="font-mono text-xs text-payload-muted truncate">
+                              {request.user_email}
+                            </div>
+                            <div className="font-mono text-xs text-payload-cyan mt-1">
+                              Gmail: {request.gmail_account}
+                            </div>
+                            <div className="font-mono text-[10px] text-payload-muted mt-1">
+                              Requested: {new Date(request.requested_at).toLocaleDateString()}
+                            </div>
+                          </div>
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => handleApproveAccess(request.user_id, request.user_name)}
+                              disabled={processingUser === request.user_id}
+                              className="flex items-center gap-1 font-mono text-xs bg-payload-neon text-black px-4 py-2 hover:bg-payload-neon/80 disabled:opacity-50"
+                            >
+                              <CheckCircle className="w-3 h-3" />
+                              {processingUser === request.user_id ? '...' : 'APPROVE'}
+                            </button>
+                            <button
+                              onClick={() => handleRemoveRequest(request.user_id, request.user_name)}
+                              disabled={processingUser === request.user_id}
+                              className="flex items-center gap-1 font-mono text-xs border border-red-500 text-red-500 px-4 py-2 hover:bg-red-500 hover:text-white disabled:opacity-50"
+                            >
+                              <XCircle className="w-3 h-3" />
+                              REMOVE
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
               {/* Access Payload Drive Card */}
               <motion.div
                 whileHover={{ scale: 1.01 }}
@@ -249,19 +358,62 @@ const WorkZonePage = () => {
           {/* Member View */}
           {!isAdmin && (
             <div className="space-y-8">
-              {loadingGmail ? (
+              {loadingStatus ? (
                 <div className="text-center font-mono text-payload-muted py-8">LOADING...</div>
-              ) : savedGmail ? (
+              ) : accessStatus === 'approved' ? (
                 <>
-                  {/* Gmail Saved Confirmation */}
-                  <div className="bg-payload-surface border border-payload-neon/30 p-6 rounded-sm">
+                  {/* Access Granted */}
+                  <div className="bg-payload-surface border border-payload-neon/50 p-6 rounded-sm">
                     <div className="flex items-center gap-3 mb-4">
-                      <div className="w-10 h-10 bg-payload-neon/20 rounded-full flex items-center justify-center">
-                        <Check className="w-5 h-5 text-payload-neon" />
+                      <div className="w-12 h-12 bg-payload-neon/20 rounded-full flex items-center justify-center">
+                        <CheckCircle className="w-6 h-6 text-payload-neon" />
                       </div>
                       <div>
-                        <h3 className="font-rajdhani font-bold text-lg uppercase">GMAIL REGISTERED</h3>
-                        <p className="font-mono text-xs text-payload-muted">Work Zone access pending provision</p>
+                        <h3 className="font-rajdhani font-bold text-xl uppercase text-payload-neon">ACCESS GRANTED</h3>
+                        <p className="font-mono text-xs text-payload-muted">You have been approved for Work Zone access</p>
+                      </div>
+                    </div>
+                    <div className="bg-black/50 border border-white/10 p-4 rounded-sm">
+                      <div className="font-mono text-xs text-payload-muted mb-1">YOUR GMAIL ACCOUNT</div>
+                      <div className="font-mono text-lg text-payload-neon">{savedGmail}</div>
+                    </div>
+                  </div>
+
+                  {/* Access Payload Drive Work Zone Card */}
+                  <motion.div
+                    whileHover={{ scale: 1.01 }}
+                    onClick={() => window.open(GOOGLE_WORKSPACE_URL, '_blank')}
+                    className="bg-gradient-to-br from-payload-surface to-black border-2 border-payload-cyan/50 p-6 rounded-sm cursor-pointer hover:border-payload-cyan hover:shadow-[0_0_20px_rgba(0,255,255,0.2)] transition-all"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-4">
+                        <div className="w-14 h-14 bg-payload-cyan/20 rounded-sm flex items-center justify-center">
+                          <Briefcase className="w-8 h-8 text-payload-cyan" />
+                        </div>
+                        <div>
+                          <h3 className="font-rajdhani font-bold text-xl uppercase text-payload-cyan">
+                            ACCESS PAYLOAD DRIVE WORK ZONE
+                          </h3>
+                          <p className="font-mono text-xs text-payload-muted mt-1">
+                            Open Google Workspace to access shared Payload documents
+                          </p>
+                        </div>
+                      </div>
+                      <ExternalLink className="w-6 h-6 text-payload-cyan" />
+                    </div>
+                  </motion.div>
+                </>
+              ) : accessStatus === 'pending' ? (
+                <>
+                  {/* Pending Approval Status */}
+                  <div className="bg-payload-surface border border-payload-alert/50 p-6 rounded-sm">
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="w-12 h-12 bg-payload-alert/20 rounded-full flex items-center justify-center animate-pulse">
+                        <Clock className="w-6 h-6 text-payload-alert" />
+                      </div>
+                      <div>
+                        <h3 className="font-rajdhani font-bold text-xl uppercase text-payload-alert">PENDING APPROVAL BY DIRECTOR</h3>
+                        <p className="font-mono text-xs text-payload-muted">Your request is being reviewed</p>
                       </div>
                     </div>
                     <div className="bg-black/50 border border-white/10 p-4 rounded-sm">
@@ -309,7 +461,7 @@ const WorkZonePage = () => {
                     <h4 className="font-rajdhani font-bold text-sm uppercase mb-2">ABOUT WORK ZONE</h4>
                     <p className="font-inter text-xs text-payload-muted leading-relaxed">
                       The Work Zone is a shared Google Drive space where Payload members collaborate on business documents.
-                      Once your Gmail is registered, an admin will grant you access to the shared drive.
+                      Once your Gmail is registered and approved by a Director, you will gain access to the shared drive.
                     </p>
                   </div>
                 </div>
