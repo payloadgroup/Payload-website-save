@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import axios from 'axios';
 import { toast } from 'sonner';
-import { ArrowLeft, CheckCircle, XCircle, Clock, BarChart3, Lock, Unlock, Trash2, Users, ShieldOff, Crown, Bell, UserPlus, Eye, EyeOff, X, User, Mail, Phone, Calendar, MapPin, CreditCard, Award, Hash, Ban, RotateCcw, UserX } from 'lucide-react';
+import { ArrowLeft, CheckCircle, XCircle, Clock, BarChart3, Lock, Unlock, Trash2, Users, ShieldOff, Crown, Bell, UserPlus, Eye, EyeOff, X, User, Mail, Phone, Calendar, MapPin, CreditCard, Award, Hash, Ban, RotateCcw, UserX, TrendingUp } from 'lucide-react';
 import PayloadLogo from '@/components/PayloadLogo';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
