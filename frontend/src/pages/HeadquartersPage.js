@@ -1,9 +1,14 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
-import { ArrowLeft, Beaker, Sun, Building2, Home, Repeat, Snowflake, Coins, Truck, Flame, X, Lock } from 'lucide-react';
+import axios from 'axios';
+import { toast } from 'sonner';
+import { ArrowLeft, Beaker, Sun, Building2, Home, Repeat, Snowflake, Coins, Truck, Flame, X, Lock, Rocket, CheckCircle } from 'lucide-react';
 import PayloadLogo from '@/components/PayloadLogo';
+
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+const API = `${BACKEND_URL}/api`;
 
 // Tier unlock configuration - which rooms are unlocked at each tier
 const TIER_UNLOCK_MAP = {
