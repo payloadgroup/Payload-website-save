@@ -335,3 +335,82 @@ class ResourceResponse(BaseModel):
     url: str
     uploaded_by: str
     created_at: str
+
+
+# ============ PROJECT & TASK MODELS ============
+
+# Business types available in HQ
+class BusinessType(str, Enum):
+    CENSORED_REFERRALS = "censored_referrals"
+    GUARANTEED_FLIPS = "guaranteed_flips"
+    SOLARHEX = "solarhex"
+    ICEBERG_TECHNOLOGIES = "iceberg_technologies"
+    CPOD = "cpod"
+    PAYLOAD_FINTECH = "payload_fintech"
+    PAYBOND = "paybond"
+    H2_GREEN_PRODUCTION = "h2_green_production"
+
+class TaskStatus(str, Enum):
+    PENDING = "pending"
+    IN_PROGRESS = "in_progress"
+    COMPLETED = "completed"
+
+# Task Template - Admin configurable tasks per business type
+class TaskTemplateCreate(BaseModel):
+    business_type: BusinessType
+    title: str
+    description: str
+    order: int = 0
+
+class TaskTemplateUpdate(BaseModel):
+    title: Optional[str] = None
+    description: Optional[str] = None
+    order: Optional[int] = None
+
+class TaskTemplateResponse(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str
+    business_type: BusinessType
+    title: str
+    description: str
+    order: int
+    created_at: str
+
+# Member Project (Active Business from HQ)
+class MemberProjectResponse(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str
+    user_id: str
+    business_type: BusinessType
+    business_name: str
+    status: str  # active, paused, completed
+    started_at: str
+    completed_at: Optional[str] = None
+
+# Member Task (Instance of TaskTemplate for a specific member's project)
+class MemberTaskResponse(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str
+    project_id: str
+    user_id: str
+    template_id: str
+    title: str
+    description: str
+    order: int
+    status: TaskStatus
+    completed_at: Optional[str] = None
+
+class TaskStatusUpdate(BaseModel):
+    status: TaskStatus
+
+# Member Progress Summary (for Admin view)
+class MemberProgressResponse(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    user_id: str
+    user_name: str
+    user_email: str
+    tier: str
+    total_projects: int
+    active_projects: int
+    completed_projects: int
+    overall_progress: float  # percentage
