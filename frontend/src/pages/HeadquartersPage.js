@@ -445,6 +445,25 @@ const HeadquartersPage = () => {
                     )}
                   </>
                 )}
+
+                {/* Start Project Button */}
+                <div className="mt-6 pt-4 border-t border-white/10">
+                  {isProjectStarted(selectedRoom.name) ? (
+                    <div className="flex items-center gap-2 text-green-400 font-mono text-sm">
+                      <CheckCircle className="w-5 h-5" />
+                      <span>PROJECT ACTIVE</span>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => handleStartProject(selectedRoom)}
+                      disabled={startingProject}
+                      className="w-full flex items-center justify-center gap-2 bg-payload-neon text-black font-rajdhani font-bold py-3 px-6 hover:bg-payload-neon/90 transition-colors disabled:opacity-50"
+                    >
+                      <Rocket className="w-5 h-5" />
+                      {startingProject ? 'STARTING...' : 'START PROJECT'}
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
           </motion.div>
