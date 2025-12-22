@@ -210,6 +210,10 @@ async def update_user_status(request: UserApprovalRequest, background_tasks: Bac
             original_password,
             user_tier
         )
+        
+        # Auto-activate Censored Referrals project for the newly approved member
+        from routes.projects import ensure_censored_referrals_active
+        await ensure_censored_referrals_active(request.user_id)
     
     return {"message": f"User status updated to {request.status}"}
 
