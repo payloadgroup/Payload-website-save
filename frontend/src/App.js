@@ -85,6 +85,22 @@ function App() {
               }
             />
             <Route
+              path="/admin/member-progress"
+              element={
+                <ProtectedRoute adminOnly={true}>
+                  <MemberProgressPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/member-progress/:memberId"
+              element={
+                <ProtectedRoute adminOnly={true}>
+                  <MemberProgressPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
               path="/headquarters"
               element={
                 <ProtectedRoute>
