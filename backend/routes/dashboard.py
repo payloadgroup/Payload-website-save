@@ -15,9 +15,14 @@ async def get_dashboard(current_user: User = Depends(get_current_user)):
     if current_user.role == UserRole.ADMIN:
         payloads_count = await db.payloads.count_documents({})
         missions_count = await db.missions.count_documents({})
+        projects_count = await db.member_projects.count_documents({})
+        active_missions_count = await db.member_projects.count_documents({"status": "active"})
     else:
-        payloads_count = await db.payloads.count_documents({"assigned_to": current_user.id, "is_active": True})
-        missions_count = await db.missions.count_documents({"assigned_to": current_user.id, "is_active": True})
+        # Count member's active projects (business cards they've started)
+        projects_count = await db.member_projects.count_documents({"user_id": current_user.id})
+        active_missions_count = await db.member_projects.count_documents({"user_id": current_user.id, "status": "active"})
+        payloads_count = projects_count  # Projects are the new payloads
+        missions_count = active_missions_count
     
     transactions = await db.transactions.find({"user_id": current_user.id}).sort("date", -1).limit(1).to_list(1)
     balance = transactions[0]["balance_after"] if transactions else 0.0
@@ -30,6 +35,8 @@ async def get_dashboard(current_user: User = Depends(get_current_user)):
         "status": "Mission Control Online",
         "payloads_count": payloads_count,
         "missions_count": missions_count,
+        "projects_count": projects_count,
+        "active_missions_count": active_missions_count,
         "balance": balance,
         "headquarters": headquarters,
         "stations_count": stations_count
