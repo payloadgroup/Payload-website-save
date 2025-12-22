@@ -17,6 +17,7 @@ import NotificationSettingsPage from "@/pages/NotificationSettingsPage";
 import WorkZonePage from "@/pages/WorkZonePage";
 import GuaranteedFlipsPage from "@/pages/GuaranteedFlipsPage";
 import IconDemoPage from "@/pages/IconDemoPage";
+import MemberProgressPage from "@/pages/MemberProgressPage";
 import { AuthProvider, useAuth } from "@/context/AuthContext";
 
 const ProtectedRoute = ({ children, adminOnly = false }) => {
