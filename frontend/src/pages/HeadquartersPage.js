@@ -40,6 +40,18 @@ const ROOM_UNLOCK_TIER = {
   8: 'top_leadership'
 };
 
+// Map room names to business types for API
+const ROOM_TO_BUSINESS_TYPE = {
+  'Censored Referrals': 'censored_referrals',
+  'Guaranteed Flips': 'guaranteed_flips',
+  'SolarHex': 'solarhex',
+  'Iceberg Technologies': 'iceberg_technologies',
+  'CPOD': 'cpod',
+  'Payload Fintech': 'payload_fintech',
+  'PayBond': 'paybond',
+  'H2 Green Production': 'h2_green_production'
+};
+
 const ROOMS = [
   {
     id: 1,
@@ -51,7 +63,8 @@ const ROOMS = [
     bgColor: 'bg-blue-500/10',
     description: 'Member referral tracking and social media content guidance program.',
     focus: 'Grow the community through referrals and boost your member tier.',
-    details: null
+    details: null,
+    navigateTo: '/referrals'
   },
   {
     id: 2,
