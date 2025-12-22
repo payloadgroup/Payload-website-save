@@ -1,5 +1,5 @@
 {
-  "summary": "27/27 tests passed",
+  "summary": "40/40 tests passed",
   "tests": [
     {
       "test": "Admin Login",
@@ -12,130 +12,195 @@
       "details": ""
     },
     {
-      "test": "Get My Referral Code",
+      "test": "Get My Projects",
       "success": true,
       "details": ""
     },
     {
-      "test": "Referral Code Response - own_referral_code",
+      "test": "My Projects Response Format",
       "success": true,
       "details": ""
     },
     {
-      "test": "Referral Code Response - referral_count",
+      "test": "Start Guaranteed Flips Project",
       "success": true,
       "details": ""
     },
     {
-      "test": "Get My Referrals",
+      "test": "Start Project Response - id",
       "success": true,
       "details": ""
     },
     {
-      "test": "My Referrals Response Format",
+      "test": "Start Project Response - user_id",
       "success": true,
       "details": ""
     },
     {
-      "test": "Get Referral Code for Test",
+      "test": "Start Project Response - business_type",
       "success": true,
       "details": ""
     },
     {
-      "test": "Register with Referral Code",
+      "test": "Start Project Response - business_name",
       "success": true,
       "details": ""
     },
     {
-      "test": "Referral Code Processing",
+      "test": "Start Project Response - status",
       "success": true,
       "details": ""
     },
     {
-      "test": "Admin Referral Stats",
+      "test": "Attempt Duplicate Project Start",
       "success": true,
       "details": ""
     },
     {
-      "test": "Referral Stats - total_referrals",
+      "test": "Duplicate Project Prevention",
       "success": true,
       "details": ""
     },
     {
-      "test": "Referral Stats - successful_referrals",
+      "test": "Get Project Tasks",
       "success": true,
       "details": ""
     },
     {
-      "test": "Referral Stats - pending_referrals",
+      "test": "Project Tasks Response Format",
       "success": true,
       "details": ""
     },
     {
-      "test": "Referral Stats - top_referrers",
+      "test": "Task Structure - id",
       "success": true,
       "details": ""
     },
     {
-      "test": "Recalculate Referral Tiers",
+      "test": "Task Structure - project_id",
       "success": true,
       "details": ""
     },
     {
-      "test": "Tier Recalculation - message",
+      "test": "Task Structure - title",
       "success": true,
       "details": ""
     },
     {
-      "test": "Tier Recalculation - upgraded_count",
+      "test": "Task Structure - description",
       "success": true,
       "details": ""
     },
     {
-      "test": "Get Member Data Before Approval",
+      "test": "Task Structure - status",
       "success": true,
       "details": ""
     },
     {
-      "test": "Approve Referred User",
+      "test": "Task Structure - order",
       "success": true,
       "details": ""
     },
     {
-      "test": "Get Member Data After Approval",
+      "test": "Update Task to In Progress",
       "success": true,
       "details": ""
     },
     {
-      "test": "Referral Count Increment",
+      "test": "Task Status Update Verification",
       "success": true,
       "details": ""
     },
     {
-      "test": "Tier Logic - 0 referrals = JUNIOR_RECRUIT",
+      "test": "Get Project Progress",
       "success": true,
       "details": ""
     },
     {
-      "test": "Tier Logic - 1 referrals = FRONT_LINE",
+      "test": "Progress Response - project_id",
       "success": true,
       "details": ""
     },
     {
-      "test": "Tier Logic - 3 referrals = MID_LEVEL_MANAGER",
+      "test": "Progress Response - business_name",
       "success": true,
       "details": ""
     },
     {
-      "test": "Tier Logic - 5 referrals = SENIOR_MANAGER",
+      "test": "Progress Response - total_tasks",
       "success": true,
       "details": ""
     },
     {
-      "test": "Tier Logic - 10 referrals = TOP_LEADERSHIP",
+      "test": "Progress Response - completed_tasks",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Progress Response - progress_percentage",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Admin Member Progress",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Admin Member Progress Response Format",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Member Progress Structure - user_id",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Member Progress Structure - user_name",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Member Progress Structure - user_email",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Member Progress Structure - total_projects",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Member Progress Structure - overall_progress",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Admin Member Detail",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Member Detail Response - member",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Member Detail Response - projects",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Activate Censored Referrals for All",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Censored Referrals Activation Response",
       "success": true,
       "details": ""
     }
   ],
-  "timestamp": "2025-12-21T10:18:04.644328"
+  "timestamp": "2025-12-22T17:12:37.206019"
 }
