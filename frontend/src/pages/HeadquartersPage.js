@@ -168,8 +168,57 @@ const ROOMS = [
 
 const HeadquartersPage = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const [selectedRoom, setSelectedRoom] = useState(null);
+  const [myProjects, setMyProjects] = useState([]);
+  const [startingProject, setStartingProject] = useState(false);
+
+  // Fetch user's active projects
+  useEffect(() => {
+    fetchMyProjects();
+  }, []);
+
+  const fetchMyProjects = async () => {
+    try {
+      const res = await axios.get(`${API}/projects/my-projects`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setMyProjects(res.data);
+    } catch (error) {
+      console.error('Error fetching projects:', error);
+    }
+  };
+
+  const isProjectStarted = (roomName) => {
+    const businessType = ROOM_TO_BUSINESS_TYPE[roomName];
+    return myProjects.some(p => p.business_type === businessType);
+  };
+
+  const handleStartProject = async (room) => {
+    const businessType = ROOM_TO_BUSINESS_TYPE[room.name];
+    if (!businessType) {
+      toast.error('Business type not found');
+      return;
+    }
+
+    setStartingProject(true);
+    try {
+      await axios.post(`${API}/projects/start/${businessType}`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      toast.success(`${room.name} project started!`);
+      await fetchMyProjects();
+      setSelectedRoom(null);
+    } catch (error) {
+      if (error.response?.data?.detail === 'Project already started for this business') {
+        toast.info('Project already active');
+      } else {
+        toast.error(error.response?.data?.detail || 'Failed to start project');
+      }
+    } finally {
+      setStartingProject(false);
+    }
+  };
 
   // Get unlocked rooms based on user tier (admin sees all)
   const userTier = user?.tier || 'junior_recruit';
@@ -185,7 +234,7 @@ const HeadquartersPage = () => {
 
   const handleRoomClick = (room) => {
     if (isRoomUnlocked(room.id)) {
-      // Guaranteed Flips navigates to its dedicated page
+      // Rooms with dedicated pages navigate directly
       if (room.name === 'Guaranteed Flips') {
         navigate('/guaranteed-flips');
       } else if (room.name === 'Censored Referrals') {
