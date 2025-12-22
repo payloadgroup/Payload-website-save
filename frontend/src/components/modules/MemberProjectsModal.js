@@ -137,8 +137,11 @@ const MemberProjectsModal = ({ onClose, onUpdate }) => {
                 projects.map((project) => (
                   <div
                     key={project.id}
-                    onClick={() => handleProjectClick(project)}
-                    className="bg-black/30 border border-white/10 p-4 rounded-sm cursor-pointer hover:border-payload-neon/50 transition-all"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleProjectClick(project);
+                    }}
+                    className="bg-black/30 border border-white/10 p-4 rounded-sm cursor-pointer hover:border-payload-neon/50 transition-all relative z-10"
                   >
                     <div className="flex items-center justify-between mb-3">
                       <h3 className="font-rajdhani font-bold text-lg uppercase text-payload-neon">
