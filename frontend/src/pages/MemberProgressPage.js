@@ -251,7 +251,7 @@ const MemberProgressPage = () => {
         {/* Header */}
         <div className="flex items-center gap-4 mb-8">
           <button
-            onClick={() => navigate('/admin-management')}
+            onClick={() => navigate('/admin')}
             className="p-2 border border-white/10 hover:border-white/30 transition-colors"
           >
             <ArrowLeft className="w-5 h-5" />
