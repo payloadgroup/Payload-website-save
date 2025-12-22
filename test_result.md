@@ -1,47 +1,70 @@
 # Test Results for Payload Application
 
 ## Current Testing Focus
-Testing the REFERRAL LINK feature:
-1. Referrals page shows shareable referral link with member's code
-2. Copy Link and Share buttons work
-3. Visiting /register?ref=CODE auto-fills the referral code field
-4. User registering via referral link has the code saved
-5. After admin approval, referrer's count and tier update correctly
+Testing the PAYLOADS, MISSIONS, and MEMBER PROGRESS features:
+
+1. Payloads Card - Shows member's active business projects
+2. Censored Referrals auto-activated for all members
+3. HQ page "Start Project" functionality
+4. Missions/Projects modal with task list and progress bar
+5. Admin Member Progress page
 
 ## Test Credentials
 - Admin: admin@payload.com / admin123
 - Member: member@payload.com / member123
 
 ## Files Changed
-- /app/frontend/src/pages/ReferralsPage.js - Added shareable referral link section with Copy Link and Share buttons
-- /app/frontend/src/pages/RegisterPage.js - Added URL query param capture for ?ref= parameter, auto-fills referral code field
+### Backend:
+- /app/backend/models/schemas.py - Added BusinessType, TaskStatus enums, task/project models
+- /app/backend/routes/projects.py - NEW file with all project/task/template APIs
+- /app/backend/routes/dashboard.py - Updated to include project counts
+- /app/backend/routes/admin.py - Auto-activates Censored Referrals on member approval
+- /app/backend/server.py - Added projects router
+
+### Frontend:
+- /app/frontend/src/pages/HeadquartersPage.js - Added "Start Project" button in room modal
+- /app/frontend/src/pages/Dashboard.js - Uses MemberProjectsModal for members
+- /app/frontend/src/pages/MemberProgressPage.js - NEW Admin page for member progress tracking
+- /app/frontend/src/pages/AdminPanel.js - Added "Progress" button in nav
+- /app/frontend/src/components/modules/MemberProjectsModal.js - NEW modal for viewing projects/tasks
+- /app/frontend/src/App.js - Added MemberProgressPage routes
 
 ## Key Test Scenarios
-### Scenario 1: Referral link on Referrals page
+### Scenario 1: Payloads Card shows active projects
 - Login as member
-- Navigate to /referrals
-- Verify "YOUR REFERRAL LINK" section shows the correct link format: {origin}/register?ref={CODE}
-- Verify COPY LINK and SHARE buttons are present
+- Click Payloads card on dashboard
+- Should show "Censored Referrals" as active (auto-activated)
+- Should show task list with progress bar when project is clicked
 
-### Scenario 2: Auto-fill referral code from URL
-- Visit /register?ref=TESTDC81C9
-- Verify referral_code field is auto-filled with TESTDC81C9
-- Verify "(AUTO-FILLED FROM LINK)" label appears
-- Verify "You were referred by a Payload member!" message appears
-- Verify field is read-only when auto-filled
+### Scenario 2: Start Project from HQ
+- Login as member
+- Navigate to /headquarters
+- Click on a business card (e.g., SolarHex)
+- Click "Start Project" button
+- Project should appear in Payloads
 
-### Scenario 3: Complete referral flow via link
-- Get member's referral code
-- Register new user via /register?ref={CODE}
-- Admin approves the new user
-- Verify member's referral_count increments
-- Verify member's tier upgrades if threshold met
+### Scenario 3: Task completion and progress
+- Open a project in Payloads modal
+- Change task status to "In Progress" or "Completed"
+- Progress bar should update
+
+### Scenario 4: Admin Member Progress
+- Login as admin
+- Navigate to /admin/member-progress
+- Should see list of all approved members with progress circles
+- Click on a member to see their projects and task progress
 
 ## API Endpoints to Test
-- GET /api/users/my-referral-code - Returns member's own_referral_code
-- POST /api/auth/register - Accepts referral_code from form
-- POST /api/admin/update-user-status - Triggers referral count + tier upgrade
+- GET /api/projects/my-projects - Get member's active projects
+- POST /api/projects/start/{business_type} - Start a new project
+- GET /api/projects/{project_id}/tasks - Get tasks for a project
+- PUT /api/projects/tasks/{task_id}/status - Update task status
+- GET /api/projects/admin/member-progress - Get all members' progress (admin)
+- GET /api/projects/admin/member/{user_id}/projects - Get specific member's projects (admin)
 
 ## Incorporate User Feedback
-- Referral link should automatically capture which member the referral belongs to
-- Signup using referral link should be recognized and update referrals page
+- Payloads Card shows all activated businesses (projects)
+- Censored Referrals auto-activated for new and existing members
+- Start Project from HQ adds to Payloads + creates Mission tasks
+- Missions modal shows sequential tasks with progress bar
+- Admin can view member progress (read-only)
