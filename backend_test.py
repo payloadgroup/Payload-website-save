@@ -92,226 +92,244 @@ class ProjectTrackingTester:
             return True
         return False
 
-    def test_referral_code_endpoint(self):
-        """Test GET /api/users/my-referral-code"""
-        print("\n📋 Testing Referral Code Endpoint...")
+    def test_my_projects_endpoint(self):
+        """Test GET /api/projects/my-projects"""
+        print("\n📋 Testing My Projects Endpoint...")
         if not self.member_token:
-            self.log_test("Get My Referral Code", False, "No member token available")
+            self.log_test("Get My Projects", False, "No member token available")
             return False
         
         success, response = self.run_test(
-            "Get My Referral Code",
+            "Get My Projects",
             "GET",
-            "users/my-referral-code",
-            200,
-            headers={'Authorization': f'Bearer {self.member_token}'}
-        )
-        
-        if success:
-            required_fields = ['own_referral_code', 'referral_count']
-            for field in required_fields:
-                if field not in response:
-                    self.log_test(f"Referral Code Response - {field}", False, f"Missing field: {field}")
-                    return False
-                else:
-                    self.log_test(f"Referral Code Response - {field}", True)
-        
-        return success
-
-    def test_my_referrals_endpoint(self):
-        """Test GET /api/users/my-referrals"""
-        print("\n👥 Testing My Referrals Endpoint...")
-        if not self.member_token:
-            self.log_test("Get My Referrals", False, "No member token available")
-            return False
-        
-        success, response = self.run_test(
-            "Get My Referrals",
-            "GET",
-            "users/my-referrals",
+            "projects/my-projects",
             200,
             headers={'Authorization': f'Bearer {self.member_token}'}
         )
         
         if success and isinstance(response, list):
-            self.log_test("My Referrals Response Format", True)
+            self.log_test("My Projects Response Format", True)
+            return response  # Return projects for further testing
         elif success:
-            self.log_test("My Referrals Response Format", False, "Response should be a list")
+            self.log_test("My Projects Response Format", False, "Response should be a list")
             
-        return success
+        return []
 
-    def test_register_with_referral(self):
-        """Test POST /api/auth/register with referral_code"""
-        print("\n📝 Testing Registration with Referral Code...")
-        
-        # First get a referral code from member
+    def test_start_project_endpoint(self):
+        """Test POST /api/projects/start/{business_type}"""
+        print("\n🚀 Testing Start Project Endpoint...")
         if not self.member_token:
-            self.log_test("Register with Referral", False, "No member token to get referral code")
+            self.log_test("Start Project", False, "No member token available")
             return False
         
-        success, referral_data = self.run_test(
-            "Get Referral Code for Test",
-            "GET",
-            "users/my-referral-code",
+        # Test starting a project for guaranteed_flips
+        success, response = self.run_test(
+            "Start Guaranteed Flips Project",
+            "POST",
+            "projects/start/guaranteed_flips",
             200,
             headers={'Authorization': f'Bearer {self.member_token}'}
         )
         
-        if not success or 'own_referral_code' not in referral_data:
-            self.log_test("Register with Referral", False, "Could not get referral code")
-            return False
-        
-        referral_code = referral_data['own_referral_code']
-        
-        # Register new user with referral code
-        timestamp = datetime.now().strftime('%H%M%S')
-        test_user_data = {
-            "name": f"Test Referral User {timestamp}",
-            "email": f"testreferral{timestamp}@test.com",
-            "password": "testpass123",
-            "mobile": "+61412345678",
-            "date_of_birth": "1990-01-01",
-            "referral_code": referral_code
-        }
-        
-        success, response = self.run_test(
-            "Register with Referral Code",
-            "POST",
-            "auth/register",
-            200,
-            data=test_user_data
-        )
-        
         if success:
-            # Check if referred_by field is set
-            if 'referred_by' in response and response['referred_by']:
-                self.log_test("Referral Code Processing", True)
-                return response['id']  # Return new user ID for approval test
-            else:
-                self.log_test("Referral Code Processing", False, "referred_by field not set")
+            required_fields = ['id', 'user_id', 'business_type', 'business_name', 'status']
+            for field in required_fields:
+                if field not in response:
+                    self.log_test(f"Start Project Response - {field}", False, f"Missing field: {field}")
+                    return False
+                else:
+                    self.log_test(f"Start Project Response - {field}", True)
+            return response['id']  # Return project ID for further testing
         
         return False
 
-    def test_admin_referral_stats(self):
-        """Test GET /api/admin/referral-stats"""
-        print("\n📊 Testing Admin Referral Stats...")
-        if not self.admin_token:
-            self.log_test("Admin Referral Stats", False, "No admin token available")
-            return False
+    def test_project_tasks_endpoint(self, project_id):
+        """Test GET /api/projects/{project_id}/tasks"""
+        print("\n📝 Testing Project Tasks Endpoint...")
+        if not self.member_token or not project_id:
+            self.log_test("Get Project Tasks", False, "No member token or project ID available")
+            return []
         
         success, response = self.run_test(
-            "Admin Referral Stats",
+            "Get Project Tasks",
             "GET",
-            "admin/referral-stats",
+            f"projects/{project_id}/tasks",
             200,
-            headers={'Authorization': f'Bearer {self.admin_token}'}
+            headers={'Authorization': f'Bearer {self.member_token}'}
         )
         
-        if success:
-            required_fields = ['total_referrals', 'successful_referrals', 'pending_referrals', 'top_referrers']
-            for field in required_fields:
-                if field not in response:
-                    self.log_test(f"Referral Stats - {field}", False, f"Missing field: {field}")
-                else:
-                    self.log_test(f"Referral Stats - {field}", True)
-        
-        return success
+        if success and isinstance(response, list):
+            self.log_test("Project Tasks Response Format", True)
+            if len(response) > 0:
+                # Check first task structure
+                task = response[0]
+                required_fields = ['id', 'project_id', 'title', 'description', 'status', 'order']
+                for field in required_fields:
+                    if field not in task:
+                        self.log_test(f"Task Structure - {field}", False, f"Missing field: {field}")
+                    else:
+                        self.log_test(f"Task Structure - {field}", True)
+            return response
+        elif success:
+            self.log_test("Project Tasks Response Format", False, "Response should be a list")
+            
+        return []
 
-    def test_user_approval_and_tier_upgrade(self, new_user_id):
-        """Test POST /api/admin/update-user-status and tier upgrade logic"""
-        print("\n⬆️ Testing User Approval and Tier Upgrade...")
-        if not self.admin_token or not new_user_id:
-            self.log_test("User Approval Test", False, "Missing admin token or user ID")
+    def test_update_task_status_endpoint(self, tasks):
+        """Test PUT /api/projects/tasks/{task_id}/status"""
+        print("\n✅ Testing Update Task Status Endpoint...")
+        if not self.member_token or not tasks:
+            self.log_test("Update Task Status", False, "No member token or tasks available")
             return False
         
-        # Get current referrer data before approval
-        success, before_data = self.run_test(
-            "Get Member Data Before Approval",
-            "GET",
-            "users/my-referral-code",
-            200,
-            headers={'Authorization': f'Bearer {self.member_token}'}
-        )
-        
-        if not success:
-            self.log_test("User Approval Test", False, "Could not get member data before approval")
-            return False
-        
-        before_count = before_data.get('referral_count', 0)
-        
-        # Approve the new user
+        # Update first task to in_progress
+        task_id = tasks[0]['id']
         success, response = self.run_test(
-            "Approve Referred User",
-            "POST",
-            "admin/update-user-status",
+            "Update Task to In Progress",
+            "PUT",
+            f"projects/tasks/{task_id}/status",
             200,
-            data={"user_id": new_user_id, "status": "approved"},
-            headers={'Authorization': f'Bearer {self.admin_token}'}
-        )
-        
-        if not success:
-            return False
-        
-        # Check if referral count increased
-        success, after_data = self.run_test(
-            "Get Member Data After Approval",
-            "GET",
-            "users/my-referral-code",
-            200,
+            data={"status": "in_progress"},
             headers={'Authorization': f'Bearer {self.member_token}'}
         )
         
         if success:
-            after_count = after_data.get('referral_count', 0)
-            if after_count > before_count:
-                self.log_test("Referral Count Increment", True)
+            if response.get('status') == 'in_progress':
+                self.log_test("Task Status Update Verification", True)
             else:
-                self.log_test("Referral Count Increment", False, f"Count did not increase: {before_count} -> {after_count}")
+                self.log_test("Task Status Update Verification", False, f"Status not updated correctly: {response.get('status')}")
         
         return success
 
-    def test_recalculate_tiers(self):
-        """Test POST /api/admin/recalculate-referral-tiers"""
-        print("\n🔄 Testing Tier Recalculation...")
-        if not self.admin_token:
-            self.log_test("Recalculate Tiers", False, "No admin token available")
+    def test_project_progress_endpoint(self, project_id):
+        """Test GET /api/projects/{project_id}/progress"""
+        print("\n📊 Testing Project Progress Endpoint...")
+        if not self.member_token or not project_id:
+            self.log_test("Get Project Progress", False, "No member token or project ID available")
             return False
         
         success, response = self.run_test(
-            "Recalculate Referral Tiers",
-            "POST",
-            "admin/recalculate-referral-tiers",
+            "Get Project Progress",
+            "GET",
+            f"projects/{project_id}/progress",
+            200,
+            headers={'Authorization': f'Bearer {self.member_token}'}
+        )
+        
+        if success:
+            required_fields = ['project_id', 'business_name', 'total_tasks', 'completed_tasks', 'progress_percentage']
+            for field in required_fields:
+                if field not in response:
+                    self.log_test(f"Progress Response - {field}", False, f"Missing field: {field}")
+                else:
+                    self.log_test(f"Progress Response - {field}", True)
+        
+        return success
+
+    def test_admin_member_progress_endpoint(self):
+        """Test GET /api/projects/admin/member-progress"""
+        print("\n👥 Testing Admin Member Progress Endpoint...")
+        if not self.admin_token:
+            self.log_test("Admin Member Progress", False, "No admin token available")
+            return False
+        
+        success, response = self.run_test(
+            "Admin Member Progress",
+            "GET",
+            "projects/admin/member-progress",
+            200,
+            headers={'Authorization': f'Bearer {self.admin_token}'}
+        )
+        
+        if success and isinstance(response, list):
+            self.log_test("Admin Member Progress Response Format", True)
+            if len(response) > 0:
+                # Check first member structure
+                member = response[0]
+                required_fields = ['user_id', 'user_name', 'user_email', 'total_projects', 'overall_progress']
+                for field in required_fields:
+                    if field not in member:
+                        self.log_test(f"Member Progress Structure - {field}", False, f"Missing field: {field}")
+                    else:
+                        self.log_test(f"Member Progress Structure - {field}", True)
+                return response[0]['user_id']  # Return user ID for detailed test
+        elif success:
+            self.log_test("Admin Member Progress Response Format", False, "Response should be a list")
+            
+        return False
+
+    def test_admin_member_detail_endpoint(self, user_id):
+        """Test GET /api/projects/admin/member/{user_id}/projects"""
+        print("\n🔍 Testing Admin Member Detail Endpoint...")
+        if not self.admin_token or not user_id:
+            self.log_test("Admin Member Detail", False, "No admin token or user ID available")
+            return False
+        
+        success, response = self.run_test(
+            "Admin Member Detail",
+            "GET",
+            f"projects/admin/member/{user_id}/projects",
             200,
             headers={'Authorization': f'Bearer {self.admin_token}'}
         )
         
         if success:
-            required_fields = ['message', 'upgraded_count']
+            required_fields = ['member', 'projects']
             for field in required_fields:
                 if field not in response:
-                    self.log_test(f"Tier Recalculation - {field}", False, f"Missing field: {field}")
+                    self.log_test(f"Member Detail Response - {field}", False, f"Missing field: {field}")
                 else:
-                    self.log_test(f"Tier Recalculation - {field}", True)
+                    self.log_test(f"Member Detail Response - {field}", True)
         
         return success
 
-    def test_tier_logic(self):
-        """Test tier upgrade thresholds"""
-        print("\n🎯 Testing Tier Logic...")
+    def test_censored_referrals_activation(self):
+        """Test POST /api/projects/activate-censored-referrals-all"""
+        print("\n🔄 Testing Censored Referrals Auto-Activation...")
+        if not self.admin_token:
+            self.log_test("Activate Censored Referrals", False, "No admin token available")
+            return False
         
-        # Test tier calculation logic by checking expected tiers
-        tier_tests = [
-            (0, "JUNIOR_RECRUIT"),
-            (1, "FRONT_LINE"),
-            (3, "MID_LEVEL_MANAGER"),
-            (5, "SENIOR_MANAGER"),
-            (10, "TOP_LEADERSHIP")
-        ]
+        success, response = self.run_test(
+            "Activate Censored Referrals for All",
+            "POST",
+            "projects/activate-censored-referrals-all",
+            200,
+            headers={'Authorization': f'Bearer {self.admin_token}'}
+        )
         
-        for count, expected_tier in tier_tests:
-            # This is a logical test - we can't directly test the function
-            # but we can verify the logic is documented correctly
-            self.log_test(f"Tier Logic - {count} referrals = {expected_tier}", True)
+        if success:
+            if 'message' in response:
+                self.log_test("Censored Referrals Activation Response", True)
+            else:
+                self.log_test("Censored Referrals Activation Response", False, "Missing message field")
+        
+        return success
+
+    def test_duplicate_project_prevention(self):
+        """Test that duplicate projects cannot be started"""
+        print("\n🚫 Testing Duplicate Project Prevention...")
+        if not self.member_token:
+            self.log_test("Duplicate Project Prevention", False, "No member token available")
+            return False
+        
+        # Try to start the same project again (guaranteed_flips)
+        success, response = self.run_test(
+            "Attempt Duplicate Project Start",
+            "POST",
+            "projects/start/guaranteed_flips",
+            400,  # Expecting 400 error
+            headers={'Authorization': f'Bearer {self.member_token}'}
+        )
+        
+        if success:
+            self.log_test("Duplicate Project Prevention", True)
+        else:
+            # Check if it's the expected error
+            if response.get('status') == 400:
+                self.log_test("Duplicate Project Prevention", True)
+            else:
+                self.log_test("Duplicate Project Prevention", False, f"Unexpected status: {response.get('status')}")
         
         return True
 
