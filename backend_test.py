@@ -334,8 +334,8 @@ class ProjectTrackingTester:
         return True
 
 def main():
-    print("🚀 Starting Referral System Testing...")
-    tester = ReferralSystemTester()
+    print("🚀 Starting Project Tracking System Testing...")
+    tester = ProjectTrackingTester()
     
     # Login tests
     if not tester.login_admin():
@@ -346,23 +346,33 @@ def main():
         print("❌ Member login failed, stopping tests")
         return 1
     
-    # Test referral endpoints
-    tester.test_referral_code_endpoint()
-    tester.test_my_referrals_endpoint()
+    # Test project endpoints
+    projects = tester.test_my_projects_endpoint()
     
-    # Test registration with referral
-    new_user_id = tester.test_register_with_referral()
+    # Test starting a new project
+    project_id = tester.test_start_project_endpoint()
+    
+    # Test duplicate project prevention
+    tester.test_duplicate_project_prevention()
+    
+    # Test project tasks
+    if project_id:
+        tasks = tester.test_project_tasks_endpoint(project_id)
+        
+        # Test task status update
+        if tasks:
+            tester.test_update_task_status_endpoint(tasks)
+        
+        # Test project progress
+        tester.test_project_progress_endpoint(project_id)
     
     # Test admin endpoints
-    tester.test_admin_referral_stats()
-    tester.test_recalculate_tiers()
+    user_id = tester.test_admin_member_progress_endpoint()
+    if user_id:
+        tester.test_admin_member_detail_endpoint(user_id)
     
-    # Test approval and tier upgrade
-    if new_user_id:
-        tester.test_user_approval_and_tier_upgrade(new_user_id)
-    
-    # Test tier logic
-    tester.test_tier_logic()
+    # Test censored referrals activation
+    tester.test_censored_referrals_activation()
     
     # Print results
     print(f"\n📊 Test Results: {tester.tests_passed}/{tester.tests_run} passed")
