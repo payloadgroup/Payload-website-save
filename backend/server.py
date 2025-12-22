@@ -18,7 +18,7 @@ from models.schemas import UserRole, UserStatus
 from datetime import datetime, timezone
 
 # Import routers
-from routes import auth, users, admin, dashboard, payloads, missions, bank, headquarters, stations, basecamp, notifications, workzone, flips
+from routes import auth, users, admin, dashboard, payloads, missions, bank, headquarters, stations, basecamp, notifications, workzone, flips, projects
 
 app = FastAPI()
 
