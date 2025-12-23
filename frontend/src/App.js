@@ -174,6 +174,14 @@ function App() {
                 </ProtectedRoute>
               }
             />
+            <Route
+              path="/admin/funding-progress"
+              element={
+                <ProtectedRoute adminOnly={true}>
+                  <FundingProgressPage />
+                </ProtectedRoute>
+              }
+            />
           </Routes>
         </BrowserRouter>
         <Toaster position="top-right" theme="dark" />
