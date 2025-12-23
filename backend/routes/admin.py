@@ -173,7 +173,15 @@ async def update_user_status(request: UserApprovalRequest, background_tasks: Bac
         raise HTTPException(status_code=404, detail="User not found")
     
     previous_status = user.get("status")
-    await db.users.update_one({"id": request.user_id}, {"$set": {"status": request.status}})
+    
+    # Prepare update data
+    update_data = {"status": request.status}
+    
+    # Track approval date if being approved
+    if request.status == UserStatus.APPROVED and previous_status != UserStatus.APPROVED:
+        update_data["approved_at"] = datetime.now(timezone.utc).isoformat()
+    
+    await db.users.update_one({"id": request.user_id}, {"$set": update_data})
     
     # Handle referral count update and automatic tier upgrade
     if request.status == UserStatus.APPROVED and user.get("referred_by"):
