@@ -244,9 +244,60 @@ const FlipCategoryPage = () => {
       });
       toast.success(res.data.message);
       setJoinStatus(prev => ({ ...prev, [playId]: true }));
+      
+      // For arbitrage crypto plays, open the form after joining
+      const play = plays.find(p => p.id === playId);
+      if (section === 'arbitrage' && play?.title.toLowerCase().includes('crypto')) {
+        setCryptoFormOpen(prev => ({ ...prev, [playId]: true }));
+        setCryptoFormData(prev => ({ ...prev, [playId]: { name: user?.name || '', contact_number: '', telegram_handle: '' } }));
+      }
+      
       fetchPlays();
     } catch (error) {
       toast.error(error.response?.data?.detail || 'Failed to join play');
+    }
+  };
+
+  const handleCryptoSubmission = async (playId) => {
+    const formValues = cryptoFormData[playId] || {};
+    if (!formValues.name?.trim()) {
+      toast.error('Name is required');
+      return;
+    }
+    
+    setSubmittingCrypto(playId);
+    try {
+      const formPayload = new FormData();
+      formPayload.append('name', formValues.name);
+      if (formValues.contact_number) formPayload.append('contact_number', formValues.contact_number);
+      if (formValues.telegram_handle) formPayload.append('telegram_handle', formValues.telegram_handle);
+      
+      await axios.post(`${API}/flips/plays/${playId}/crypto-submission`, formPayload, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      toast.success('Details submitted successfully');
+      setCryptoFormOpen(prev => ({ ...prev, [playId]: false }));
+      setCryptoSubmissionStatus(prev => ({ ...prev, [playId]: true }));
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Failed to submit details');
+    } finally {
+      setSubmittingCrypto(null);
+    }
+  };
+
+  const handleViewCryptoSubmissions = async (play) => {
+    setCryptoSubmissionsModal(play);
+    setLoadingCryptoSubmissions(true);
+    try {
+      const res = await axios.get(`${API}/flips/plays/${play.id}/crypto-submissions`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setCryptoSubmissions(res.data);
+    } catch (error) {
+      toast.error('Failed to load submissions');
+    } finally {
+      setLoadingCryptoSubmissions(false);
     }
   };
 
