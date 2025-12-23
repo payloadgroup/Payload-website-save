@@ -162,28 +162,28 @@ async def submit_opportunity(
     if files:
         for file in files:
             if file.filename:
-            # Validate file type
-            allowed_types = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 
-                           'application/pdf', 'application/msword',
-                           'application/vnd.openxmlformats-officedocument.wordprocessingml.document']
-            
-            if file.content_type not in allowed_types:
-                raise HTTPException(
-                    status_code=400, 
-                    detail=f"File type not allowed: {file.filename}. Allowed: images, PDF, DOC, DOCX"
-                )
-            
-            # Read and encode file (store as base64 in DB for simplicity)
-            file_content = await file.read()
-            if len(file_content) > 10 * 1024 * 1024:  # 10MB limit
-                raise HTTPException(status_code=400, detail=f"File too large: {file.filename}. Max 10MB.")
-            
-            attachments.append({
-                "filename": file.filename,
-                "content_type": file.content_type,
-                "size": len(file_content),
-                "data": base64.b64encode(file_content).decode('utf-8')
-            })
+                # Validate file type
+                allowed_types = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 
+                               'application/pdf', 'application/msword',
+                               'application/vnd.openxmlformats-officedocument.wordprocessingml.document']
+                
+                if file.content_type not in allowed_types:
+                    raise HTTPException(
+                        status_code=400, 
+                        detail=f"File type not allowed: {file.filename}. Allowed: images, PDF, DOC, DOCX"
+                    )
+                
+                # Read and encode file (store as base64 in DB for simplicity)
+                file_content = await file.read()
+                if len(file_content) > 10 * 1024 * 1024:  # 10MB limit
+                    raise HTTPException(status_code=400, detail=f"File too large: {file.filename}. Max 10MB.")
+                
+                attachments.append({
+                    "filename": file.filename,
+                    "content_type": file.content_type,
+                    "size": len(file_content),
+                    "data": base64.b64encode(file_content).decode('utf-8')
+                })
     
     submission = {
         "id": str(uuid4()),
