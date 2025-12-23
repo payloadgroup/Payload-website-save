@@ -3,16 +3,18 @@ import { motion } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
 import axios from 'axios';
 import { toast } from 'sonner';
-import { X, Plus, DollarSign, TrendingUp, TrendingDown } from 'lucide-react';
+import { X, Plus, DollarSign, TrendingUp, TrendingDown, Trash2 } from 'lucide-react';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
 const BankModal = ({ onClose, onUpdate }) => {
-  const { token } = useAuth();
+  const { token, user } = useAuth();
+  const isAdmin = user?.role === 'admin';
   const [transactions, setTransactions] = useState([]);
   const [balance, setBalance] = useState(0);
   const [showForm, setShowForm] = useState(false);
+  const [deletingId, setDeletingId] = useState(null);
   const [formData, setFormData] = useState({
     type: 'deposit',
     amount: 0,
