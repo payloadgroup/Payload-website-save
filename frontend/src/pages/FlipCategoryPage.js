@@ -817,6 +817,94 @@ const FlipCategoryPage = () => {
           </div>
         )}
       </AnimatePresence>
+
+      {/* Crypto Submissions Modal (Admin) */}
+      <AnimatePresence>
+        {cryptoSubmissionsModal && (
+          <div 
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
+            onClick={() => setCryptoSubmissionsModal(null)}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              onClick={(e) => e.stopPropagation()}
+              className="bg-payload-surface border border-white/20 rounded-sm w-full max-w-3xl max-h-[90vh] overflow-hidden"
+            >
+              <div className="border-b border-white/10 p-4 sm:p-6 flex items-center justify-between">
+                <div>
+                  <h2 className="font-rajdhani font-bold text-xl uppercase flex items-center gap-2">
+                    <MessageSquare className="w-5 h-5 text-payload-alert" />
+                    CRYPTO SUBMISSIONS
+                  </h2>
+                  <p className="font-mono text-xs text-payload-muted">{cryptoSubmissionsModal.title}</p>
+                </div>
+                <button
+                  onClick={() => setCryptoSubmissionsModal(null)}
+                  className="p-2 hover:bg-white/10"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <div className="p-4 sm:p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+                {loadingCryptoSubmissions ? (
+                  <div className="text-center py-8 font-mono text-payload-muted">LOADING...</div>
+                ) : cryptoSubmissions.length === 0 ? (
+                  <div className="text-center py-8">
+                    <MessageSquare className="w-12 h-12 mx-auto mb-3 text-payload-muted opacity-30" />
+                    <p className="font-mono text-payload-muted">NO SUBMISSIONS YET</p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {cryptoSubmissions.map((submission) => (
+                      <div key={submission.id} className="bg-black/30 border border-white/10 rounded-sm p-4">
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="flex items-start gap-3">
+                            <div className="w-10 h-10 bg-payload-alert/20 rounded-full flex items-center justify-center font-rajdhani font-bold text-payload-alert">
+                              {submission.name.charAt(0).toUpperCase()}
+                            </div>
+                            <div>
+                              <button
+                                onClick={() => navigate(`/admin/members/${submission.user_id}`)}
+                                className="font-rajdhani font-bold text-lg hover:text-payload-neon transition-colors"
+                              >
+                                {submission.name}
+                              </button>
+                              <div className="font-mono text-xs text-payload-muted">{submission.user_email}</div>
+                              <div className="mt-2 space-y-1">
+                                {submission.contact_number && (
+                                  <div className="flex items-center gap-2 font-mono text-xs">
+                                    <Phone className="w-3 h-3 text-payload-cyan" />
+                                    <span className="text-payload-text">{submission.contact_number}</span>
+                                  </div>
+                                )}
+                                {submission.telegram_handle && (
+                                  <div className="flex items-center gap-2 font-mono text-xs">
+                                    <MessageSquare className="w-3 h-3 text-blue-400" />
+                                    <span className="text-payload-text">{submission.telegram_handle}</span>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <div className="font-mono text-[10px] text-payload-muted">SUBMITTED</div>
+                            <div className="font-mono text-xs text-payload-text">
+                              {new Date(submission.submitted_at).toLocaleString()}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
