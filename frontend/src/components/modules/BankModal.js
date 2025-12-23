@@ -122,7 +122,8 @@ const BankModal = ({ onClose, onUpdate }) => {
             <div className="font-mono text-4xl text-payload-alert">${balance.toFixed(2)}</div>
           </div>
 
-          {!showForm && (
+          {/* Only show Add Transaction for Admin */}
+          {isAdmin && !showForm && (
             <button
               data-testid="add-transaction-btn"
               onClick={() => setShowForm(true)}
