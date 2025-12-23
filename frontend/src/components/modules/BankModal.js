@@ -229,15 +229,28 @@ const BankModal = ({ onClose, onUpdate }) => {
                       </div>
                     </div>
                   </div>
-                  <div className="text-right">
-                    <div className={`font-mono text-lg ${
-                      transaction.type === 'deposit' ? 'text-payload-neon' : 'text-red-500'
-                    }`}>
-                      {transaction.type === 'deposit' ? '+' : '-'}${transaction.amount.toFixed(2)}
+                  <div className="flex items-center gap-4">
+                    <div className="text-right">
+                      <div className={`font-mono text-lg ${
+                        transaction.type === 'deposit' ? 'text-payload-neon' : 'text-red-500'
+                      }`}>
+                        {transaction.type === 'deposit' ? '+' : '-'}${transaction.amount.toFixed(2)}
+                      </div>
+                      <div className="font-mono text-xs text-payload-muted">
+                        Balance: ${transaction.balance_after.toFixed(2)}
+                      </div>
                     </div>
-                    <div className="font-mono text-xs text-payload-muted">
-                      Balance: ${transaction.balance_after.toFixed(2)}
-                    </div>
+                    {/* Delete button for Admin */}
+                    {isAdmin && (
+                      <button
+                        onClick={() => handleDeleteTransaction(transaction.id)}
+                        disabled={deletingId === transaction.id}
+                        className="p-2 hover:bg-red-500/20 text-red-500 rounded-none transition-colors disabled:opacity-50"
+                        title="Delete transaction"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    )}
                   </div>
                 </div>
               ))
