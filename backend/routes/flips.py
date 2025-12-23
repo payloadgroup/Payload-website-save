@@ -7,7 +7,9 @@ import base64
 
 from models.schemas import (
     User, MemberTier, FlipSectionType, FlipTierAccess, 
-    OpportunitySubmission, OpportunitySubmitRequest
+    OpportunitySubmission, OpportunitySubmitRequest,
+    PlayCreate, PlayUpdate, PlayResponse, PlayParticipation,
+    PlayParticipantUpdate, ContactStatus
 )
 from utils.dependencies import get_current_user, get_admin_user
 from utils.database import db
