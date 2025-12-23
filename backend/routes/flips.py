@@ -540,3 +540,96 @@ async def get_plays_stats(admin_user: User = Depends(get_admin_user)):
         "total_participants": total_participants,
         "section_stats": section_stats
     }
+
+
+# ============ CRYPTO SUBMISSIONS (Arbitrage) ============
+
+@router.post("/plays/{play_id}/crypto-submission")
+async def submit_crypto_details(
+    play_id: str,
+    name: str = Form(...),
+    contact_number: Optional[str] = Form(None),
+    telegram_handle: Optional[str] = Form(None),
+    current_user: User = Depends(get_current_user)
+):
+    """Member submits additional details after joining a Crypto play in Arbitrage"""
+    # Verify play exists and is in arbitrage section
+    play = await db.flip_plays.find_one({"id": play_id}, {"_id": 0})
+    if not play:
+        raise HTTPException(status_code=404, detail="Play not found")
+    
+    # Check if user is a participant
+    participation = await db.play_participants.find_one({
+        "play_id": play_id,
+        "user_id": current_user.id
+    })
+    if not participation:
+        raise HTTPException(status_code=403, detail="You must join this play first")
+    
+    # Check if already submitted
+    existing = await db.crypto_submissions.find_one({
+        "play_id": play_id,
+        "user_id": current_user.id
+    })
+    if existing:
+        raise HTTPException(status_code=400, detail="You have already submitted your details")
+    
+    submission = {
+        "id": str(uuid4()),
+        "play_id": play_id,
+        "user_id": current_user.id,
+        "user_name": current_user.name,
+        "user_email": current_user.email,
+        "name": name,
+        "contact_number": contact_number,
+        "telegram_handle": telegram_handle,
+        "submitted_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    await db.crypto_submissions.insert_one(submission)
+    
+    return {
+        "message": "Your details have been submitted successfully",
+        "submission_id": submission["id"]
+    }
+
+
+@router.get("/plays/{play_id}/crypto-submission/my-status")
+async def get_my_crypto_submission_status(
+    play_id: str,
+    current_user: User = Depends(get_current_user)
+):
+    """Check if current user has submitted crypto details"""
+    submission = await db.crypto_submissions.find_one({
+        "play_id": play_id,
+        "user_id": current_user.id
+    }, {"_id": 0})
+    
+    return {
+        "submitted": submission is not None,
+        "submission": submission
+    }
+
+
+@router.get("/plays/{play_id}/crypto-submissions")
+async def get_crypto_submissions(
+    play_id: str,
+    admin_user: User = Depends(get_admin_user)
+):
+    """Admin gets all crypto submissions for a play"""
+    submissions = await db.crypto_submissions.find(
+        {"play_id": play_id},
+        {"_id": 0}
+    ).sort("submitted_at", -1).to_list(1000)
+    
+    return submissions
+
+
+@router.get("/plays/{play_id}/crypto-submissions/count")
+async def get_crypto_submission_count(
+    play_id: str,
+    current_user: User = Depends(get_current_user)
+):
+    """Get count of crypto submissions for a play"""
+    count = await db.crypto_submissions.count_documents({"play_id": play_id})
+    return {"count": count}
