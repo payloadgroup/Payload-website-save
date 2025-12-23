@@ -420,13 +420,13 @@ async def get_member_projects_detail(user_id: str, admin_user: User = Depends(ge
     }
 
 
-# ============ AUTO-ACTIVATE CENSORED REFERRALS ============
+# ============ AUTO-ACTIVATE PROJECTS ============
 
-async def ensure_censored_referrals_active(user_id: str):
-    """Ensure Censored Referrals project is active for a user"""
+async def ensure_project_active(user_id: str, business_type: BusinessType):
+    """Ensure a project is active for a user"""
     existing = await db.member_projects.find_one({
         "user_id": user_id,
-        "business_type": BusinessType.CENSORED_REFERRALS
+        "business_type": business_type
     })
     
     if not existing:
@@ -434,8 +434,8 @@ async def ensure_censored_referrals_active(user_id: str):
         project = {
             "id": project_id,
             "user_id": user_id,
-            "business_type": BusinessType.CENSORED_REFERRALS,
-            "business_name": BUSINESS_NAMES[BusinessType.CENSORED_REFERRALS],
+            "business_type": business_type,
+            "business_name": BUSINESS_NAMES.get(business_type, str(business_type)),
             "status": "active",
             "started_at": datetime.now(timezone.utc).isoformat(),
             "completed_at": None
@@ -443,7 +443,7 @@ async def ensure_censored_referrals_active(user_id: str):
         await db.member_projects.insert_one(project)
         
         # Create tasks from defaults
-        default_tasks = DEFAULT_TASKS.get(BusinessType.CENSORED_REFERRALS, [])
+        default_tasks = DEFAULT_TASKS.get(business_type, [])
         for task in default_tasks:
             member_task = {
                 "id": str(uuid.uuid4()),
@@ -460,6 +460,16 @@ async def ensure_censored_referrals_active(user_id: str):
         
         return project
     return existing
+
+
+async def ensure_censored_referrals_active(user_id: str):
+    """Ensure Censored Referrals project is active for a user"""
+    return await ensure_project_active(user_id, BusinessType.CENSORED_REFERRALS)
+
+
+async def ensure_guaranteed_flips_active(user_id: str):
+    """Ensure Guaranteed Flips project is active for a user"""
+    return await ensure_project_active(user_id, BusinessType.GUARANTEED_FLIPS)
 
 
 @router.post("/activate-censored-referrals-all")
@@ -479,3 +489,42 @@ async def activate_censored_referrals_for_all(admin_user: User = Depends(get_adm
             activated_count += 1
     
     return {"message": f"Activated Censored Referrals for {activated_count} members"}
+
+
+@router.post("/activate-guaranteed-flips-all")
+async def activate_guaranteed_flips_for_all(admin_user: User = Depends(get_admin_user)):
+    """Activate Guaranteed Flips for all existing approved members"""
+    from models.schemas import UserStatus
+    
+    members = await db.users.find(
+        {"role": "member", "status": UserStatus.APPROVED},
+        {"_id": 0}
+    ).to_list(1000)
+    
+    activated_count = 0
+    for member in members:
+        result = await ensure_guaranteed_flips_active(member["id"])
+        if result:
+            activated_count += 1
+    
+    return {"message": f"Activated Guaranteed Flips for {activated_count} members"}
+
+
+# ============ DEACTIVATE PROJECTS ============
+
+@router.post("/deactivate/{project_id}")
+async def deactivate_project(project_id: str, current_user: User = Depends(get_current_user)):
+    """Deactivate a project (member removes it from their active list)"""
+    project = await db.member_projects.find_one({"id": project_id}, {"_id": 0})
+    
+    if not project:
+        raise HTTPException(status_code=404, detail="Project not found")
+    
+    if project["user_id"] != current_user.id:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    # Delete the project and its tasks
+    await db.member_projects.delete_one({"id": project_id})
+    await db.member_tasks.delete_many({"project_id": project_id})
+    
+    return {"message": "Project deactivated successfully"}
