@@ -66,6 +66,25 @@ const BankModal = ({ onClose, onUpdate }) => {
     }
   };
 
+  const handleDeleteTransaction = async (transactionId) => {
+    if (!window.confirm('Are you sure you want to delete this transaction?')) return;
+    
+    setDeletingId(transactionId);
+    try {
+      await axios.delete(`${API}/transactions/${transactionId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      toast.success('Transaction deleted');
+      fetchTransactions();
+      fetchBalance();
+      onUpdate();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Failed to delete transaction');
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
   const handleBackdropClick = (e) => {
     if (e.target === e.currentTarget) {
       onClose();
