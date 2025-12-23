@@ -308,30 +308,348 @@ class PayloadFeatureTester:
         
         return success
 
-    def test_duplicate_project_prevention(self):
-        """Test that duplicate projects cannot be started"""
-        print("\n🚫 Testing Duplicate Project Prevention...")
-        if not self.member_token:
-            self.log_test("Duplicate Project Prevention", False, "No member token available")
-            return False
+    def test_guaranteed_flips_apis(self):
+        """Test Guaranteed Flips API endpoints"""
+        print("\n🎯 Testing Guaranteed Flips APIs...")
         
-        # Try to start the same project again (guaranteed_flips)
+        # Test get plays for property section (should be accessible to all)
         success, response = self.run_test(
-            "Attempt Duplicate Project Start",
-            "POST",
-            "projects/start/guaranteed_flips",
-            400,  # Expecting 400 error
+            "Get Property Plays",
+            "GET",
+            "flips/plays/property",
+            200,
+            headers={'Authorization': f'Bearer {self.member_token}'}
+        )
+        
+        if success and isinstance(response, list):
+            self.log_test("Property Plays Response Format", True)
+        elif success:
+            self.log_test("Property Plays Response Format", False, "Response should be a list")
+        
+        # Test member access check
+        success, response = self.run_test(
+            "Get Member Flip Access",
+            "GET",
+            "flips/my-access",
+            200,
             headers={'Authorization': f'Bearer {self.member_token}'}
         )
         
         if success:
-            self.log_test("Duplicate Project Prevention", True)
-        else:
-            # Check if it's the expected error
-            if response.get('status') == 400:
-                self.log_test("Duplicate Project Prevention", True)
+            required_fields = ['user_tier', 'sections']
+            for field in required_fields:
+                if field not in response:
+                    self.log_test(f"Member Access Response - {field}", False, f"Missing field: {field}")
+                else:
+                    self.log_test(f"Member Access Response - {field}", True)
+        
+        return success
+
+    def test_admin_play_management(self):
+        """Test Admin Play CRUD operations"""
+        print("\n⚙️ Testing Admin Play Management...")
+        
+        if not self.admin_token:
+            self.log_test("Admin Play Management", False, "No admin token available")
+            return False
+        
+        # Create a play
+        play_data = {
+            "title": "Test Property Deal",
+            "description": "A test property investment opportunity",
+            "section": "property",
+            "min_investment": 10000,
+            "expected_return": "20%",
+            "deadline": "2024-12-31",
+            "is_active": True
+        }
+        
+        success, response = self.run_test(
+            "Create Play",
+            "POST",
+            "flips/plays",
+            200,
+            data=play_data,
+            headers={'Authorization': f'Bearer {self.admin_token}'}
+        )
+        
+        if success and 'id' in response:
+            self.created_play_id = response['id']
+            self.log_test("Play Creation Response", True)
+            
+            # Test update play
+            update_data = {
+                "title": "Updated Test Property Deal",
+                "expected_return": "25%"
+            }
+            
+            success, response = self.run_test(
+                "Update Play",
+                "PUT",
+                f"flips/plays/{self.created_play_id}",
+                200,
+                data=update_data,
+                headers={'Authorization': f'Bearer {self.admin_token}'}
+            )
+            
+            if success and response.get('title') == "Updated Test Property Deal":
+                self.log_test("Play Update Verification", True)
             else:
-                self.log_test("Duplicate Project Prevention", False, f"Unexpected status: {response.get('status')}")
+                self.log_test("Play Update Verification", False, "Title not updated correctly")
+        
+        return success
+
+    def test_member_play_participation(self):
+        """Test Member Play Participation"""
+        print("\n👥 Testing Member Play Participation...")
+        
+        if not self.member_token or not self.created_play_id:
+            self.log_test("Member Play Participation", False, "No member token or play ID available")
+            return False
+        
+        # Join a play
+        success, response = self.run_test(
+            "Join Play",
+            "POST",
+            f"flips/plays/{self.created_play_id}/join",
+            200,
+            headers={'Authorization': f'Bearer {self.member_token}'}
+        )
+        
+        if success:
+            if 'message' in response and 'instructions' in response['message'].lower():
+                self.log_test("Join Play Message Check", True)
+            else:
+                self.log_test("Join Play Message Check", False, "Expected instructions message not found")
+        
+        # Check join status
+        success, response = self.run_test(
+            "Check Play Join Status",
+            "GET",
+            f"flips/plays/{self.created_play_id}/my-status",
+            200,
+            headers={'Authorization': f'Bearer {self.member_token}'}
+        )
+        
+        if success and response.get('joined') == True:
+            self.log_test("Play Join Status Verification", True)
+        else:
+            self.log_test("Play Join Status Verification", False, "Join status not correct")
+        
+        return success
+
+    def test_admin_participant_management(self):
+        """Test Admin Participant Management"""
+        print("\n📋 Testing Admin Participant Management...")
+        
+        if not self.admin_token or not self.created_play_id:
+            self.log_test("Admin Participant Management", False, "No admin token or play ID available")
+            return False
+        
+        # Get participants
+        success, response = self.run_test(
+            "Get Play Participants",
+            "GET",
+            f"flips/plays/{self.created_play_id}/participants",
+            200,
+            headers={'Authorization': f'Bearer {self.admin_token}'}
+        )
+        
+        if success and isinstance(response, list):
+            self.log_test("Participants List Format", True)
+            
+            if len(response) > 0:
+                participant = response[0]
+                user_id = participant.get('user_id')
+                
+                if user_id:
+                    # Update contact status
+                    success, response = self.run_test(
+                        "Update Contact Status",
+                        "PUT",
+                        f"flips/plays/{self.created_play_id}/participants/{user_id}/contact-status",
+                        200,
+                        data={"contact_status": "contacted"},
+                        headers={'Authorization': f'Bearer {self.admin_token}'}
+                    )
+                    
+                    if success:
+                        self.log_test("Contact Status Update", True)
+                    else:
+                        self.log_test("Contact Status Update", False, "Failed to update contact status")
+        
+        return success
+
+    def test_opportunity_submissions(self):
+        """Test Member Opportunity Submissions"""
+        print("\n📝 Testing Opportunity Submissions...")
+        
+        if not self.member_token:
+            self.log_test("Opportunity Submissions", False, "No member token available")
+            return False
+        
+        # Submit an opportunity
+        success, response = self.run_test(
+            "Submit Opportunity",
+            "POST",
+            "flips/submit-opportunity",
+            200,
+            data={"content": "Test opportunity submission for automated testing"},
+            headers={'Authorization': f'Bearer {self.member_token}', 'Content-Type': 'application/json'}
+        )
+        
+        if success and 'submission_id' in response:
+            self.created_submission_id = response['submission_id']
+            self.log_test("Opportunity Submission", True)
+        
+        # Get member's submissions
+        success, response = self.run_test(
+            "Get My Submissions",
+            "GET",
+            "flips/my-submissions",
+            200,
+            headers={'Authorization': f'Bearer {self.member_token}'}
+        )
+        
+        if success and isinstance(response, list):
+            self.log_test("My Submissions Format", True)
+        
+        return success
+
+    def test_admin_submission_management(self):
+        """Test Admin Submission Management"""
+        print("\n🔧 Testing Admin Submission Management...")
+        
+        if not self.admin_token:
+            self.log_test("Admin Submission Management", False, "No admin token available")
+            return False
+        
+        # Get all submissions
+        success, response = self.run_test(
+            "Get All Submissions",
+            "GET",
+            "flips/admin/submissions",
+            200,
+            headers={'Authorization': f'Bearer {self.admin_token}'}
+        )
+        
+        if success and isinstance(response, list):
+            self.log_test("All Submissions Format", True)
+            
+            if self.created_submission_id:
+                # Mark submission as achieved
+                success, response = self.run_test(
+                    "Mark Submission Achieved",
+                    "POST",
+                    f"flips/admin/submission/{self.created_submission_id}/status?status=achieved",
+                    200,
+                    headers={'Authorization': f'Bearer {self.admin_token}'}
+                )
+                
+                if success:
+                    self.log_test("Mark Submission Achieved", True)
+        
+        return success
+
+    def test_funding_apis(self):
+        """Test Funding Progress APIs"""
+        print("\n💰 Testing Funding Progress APIs...")
+        
+        if not self.admin_token:
+            self.log_test("Funding APIs", False, "No admin token available")
+            return False
+        
+        # Get funding summary
+        success, response = self.run_test(
+            "Get Funding Summary",
+            "GET",
+            "funding/progress/summary",
+            200,
+            headers={'Authorization': f'Bearer {self.admin_token}'}
+        )
+        
+        if success:
+            required_fields = ['total_members', 'registered_count', 'funded_count']
+            for field in required_fields:
+                if field not in response:
+                    self.log_test(f"Funding Summary - {field}", False, f"Missing field: {field}")
+                else:
+                    self.log_test(f"Funding Summary - {field}", True)
+        
+        # Get all members funding status
+        success, response = self.run_test(
+            "Get Members Funding Status",
+            "GET",
+            "funding/progress/members",
+            200,
+            headers={'Authorization': f'Bearer {self.admin_token}'}
+        )
+        
+        if success and isinstance(response, list):
+            self.log_test("Members Funding Status Format", True)
+        
+        return success
+
+    def test_cluster_apis(self):
+        """Test Cluster Syndicate APIs"""
+        print("\n🏢 Testing Cluster Syndicate APIs...")
+        
+        # Get cluster summary (available to all users)
+        success, response = self.run_test(
+            "Get Cluster Summary",
+            "GET",
+            "funding/cluster/summary",
+            200,
+            headers={'Authorization': f'Bearer {self.member_token}'}
+        )
+        
+        if success:
+            required_fields = ['clusters', 'total_capital']
+            for field in required_fields:
+                if field not in response:
+                    self.log_test(f"Cluster Summary - {field}", False, f"Missing field: {field}")
+                else:
+                    self.log_test(f"Cluster Summary - {field}", True)
+        
+        return success
+
+    def test_bank_total_api(self):
+        """Test Bank Total API"""
+        print("\n🏦 Testing Bank Total API...")
+        
+        # Get bank total (available to all users)
+        success, response = self.run_test(
+            "Get Bank Total",
+            "GET",
+            "funding/bank/total",
+            200,
+            headers={'Authorization': f'Bearer {self.member_token}'}
+        )
+        
+        if success:
+            if 'total' in response and isinstance(response['total'], (int, float)):
+                self.log_test("Bank Total Format", True)
+            else:
+                self.log_test("Bank Total Format", False, "Total should be a number")
+        
+        return success
+
+    def cleanup_test_data(self):
+        """Clean up test data"""
+        print("\n🧹 Cleaning up test data...")
+        
+        if self.admin_token and self.created_play_id:
+            # Delete the test play
+            success, response = self.run_test(
+                "Delete Test Play",
+                "DELETE",
+                f"flips/plays/{self.created_play_id}",
+                200,
+                headers={'Authorization': f'Bearer {self.admin_token}'}
+            )
+            
+            if success:
+                self.log_test("Test Play Cleanup", True)
         
         return True
 
