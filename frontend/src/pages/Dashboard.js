@@ -41,11 +41,19 @@ const Dashboard = () => {
   const [announcements, setAnnouncements] = useState([]);
   const [dismissedAnnouncements, setDismissedAnnouncements] = useState([]);
   const [profile, setProfile] = useState(null);
+  const [clusterData, setClusterData] = useState({ clusters: [], total_capital: 0 });
+  const [bankTotal, setBankTotal] = useState(0);
+  const [fundingSummary, setFundingSummary] = useState({ total_members: 0, registered_count: 0, funded_count: 0 });
 
   useEffect(() => {
     fetchDashboardData();
     fetchAnnouncements();
     fetchProfile();
+    fetchClusterData();
+    fetchBankTotal();
+    if (user?.role === 'admin') {
+      fetchFundingSummary();
+    }
   }, []);
 
   const fetchProfile = async () => {
