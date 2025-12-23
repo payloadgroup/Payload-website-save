@@ -134,7 +134,7 @@ const BankModal = ({ onClose, onUpdate }) => {
             </button>
           )}
 
-          {showForm && (
+          {isAdmin && showForm && (
             <form onSubmit={handleSubmit} className="bg-black/30 border border-white/10 p-6 rounded-sm mb-6">
               <h3 className="font-mono text-xs uppercase tracking-widest text-payload-muted mb-4">NEW TRANSACTION</h3>
               <div className="space-y-4">
