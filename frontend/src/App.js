@@ -165,6 +165,14 @@ function App() {
                 </ProtectedRoute>
               }
             />
+            <Route
+              path="/guaranteed-flips/:section"
+              element={
+                <ProtectedRoute>
+                  <FlipCategoryPage />
+                </ProtectedRoute>
+              }
+            />
           </Routes>
         </BrowserRouter>
         <Toaster position="top-right" theme="dark" />
