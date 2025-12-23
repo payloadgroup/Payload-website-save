@@ -1,5 +1,5 @@
 {
-  "summary": "40/40 tests passed",
+  "summary": "48/51 tests passed",
   "tests": [
     {
       "test": "Admin Login",
@@ -8,6 +8,171 @@
     },
     {
       "test": "Member Login",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Get Property Plays",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Property Plays Response Format",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Get Member Flip Access",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Member Access Response - user_tier",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Member Access Response - sections",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Create Play",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Play Creation Response",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Update Play",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Play Update Verification",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Join Play",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Join Play Message Check",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Check Play Join Status",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Play Join Status Verification",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Get Play Participants",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Participants List Format",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Update Contact Status",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Contact Status Update",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Submit Opportunity",
+      "success": false,
+      "details": "Expected 200, got 422"
+    },
+    {
+      "test": "Get My Submissions",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "My Submissions Format",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Get All Submissions",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "All Submissions Format",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Get Funding Summary",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Funding Summary - total_members",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Funding Summary - registered_count",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Funding Summary - funded_count",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Get Members Funding Status",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Members Funding Status Format",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Get Cluster Summary",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Cluster Summary - clusters",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Cluster Summary - total_capital",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Get Bank Total",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Bank Total Format",
       "success": true,
       "details": ""
     },
@@ -23,123 +188,8 @@
     },
     {
       "test": "Start Guaranteed Flips Project",
-      "success": true,
-      "details": ""
-    },
-    {
-      "test": "Start Project Response - id",
-      "success": true,
-      "details": ""
-    },
-    {
-      "test": "Start Project Response - user_id",
-      "success": true,
-      "details": ""
-    },
-    {
-      "test": "Start Project Response - business_type",
-      "success": true,
-      "details": ""
-    },
-    {
-      "test": "Start Project Response - business_name",
-      "success": true,
-      "details": ""
-    },
-    {
-      "test": "Start Project Response - status",
-      "success": true,
-      "details": ""
-    },
-    {
-      "test": "Attempt Duplicate Project Start",
-      "success": true,
-      "details": ""
-    },
-    {
-      "test": "Duplicate Project Prevention",
-      "success": true,
-      "details": ""
-    },
-    {
-      "test": "Get Project Tasks",
-      "success": true,
-      "details": ""
-    },
-    {
-      "test": "Project Tasks Response Format",
-      "success": true,
-      "details": ""
-    },
-    {
-      "test": "Task Structure - id",
-      "success": true,
-      "details": ""
-    },
-    {
-      "test": "Task Structure - project_id",
-      "success": true,
-      "details": ""
-    },
-    {
-      "test": "Task Structure - title",
-      "success": true,
-      "details": ""
-    },
-    {
-      "test": "Task Structure - description",
-      "success": true,
-      "details": ""
-    },
-    {
-      "test": "Task Structure - status",
-      "success": true,
-      "details": ""
-    },
-    {
-      "test": "Task Structure - order",
-      "success": true,
-      "details": ""
-    },
-    {
-      "test": "Update Task to In Progress",
-      "success": true,
-      "details": ""
-    },
-    {
-      "test": "Task Status Update Verification",
-      "success": true,
-      "details": ""
-    },
-    {
-      "test": "Get Project Progress",
-      "success": true,
-      "details": ""
-    },
-    {
-      "test": "Progress Response - project_id",
-      "success": true,
-      "details": ""
-    },
-    {
-      "test": "Progress Response - business_name",
-      "success": true,
-      "details": ""
-    },
-    {
-      "test": "Progress Response - total_tasks",
-      "success": true,
-      "details": ""
-    },
-    {
-      "test": "Progress Response - completed_tasks",
-      "success": true,
-      "details": ""
-    },
-    {
-      "test": "Progress Response - progress_percentage",
-      "success": true,
-      "details": ""
+      "success": false,
+      "details": "Expected 200, got 400"
     },
     {
       "test": "Admin Member Progress",
@@ -200,7 +250,12 @@
       "test": "Censored Referrals Activation Response",
       "success": true,
       "details": ""
+    },
+    {
+      "test": "Delete Test Play",
+      "success": false,
+      "details": "Request failed: cannot access local variable 'response' where it is not associated with a value"
     }
   ],
-  "timestamp": "2025-12-22T17:12:37.206019"
+  "timestamp": "2025-12-23T09:08:36.831016"
 }
