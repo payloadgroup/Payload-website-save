@@ -414,3 +414,86 @@ class MemberProgressResponse(BaseModel):
     active_projects: int
     completed_projects: int
     overall_progress: float  # percentage
+
+
+# ============ GUARANTEED FLIPS - PLAYS SYSTEM ============
+
+class ContactStatus(str, Enum):
+    NOT_CONTACTED = "not_contacted"
+    CONTACTED = "contacted"
+
+class PlayCreate(BaseModel):
+    title: str
+    description: str
+    section: FlipSectionType
+    min_investment: Optional[float] = None
+    expected_return: Optional[str] = None
+    deadline: Optional[str] = None
+    is_active: bool = True
+
+class PlayUpdate(BaseModel):
+    title: Optional[str] = None
+    description: Optional[str] = None
+    min_investment: Optional[float] = None
+    expected_return: Optional[str] = None
+    deadline: Optional[str] = None
+    is_active: Optional[bool] = None
+
+class PlayResponse(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str
+    title: str
+    description: str
+    section: FlipSectionType
+    min_investment: Optional[float] = None
+    expected_return: Optional[str] = None
+    deadline: Optional[str] = None
+    is_active: bool
+    participant_count: int = 0
+    created_at: str
+    created_by: str
+
+class PlayParticipation(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str
+    play_id: str
+    user_id: str
+    user_name: str
+    user_email: str
+    contact_status: ContactStatus = ContactStatus.NOT_CONTACTED
+    joined_at: str
+
+class PlayParticipantUpdate(BaseModel):
+    contact_status: ContactStatus
+
+
+# ============ FUNDING PROGRESS SYSTEM ============
+
+class FundingStatus(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    user_id: str
+    user_name: str
+    user_email: str
+    business_registered: bool = False
+    business_funded: bool = False
+    registered_at: Optional[str] = None
+    funded_at: Optional[str] = None
+
+class FundingStatusUpdate(BaseModel):
+    business_registered: Optional[bool] = None
+    business_funded: Optional[bool] = None
+
+
+# ============ CLUSTER SYNDICATE - MEMBER VALUES ============
+
+class ClusterMemberValue(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    user_id: str
+    user_name: str
+    business_type: str
+    value: float = 0.0
+    updated_at: Optional[str] = None
+    updated_by: Optional[str] = None
+
+class ClusterMemberValueUpdate(BaseModel):
+    value: float
