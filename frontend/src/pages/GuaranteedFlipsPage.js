@@ -7,7 +7,7 @@ import { toast } from 'sonner';
 import { 
   ArrowLeft, TrendingUp, Lock, Unlock, Building, Briefcase, Star, 
   ArrowRightLeft, Shield, Send, Paperclip, X, FileText, Image, 
-  Eye, Archive, Clock, CheckCircle, ChevronDown, ChevronUp, Settings, Award
+  Eye, Clock, CheckCircle, ChevronDown, ChevronUp, Settings, Award
 } from 'lucide-react';
 import PayloadLogo from '@/components/PayloadLogo';
 
