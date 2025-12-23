@@ -654,8 +654,8 @@ class PayloadFeatureTester:
         return True
 
 def main():
-    print("🚀 Starting Project Tracking System Testing...")
-    tester = ProjectTrackingTester()
+    print("🚀 Starting Payload Feature Testing...")
+    tester = PayloadFeatureTester()
     
     # Login tests
     if not tester.login_admin():
@@ -666,24 +666,25 @@ def main():
         print("❌ Member login failed, stopping tests")
         return 1
     
-    # Test project endpoints
-    projects = tester.test_my_projects_endpoint()
+    # Test new features
+    tester.test_guaranteed_flips_apis()
+    tester.test_admin_play_management()
+    tester.test_member_play_participation()
+    tester.test_admin_participant_management()
+    tester.test_opportunity_submissions()
+    tester.test_admin_submission_management()
+    tester.test_funding_apis()
+    tester.test_cluster_apis()
+    tester.test_bank_total_api()
     
-    # Test starting a new project
+    # Test existing project functionality
+    projects = tester.test_my_projects_endpoint()
     project_id = tester.test_start_project_endpoint()
     
-    # Test duplicate project prevention
-    tester.test_duplicate_project_prevention()
-    
-    # Test project tasks
     if project_id:
         tasks = tester.test_project_tasks_endpoint(project_id)
-        
-        # Test task status update
         if tasks:
             tester.test_update_task_status_endpoint(tasks)
-        
-        # Test project progress
         tester.test_project_progress_endpoint(project_id)
     
     # Test admin endpoints
@@ -691,8 +692,10 @@ def main():
     if user_id:
         tester.test_admin_member_detail_endpoint(user_id)
     
-    # Test censored referrals activation
     tester.test_censored_referrals_activation()
+    
+    # Cleanup
+    tester.cleanup_test_data()
     
     # Print results
     print(f"\n📊 Test Results: {tester.tests_passed}/{tester.tests_run} passed")
