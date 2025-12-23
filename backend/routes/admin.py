@@ -27,7 +27,21 @@ async def get_pending_users(admin_user: User = Depends(get_admin_user)):
 
 @router.get("/members", response_model=List[User])
 async def get_all_members(admin_user: User = Depends(get_admin_user)):
-    members = await db.users.find({"role": UserRole.MEMBER, "status": UserStatus.APPROVED}, {"_id": 0, "password": 0}).to_list(1000)
+    # Get all approved members, sorted by approved_at (most recent first)
+    members = await db.users.find(
+        {"role": UserRole.MEMBER, "status": UserStatus.APPROVED}, 
+        {"_id": 0, "password": 0}
+    ).to_list(1000)
+    
+    # Sort members: those with approved_at first (most recent first), then others
+    def get_sort_key(member):
+        approved_at = member.get("approved_at")
+        if approved_at:
+            return (0, approved_at)  # 0 = has approval date, then sort by date desc
+        return (1, member.get("created_at", ""))  # 1 = no approval date
+    
+    members.sort(key=get_sort_key, reverse=True)
+    
     return [User(**user) for user in members]
 
 @router.get("/locked-users", response_model=List[User])
