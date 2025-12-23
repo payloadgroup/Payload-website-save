@@ -7,7 +7,8 @@ import { toast } from 'sonner';
 import { 
   ArrowLeft, Building, Briefcase, Star, ArrowRightLeft, Shield, 
   Plus, Edit, Trash2, X, Users, Check, Phone, PhoneOff, 
-  ChevronDown, ChevronUp, DollarSign, Calendar, TrendingUp
+  ChevronDown, ChevronUp, DollarSign, Calendar, TrendingUp,
+  MessageSquare, Send, User as UserIcon
 } from 'lucide-react';
 import PayloadLogo from '@/components/PayloadLogo';
 
@@ -79,6 +80,18 @@ const FlipCategoryPage = () => {
   
   // Member join status
   const [joinStatus, setJoinStatus] = useState({});
+  
+  // Crypto submission state (for Arbitrage)
+  const [cryptoFormOpen, setCryptoFormOpen] = useState({});
+  const [cryptoSubmissionStatus, setCryptoSubmissionStatus] = useState({});
+  const [cryptoFormData, setCryptoFormData] = useState({});
+  const [submittingCrypto, setSubmittingCrypto] = useState(null);
+  const [cryptoSubmissionCounts, setCryptoSubmissionCounts] = useState({});
+  
+  // Admin: Crypto submissions modal
+  const [cryptoSubmissionsModal, setCryptoSubmissionsModal] = useState(null);
+  const [cryptoSubmissions, setCryptoSubmissions] = useState([]);
+  const [loadingCryptoSubmissions, setLoadingCryptoSubmissions] = useState(false);
 
   const config = SECTION_CONFIG[section] || SECTION_CONFIG.property;
   const IconComponent = config.icon;
