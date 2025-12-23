@@ -302,3 +302,240 @@ async def get_attachment(
             }
     
     raise HTTPException(status_code=404, detail="Attachment not found")
+
+
+# ============ PLAYS (OPPORTUNITIES) SYSTEM ============
+
+@router.get("/plays/{section}")
+async def get_plays_for_section(
+    section: FlipSectionType,
+    current_user: User = Depends(get_current_user)
+):
+    """Get all plays for a section (checks access for members)"""
+    user_tier = current_user.tier or MemberTier.JUNIOR_RECRUIT
+    is_admin = current_user.role == "admin"
+    
+    # Check access for members
+    if not is_admin:
+        settings = await db.flip_tier_settings.find_one({"type": "tier_access"}, {"_id": 0})
+        tier_access = settings.get("access", {}) if settings else {}
+        required_tier = tier_access.get(section.value, DEFAULT_TIER_ACCESS[section].value)
+        
+        if not user_has_access(user_tier, MemberTier(required_tier)):
+            raise HTTPException(status_code=403, detail="You don't have access to this section")
+    
+    # Get plays with participant counts
+    plays = await db.flip_plays.find(
+        {"section": section, "is_active": True} if not is_admin else {"section": section},
+        {"_id": 0}
+    ).sort("created_at", -1).to_list(100)
+    
+    # Add participant counts
+    for play in plays:
+        count = await db.play_participants.count_documents({"play_id": play["id"]})
+        play["participant_count"] = count
+    
+    return plays
+
+
+@router.post("/plays", response_model=PlayResponse)
+async def create_play(
+    play_data: PlayCreate,
+    admin_user: User = Depends(get_admin_user)
+):
+    """Admin creates a new play/opportunity"""
+    play = {
+        "id": str(uuid4()),
+        "title": play_data.title,
+        "description": play_data.description,
+        "section": play_data.section,
+        "min_investment": play_data.min_investment,
+        "expected_return": play_data.expected_return,
+        "deadline": play_data.deadline,
+        "is_active": play_data.is_active,
+        "participant_count": 0,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "created_by": admin_user.id
+    }
+    
+    await db.flip_plays.insert_one(play)
+    return PlayResponse(**play)
+
+
+@router.put("/plays/{play_id}", response_model=PlayResponse)
+async def update_play(
+    play_id: str,
+    play_data: PlayUpdate,
+    admin_user: User = Depends(get_admin_user)
+):
+    """Admin updates a play"""
+    update_data = {k: v for k, v in play_data.model_dump().items() if v is not None}
+    if not update_data:
+        raise HTTPException(status_code=400, detail="No fields to update")
+    
+    update_data["updated_at"] = datetime.now(timezone.utc).isoformat()
+    update_data["updated_by"] = admin_user.id
+    
+    result = await db.flip_plays.update_one({"id": play_id}, {"$set": update_data})
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Play not found")
+    
+    play = await db.flip_plays.find_one({"id": play_id}, {"_id": 0})
+    count = await db.play_participants.count_documents({"play_id": play_id})
+    play["participant_count"] = count
+    return PlayResponse(**play)
+
+
+@router.delete("/plays/{play_id}")
+async def delete_play(
+    play_id: str,
+    admin_user: User = Depends(get_admin_user)
+):
+    """Admin deletes a play"""
+    result = await db.flip_plays.delete_one({"id": play_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Play not found")
+    
+    # Also delete participations
+    await db.play_participants.delete_many({"play_id": play_id})
+    
+    return {"message": "Play deleted successfully"}
+
+
+# ============ PLAY PARTICIPATION ============
+
+@router.post("/plays/{play_id}/join")
+async def join_play(
+    play_id: str,
+    current_user: User = Depends(get_current_user)
+):
+    """Member joins a play/opportunity"""
+    # Check if play exists and is active
+    play = await db.flip_plays.find_one({"id": play_id, "is_active": True}, {"_id": 0})
+    if not play:
+        raise HTTPException(status_code=404, detail="Play not found or inactive")
+    
+    # Check user access to section
+    user_tier = current_user.tier or MemberTier.JUNIOR_RECRUIT
+    settings = await db.flip_tier_settings.find_one({"type": "tier_access"}, {"_id": 0})
+    tier_access = settings.get("access", {}) if settings else {}
+    required_tier = tier_access.get(play["section"], DEFAULT_TIER_ACCESS[FlipSectionType(play["section"])].value)
+    
+    if not user_has_access(user_tier, MemberTier(required_tier)):
+        raise HTTPException(status_code=403, detail="You don't have access to this section")
+    
+    # Check if already joined
+    existing = await db.play_participants.find_one({
+        "play_id": play_id,
+        "user_id": current_user.id
+    })
+    if existing:
+        raise HTTPException(status_code=400, detail="You have already joined this play")
+    
+    participation = {
+        "id": str(uuid4()),
+        "play_id": play_id,
+        "user_id": current_user.id,
+        "user_name": current_user.name,
+        "user_email": current_user.email,
+        "contact_status": ContactStatus.NOT_CONTACTED,
+        "joined_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    await db.play_participants.insert_one(participation)
+    
+    return {
+        "message": "You have successfully joined this play. You will receive instructions soon.",
+        "participation_id": participation["id"]
+    }
+
+
+@router.get("/plays/{play_id}/my-status")
+async def get_my_play_status(
+    play_id: str,
+    current_user: User = Depends(get_current_user)
+):
+    """Check if current user has joined a play"""
+    participation = await db.play_participants.find_one({
+        "play_id": play_id,
+        "user_id": current_user.id
+    }, {"_id": 0})
+    
+    return {
+        "joined": participation is not None,
+        "participation": participation
+    }
+
+
+@router.get("/plays/{play_id}/participants")
+async def get_play_participants(
+    play_id: str,
+    admin_user: User = Depends(get_admin_user)
+):
+    """Admin gets list of participants for a play"""
+    participants = await db.play_participants.find(
+        {"play_id": play_id},
+        {"_id": 0}
+    ).sort("joined_at", -1).to_list(1000)
+    
+    # Enrich with user profile data
+    for participant in participants:
+        user = await db.users.find_one(
+            {"id": participant["user_id"]},
+            {"_id": 0, "password": 0}
+        )
+        if user:
+            participant["user_mobile"] = user.get("mobile")
+            participant["user_tier"] = user.get("tier")
+            participant["gmail_account"] = user.get("gmail_account")
+    
+    return participants
+
+
+@router.put("/plays/{play_id}/participants/{user_id}/contact-status")
+async def update_participant_contact_status(
+    play_id: str,
+    user_id: str,
+    status_update: PlayParticipantUpdate,
+    admin_user: User = Depends(get_admin_user)
+):
+    """Admin updates contact status for a participant"""
+    result = await db.play_participants.update_one(
+        {"play_id": play_id, "user_id": user_id},
+        {"$set": {
+            "contact_status": status_update.contact_status,
+            "contact_updated_at": datetime.now(timezone.utc).isoformat(),
+            "contact_updated_by": admin_user.id
+        }}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Participant not found")
+    
+    return {"message": "Contact status updated"}
+
+
+# ============ ADMIN PLAY STATS ============
+
+@router.get("/admin/plays/stats")
+async def get_plays_stats(admin_user: User = Depends(get_admin_user)):
+    """Get overall plays statistics"""
+    total_plays = await db.flip_plays.count_documents({})
+    active_plays = await db.flip_plays.count_documents({"is_active": True})
+    total_participants = await db.play_participants.count_documents({})
+    
+    # Stats per section
+    section_stats = {}
+    for section in FlipSectionType:
+        plays_count = await db.flip_plays.count_documents({"section": section})
+        section_stats[section.value] = {
+            "plays_count": plays_count,
+            "title": SECTION_INFO[section]["title"]
+        }
+    
+    return {
+        "total_plays": total_plays,
+        "active_plays": active_plays,
+        "total_participants": total_participants,
+        "section_stats": section_stats
+    }
