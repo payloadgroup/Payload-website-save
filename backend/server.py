@@ -40,6 +40,7 @@ api_router.include_router(notifications.router)
 api_router.include_router(workzone.router)
 api_router.include_router(flips.router)
 api_router.include_router(projects.router)
+api_router.include_router(funding.router)
 
 app.include_router(api_router)
 
