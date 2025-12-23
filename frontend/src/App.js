@@ -16,6 +16,7 @@ import ReferralsPage from "@/pages/ReferralsPage";
 import NotificationSettingsPage from "@/pages/NotificationSettingsPage";
 import WorkZonePage from "@/pages/WorkZonePage";
 import GuaranteedFlipsPage from "@/pages/GuaranteedFlipsPage";
+import FlipCategoryPage from "@/pages/FlipCategoryPage";
 import IconDemoPage from "@/pages/IconDemoPage";
 import MemberProgressPage from "@/pages/MemberProgressPage";
 import { AuthProvider, useAuth } from "@/context/AuthContext";
