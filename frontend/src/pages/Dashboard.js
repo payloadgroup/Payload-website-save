@@ -81,6 +81,39 @@ const Dashboard = () => {
     }
   };
 
+  const fetchClusterData = async () => {
+    try {
+      const response = await axios.get(`${API}/funding/cluster/summary`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setClusterData(response.data);
+    } catch (error) {
+      console.error('Failed to fetch cluster data:', error);
+    }
+  };
+
+  const fetchBankTotal = async () => {
+    try {
+      const response = await axios.get(`${API}/funding/bank/total`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setBankTotal(response.data.total);
+    } catch (error) {
+      console.error('Failed to fetch bank total:', error);
+    }
+  };
+
+  const fetchFundingSummary = async () => {
+    try {
+      const response = await axios.get(`${API}/funding/progress/summary`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setFundingSummary(response.data);
+    } catch (error) {
+      console.error('Failed to fetch funding summary:', error);
+    }
+  };
+
   const fetchAnnouncements = async () => {
     try {
       const response = await axios.get(`${API}/announcements`, {
