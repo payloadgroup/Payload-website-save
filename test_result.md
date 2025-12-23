@@ -1,126 +1,89 @@
 # Test Results for Payload Application
 
 ## Current Testing Focus
-Testing the NEW FEATURES implemented:
+Testing the NEW FEATURES implemented in this session:
 
-1. **Guaranteed Flips - Plays System**: Cards now open to new pages with plays/opportunities, admin CRUD, member join
-2. **Member Opportunity Submissions - Achieved Tab**: New "Achieved" tab in submissions section
-3. **Auto-Activate Guaranteed Flips**: Like Censored Referrals, auto-activated for all members
-4. **Payloads Card Update**: Shows active projects with deactivate option, removed task viewer
-5. **Admin Funding Progress Card & Page**: Track business registration and funding status
-6. **Cluster Syndicate Updates**: Show member counts per project, admin can enter $ values per member
-7. **Bank Card Update**: Display total capital from Cluster Syndicate values
+1. **Bank Card - Member Transaction Restriction**: Members can no longer add transactions; only admins can
+2. **Bank Card - Delete Transactions**: Admins can delete transaction history
+3. **Guaranteed Flips - Archive Button Cleanup**: Removed duplicate "ARCHIVE" button, kept "MARK ACHIEVED"
+4. **Admin Members Sorting**: Approved members sorted by approval date (most recent first)
+5. **Crypto Submission Form**: After joining Crypto play in Arbitrage, members fill out a form (name, contact, telegram)
+6. **Crypto Submissions Admin View**: Admin can see submission count and view all submissions by clicking crypto card
 
 ## Test Credentials
 - Admin: admin@payload.com / admin123
 - Member: member@payload.com / member123
 
-## Files Changed
+## Files Changed in This Session
 ### Backend:
-- /app/backend/routes/flips.py - Extended with plays CRUD, member participation, contact status
-- /app/backend/routes/funding.py - NEW file for funding progress and cluster values
-- /app/backend/routes/projects.py - Added deactivate endpoint, updated auto-activation
-- /app/backend/routes/admin.py - Auto-activates Guaranteed Flips on member approval
-- /app/backend/models/schemas.py - Added Play, Funding, ClusterMemberValue models
-- /app/backend/server.py - Added funding router
+- /app/backend/routes/bank.py - Added admin-only transaction creation, delete transaction endpoint
+- /app/backend/routes/admin.py - Updated get_all_members to sort by approved_at, added approved_at tracking
+- /app/backend/routes/flips.py - Added crypto submission endpoints (POST/GET)
 
 ### Frontend:
-- /app/frontend/src/pages/FlipCategoryPage.js - NEW page for viewing plays per category
-- /app/frontend/src/pages/FundingProgressPage.js - NEW admin page for funding tracking
-- /app/frontend/src/pages/GuaranteedFlipsPage.js - Cards now navigate to category pages, added Achieved tab
-- /app/frontend/src/pages/Dashboard.js - Updated Bank card, Cluster Syndicate, added Funding Progress card
-- /app/frontend/src/components/modules/MemberProjectsModal.js - Updated to show deactivate option
-- /app/frontend/src/components/modules/MemberMissionsModal.js - NEW modal for task viewer
-- /app/frontend/src/components/modules/ClusterSyndicateModal.js - NEW modal with member values
-- /app/frontend/src/App.js - Added new routes
+- /app/frontend/src/components/modules/BankModal.js - Added admin check for transaction form, added delete button
+- /app/frontend/src/pages/GuaranteedFlipsPage.js - Removed duplicate ARCHIVE button
+- /app/frontend/src/pages/FlipCategoryPage.js - Added crypto form for members, crypto submissions modal for admin
 
 ## Key Test Scenarios
-### Scenario 1: Guaranteed Flips - Plays System
-- Login as admin
-- Navigate to /guaranteed-flips
-- Click on Property card
-- Should see the play created earlier and "ADD NEW PLAY" button
-- Create a new play, edit it, delete it
-- Check participant count
 
-### Scenario 2: Member Joining a Play
-- Login as member
-- Navigate to /guaranteed-flips/property
-- Should see plays available
-- Click "JOIN" on a play
-- Should see success message "You will receive instructions soon"
-- Button should change to "JOINED"
+### Scenario 1: Bank Card - Member Cannot Add Transaction
+- Login as member (member@payload.com / member123)
+- Go to Dashboard, click on BANK card
+- Should NOT see "NEW TRANSACTION" button
+- Should still see transaction history
 
-### Scenario 3: Admin Tracking Participants
-- Login as admin
-- Navigate to /guaranteed-flips/property
-- Click on member count for a play
-- Should see list of participants with contact status dropdown
-- Change contact status to "Contacted"
-- Click on member name to expand profile details
+### Scenario 2: Bank Card - Admin Can Add and Delete Transactions
+- Login as admin (admin@payload.com / admin123)
+- Go to Dashboard, click on BANK card
+- Should see "NEW TRANSACTION" button
+- Add a transaction
+- Should see delete button (trash icon) next to each transaction
+- Delete a transaction
+- Transaction should be removed
 
-### Scenario 4: Member Opportunity Submissions - Achieved Tab
+### Scenario 3: Guaranteed Flips - No Duplicate Archive Button
 - Login as admin
 - Navigate to /guaranteed-flips
 - In "Member Opportunity Submissions" section
-- Should see "ACTIVE" and "ACHIEVED" tabs
-- Mark a submission as "Achieved"
-- It should move to the Achieved tab
+- Expand a submission
+- Should see: "MARK REVIEWED", "MARK ACHIEVED", "MARK PENDING"
+- Should NOT see separate "ARCHIVE" button
 
-### Scenario 5: Funding Progress Page
+### Scenario 4: Crypto Play Form in Arbitrage (Member)
+- Login as member with Senior Manager tier (or update tier first)
+- Navigate to /guaranteed-flips/arbitrage
+- Admin should have created a "Crypto" play first
+- Click JOIN on the Crypto play
+- After joining, a form should slide down with: Name, Contact (optional), Telegram (optional)
+- Fill the form and submit
+- Should see "Details submitted successfully"
+- Form should be replaced with success message
+
+### Scenario 5: Crypto Submissions Admin View
 - Login as admin
-- Click on "FUNDING PROGRESS" card on dashboard
-- Should navigate to /admin/funding-progress
-- See list of members with registration/funding status
-- Click checkboxes to mark as registered/funded
-
-### Scenario 6: Cluster Syndicate Modal
-- Login as admin
-- Click on "CLUSTER SYNDICATE" card on dashboard
-- Should see clusters with member counts
-- Click on a cluster to expand
-- Enter a dollar value for a member
-- Value should update and reflect in total capital
-
-### Scenario 7: Bank Card Total
-- Dashboard Bank card should show total of all cluster values
-- After updating cluster member values, Bank total should update
-
-### Scenario 8: Payloads Deactivation
-- Login as member
-- Click on "PAYLOADS" card
-- Should see active projects with "DEACTIVATE" button
-- Click deactivate on a project
-- Project should be removed from list
+- Navigate to /guaranteed-flips/arbitrage
+- For Crypto play, should see a "X SUBMISSIONS" button next to member count
+- Click on it to see modal with all submissions
+- Each submission shows: name, email, contact, telegram, submitted date
+- Clicking member name navigates to their profile
 
 ## API Endpoints to Test
-### Plays API
-- GET /api/flips/plays/{section} - Get plays for a section
-- POST /api/flips/plays - Create new play (admin)
-- PUT /api/flips/plays/{play_id} - Update play (admin)
-- DELETE /api/flips/plays/{play_id} - Delete play (admin)
-- POST /api/flips/plays/{play_id}/join - Member joins play
-- GET /api/flips/plays/{play_id}/my-status - Check if joined
-- GET /api/flips/plays/{play_id}/participants - Get participants (admin)
-- PUT /api/flips/plays/{play_id}/participants/{user_id}/contact-status - Update contact status
 
-### Funding API
-- GET /api/funding/progress/summary - Get funding summary
-- GET /api/funding/progress/members - Get all members funding status
-- PUT /api/funding/progress/{user_id} - Update member funding status
-- GET /api/funding/cluster/summary - Get cluster summary with member counts
-- GET /api/funding/cluster/{business_type}/members - Get members in cluster
-- PUT /api/funding/cluster/{business_type}/member/{user_id}/value - Update member value
-- GET /api/funding/bank/total - Get total bank value
+### Bank API Updates
+- POST /api/transactions - Create transaction (admin only now)
+- DELETE /api/transactions/{transaction_id} - Delete transaction (admin only)
 
-### Projects API
-- POST /api/projects/deactivate/{project_id} - Deactivate a project
+### Crypto Submissions API
+- POST /api/flips/plays/{play_id}/crypto-submission - Submit crypto details (member)
+- GET /api/flips/plays/{play_id}/crypto-submission/my-status - Check if submitted
+- GET /api/flips/plays/{play_id}/crypto-submissions - Get all submissions (admin)
+- GET /api/flips/plays/{play_id}/crypto-submissions/count - Get submission count
 
 ## Incorporate User Feedback
-- Guaranteed Flips cards open new pages with plays
-- Plays have join button with "You will receive instructions soon" message
-- Admin can track participants with contact status
-- Achieved tab in submissions section
-- Funding Progress card and page for admin
-- Cluster Syndicate shows member counts and admin can enter values
-- Bank card shows total cluster capital
+- Removed option to add new transaction for members on bank card
+- Admin can delete transaction history
+- Removed duplicate archive button in Guaranteed Flips submissions
+- After member joins Crypto in arbitrage, form slides down for additional details
+- Admin can view crypto submissions by clicking submission count on crypto card
+- Admin Members list sorted by approval date (most recent first)
