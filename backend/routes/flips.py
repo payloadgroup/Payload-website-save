@@ -150,7 +150,7 @@ async def get_my_flip_access(current_user: User = Depends(get_current_user)):
 @router.post("/submit-opportunity")
 async def submit_opportunity(
     content: str = Form(...),
-    files: List[UploadFile] = File(default=[]),
+    files: Optional[List[UploadFile]] = File(default=None),
     current_user: User = Depends(get_current_user)
 ):
     """Member submits an opportunity with optional attachments"""
@@ -159,8 +159,9 @@ async def submit_opportunity(
     
     # Process attachments
     attachments = []
-    for file in files:
-        if file.filename:
+    if files:
+        for file in files:
+            if file.filename:
             # Validate file type
             allowed_types = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 
                            'application/pdf', 'application/msword',
