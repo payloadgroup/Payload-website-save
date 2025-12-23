@@ -254,16 +254,23 @@ async def update_submission_status(
     admin_user: User = Depends(get_admin_user)
 ):
     """Admin updates submission status"""
-    if status not in ["pending", "reviewed", "archived"]:
+    if status not in ["pending", "reviewed", "archived", "achieved"]:
         raise HTTPException(status_code=400, detail="Invalid status")
+    
+    update_data = {
+        "status": status,
+    }
+    
+    if status == "reviewed":
+        update_data["reviewed_at"] = datetime.now(timezone.utc).isoformat()
+        update_data["reviewed_by"] = admin_user.id
+    elif status == "achieved":
+        update_data["achieved_at"] = datetime.now(timezone.utc).isoformat()
+        update_data["achieved_by"] = admin_user.id
     
     result = await db.flip_submissions.update_one(
         {"id": submission_id},
-        {"$set": {
-            "status": status,
-            "reviewed_at": datetime.now(timezone.utc).isoformat() if status == "reviewed" else None,
-            "reviewed_by": admin_user.id if status == "reviewed" else None
-        }}
+        {"$set": update_data}
     )
     
     if result.matched_count == 0:
