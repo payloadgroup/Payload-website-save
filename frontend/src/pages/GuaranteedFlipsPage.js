@@ -545,14 +545,6 @@ const GuaranteedFlipsPage = () => {
                                           <Award className="w-3 h-3" /> MARK ACHIEVED
                                         </button>
                                       )}
-                                      {submission.status !== 'archived' && (
-                                        <button
-                                          onClick={() => handleUpdateSubmissionStatus(submission.id, 'archived')}
-                                          className="flex items-center gap-1 font-mono text-xs border border-white/20 px-4 py-2 hover:bg-white/10"
-                                        >
-                                          <Archive className="w-3 h-3" /> ARCHIVE
-                                        </button>
-                                      )}
                                       {submission.status !== 'pending' && (
                                         <button
                                           onClick={() => handleUpdateSubmissionStatus(submission.id, 'pending')}
