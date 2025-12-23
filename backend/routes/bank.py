@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from typing import List
 from datetime import datetime, timezone
 import uuid
@@ -7,7 +7,7 @@ from models.schemas import (
     User, TransactionType,
     TransactionCreate, TransactionResponse
 )
-from utils.dependencies import get_current_user
+from utils.dependencies import get_current_user, get_admin_user
 from utils.database import db
 
 router = APIRouter(tags=["bank"])
@@ -19,6 +19,10 @@ async def get_transactions(current_user: User = Depends(get_current_user)):
 
 @router.post("/transactions", response_model=TransactionResponse)
 async def create_transaction(transaction_data: TransactionCreate, current_user: User = Depends(get_current_user)):
+    # Only admin can add transactions
+    if current_user.role != "admin":
+        raise HTTPException(status_code=403, detail="Only admin can add transactions")
+    
     last_transaction = await db.transactions.find_one({"user_id": current_user.id}, {"_id": 0}, sort=[("date", -1)])
     current_balance = last_transaction["balance_after"] if last_transaction else 0.0
     
