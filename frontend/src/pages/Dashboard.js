@@ -403,10 +403,14 @@ const Dashboard = () => {
       {activeModal === 'missions' && (
         user?.role === 'admin'
           ? <MissionsModal onClose={() => setActiveModal(null)} onUpdate={refreshData} />
-          : <MemberProjectsModal onClose={() => setActiveModal(null)} onUpdate={refreshData} />
+          : <MemberMissionsModal onClose={() => setActiveModal(null)} onUpdate={refreshData} />
       )}
       {activeModal === 'bank' && <BankModal onClose={() => setActiveModal(null)} onUpdate={refreshData} />}
-      {activeModal === 'stations' && <StationsModal onClose={() => setActiveModal(null)} onUpdate={refreshData} />}
+      {activeModal === 'cluster' && (
+        user?.role === 'admin'
+          ? <ClusterSyndicateModal onClose={() => setActiveModal(null)} onUpdate={() => { fetchClusterData(); fetchBankTotal(); }} isAdmin={true} />
+          : <ClusterSyndicateModal onClose={() => setActiveModal(null)} onUpdate={fetchClusterData} isAdmin={false} />
+      )}
       {activeModal === 'basecamp' && <BasecampModal onClose={() => setActiveModal(null)} />}
     </div>
   );
