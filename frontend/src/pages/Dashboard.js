@@ -332,17 +332,17 @@ const Dashboard = () => {
             </motion.div>
 
             <motion.div data-testid="bank-card" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }} onClick={() => setActiveModal('bank')} className="bg-payload-surface border border-white/10 p-4 sm:p-6 rounded-sm hover:border-payload-alert/50 transition-all cursor-pointer">
-              <div className="flex items-start justify-between gap-2 mb-3"><DollarSign className="w-6 h-6 sm:w-8 sm:h-8 text-payload-alert" /><span className="font-mono text-[8px] sm:text-xs text-payload-muted uppercase">BALANCE</span></div>
+              <div className="flex items-start justify-between gap-2 mb-3"><DollarSign className="w-6 h-6 sm:w-8 sm:h-8 text-payload-alert" /><span className="font-mono text-[8px] sm:text-xs text-payload-muted uppercase">CAPITAL</span></div>
               <h3 className="font-rajdhani font-bold text-base sm:text-xl uppercase mb-1">BANK</h3>
-              <p className="font-inter text-[10px] sm:text-xs text-payload-muted mb-2">Financial resources</p>
-              <div className="font-mono text-lg sm:text-2xl text-payload-alert">${(dashboardData?.balance || 0).toFixed(2)}</div>
+              <p className="font-inter text-[10px] sm:text-xs text-payload-muted mb-2">Total cluster capital</p>
+              <div className="font-mono text-lg sm:text-2xl text-payload-alert">${bankTotal.toLocaleString()}</div>
             </motion.div>
 
-            <motion.div data-testid="stations-card" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }} onClick={() => setActiveModal('stations')} className="bg-payload-surface border border-white/10 p-4 sm:p-6 rounded-sm hover:border-white/30 transition-all cursor-pointer">
-              <div className="flex items-start justify-between gap-2 mb-3"><Users className="w-6 h-6 sm:w-8 sm:h-8 text-purple-400" /><span className="font-mono text-[8px] sm:text-xs text-payload-muted uppercase">MEMBERS</span></div>
+            <motion.div data-testid="cluster-card" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }} onClick={() => setActiveModal('cluster')} className="bg-payload-surface border border-white/10 p-4 sm:p-6 rounded-sm hover:border-purple-400/50 transition-all cursor-pointer">
+              <div className="flex items-start justify-between gap-2 mb-3"><Users className="w-6 h-6 sm:w-8 sm:h-8 text-purple-400" /><span className="font-mono text-[8px] sm:text-xs text-payload-muted uppercase">CLUSTERS</span></div>
               <h3 className="font-rajdhani font-bold text-base sm:text-xl uppercase mb-1">CLUSTER SYNDICATE</h3>
               <p className="font-inter text-[10px] sm:text-xs text-payload-muted mb-2">Members in same business</p>
-              <div className="font-mono text-xl sm:text-2xl text-white">{dashboardData?.stations_count || 0}</div>
+              <div className="font-mono text-xl sm:text-2xl text-purple-400">{clusterData.clusters.length}</div>
             </motion.div>
 
             <motion.div data-testid="basecamp-card" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }} onClick={() => setActiveModal('basecamp')} className="bg-payload-surface border border-white/10 p-4 sm:p-6 rounded-sm hover:border-white/30 transition-all cursor-pointer">
@@ -358,6 +358,29 @@ const Dashboard = () => {
               <p className="font-inter text-[10px] sm:text-xs text-payload-muted mb-2">Track referrals & boost your tier</p>
               <div className="font-mono text-xs sm:text-sm text-purple-400">VIEW REFERRALS</div>
             </motion.div>
+
+            {/* Admin Only: Funding Progress Card */}
+            {user?.role === 'admin' && (
+              <motion.div 
+                data-testid="funding-card" 
+                initial={{ opacity: 0 }} 
+                animate={{ opacity: 1 }} 
+                transition={{ delay: 0.8 }} 
+                onClick={() => navigate('/admin/funding-progress')} 
+                className="bg-payload-surface border border-payload-cyan/30 p-4 sm:p-6 rounded-sm hover:border-payload-cyan/50 transition-all cursor-pointer col-span-2 lg:col-span-3"
+              >
+                <div className="flex items-start justify-between gap-2 mb-3">
+                  <Building2 className="w-6 h-6 sm:w-8 sm:h-8 text-payload-cyan" />
+                  <span className="font-mono text-[8px] sm:text-xs text-payload-cyan uppercase">ADMIN</span>
+                </div>
+                <h3 className="font-rajdhani font-bold text-base sm:text-xl uppercase mb-1">FUNDING PROGRESS</h3>
+                <p className="font-inter text-[10px] sm:text-xs text-payload-muted mb-2">Track member business registration & funding</p>
+                <div className="flex gap-4 font-mono text-sm">
+                  <span className="text-payload-alert">{fundingSummary.registered_count} Registered</span>
+                  <span className="text-payload-neon">{fundingSummary.funded_count} Funded</span>
+                </div>
+              </motion.div>
+            )}
           </div>
 
           <div className="mt-8 sm:mt-12 bg-payload-surface border border-white/10 p-4 sm:p-6 rounded-sm">
