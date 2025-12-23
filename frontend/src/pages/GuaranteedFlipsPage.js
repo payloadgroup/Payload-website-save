@@ -528,13 +528,21 @@ const GuaranteedFlipsPage = () => {
                                       </div>
                                     )}
 
-                                    <div className="flex gap-2 pt-2">
+                                    <div className="flex flex-wrap gap-2 pt-2">
                                       {submission.status !== 'reviewed' && (
                                         <button
                                           onClick={() => handleUpdateSubmissionStatus(submission.id, 'reviewed')}
                                           className="flex items-center gap-1 font-mono text-xs bg-payload-neon text-black px-4 py-2 hover:bg-payload-neon/80"
                                         >
                                           <CheckCircle className="w-3 h-3" /> MARK REVIEWED
+                                        </button>
+                                      )}
+                                      {submission.status !== 'achieved' && (
+                                        <button
+                                          onClick={() => handleUpdateSubmissionStatus(submission.id, 'achieved')}
+                                          className="flex items-center gap-1 font-mono text-xs bg-green-500 text-black px-4 py-2 hover:bg-green-500/80"
+                                        >
+                                          <Award className="w-3 h-3" /> MARK ACHIEVED
                                         </button>
                                       )}
                                       {submission.status !== 'archived' && (
