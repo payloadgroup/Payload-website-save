@@ -461,6 +461,7 @@ const GuaranteedFlipsPage = () => {
                                     <span className={`px-2 py-0.5 rounded-sm font-mono text-[10px] uppercase ${
                                       submission.status === 'pending' ? 'bg-payload-alert/20 text-payload-alert' :
                                       submission.status === 'reviewed' ? 'bg-payload-neon/20 text-payload-neon' :
+                                      submission.status === 'achieved' ? 'bg-green-500/20 text-green-400' :
                                       'bg-gray-500/20 text-gray-400'
                                     }`}>
                                       {submission.status}
