@@ -255,7 +255,7 @@ async def update_submission_status(
     admin_user: User = Depends(get_admin_user)
 ):
     """Admin updates submission status"""
-    if status not in ["pending", "reviewed", "archived", "achieved"]:
+    if status not in ["pending", "reviewed", "achieved"]:
         raise HTTPException(status_code=400, detail="Invalid status")
     
     update_data = {
