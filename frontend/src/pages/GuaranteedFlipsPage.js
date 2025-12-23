@@ -274,10 +274,11 @@ const GuaranteedFlipsPage = () => {
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: index * 0.1 }}
+                      onClick={() => !isLocked && navigate(`/guaranteed-flips/${section.id}`)}
                       className={`bg-payload-surface border rounded-sm overflow-hidden ${
                         isLocked 
-                          ? 'border-white/10 opacity-60' 
-                          : `border-${colorClass}/30 hover:border-${colorClass}/60`
+                          ? 'border-white/10 opacity-60 cursor-not-allowed' 
+                          : `border-${colorClass}/30 hover:border-${colorClass}/60 cursor-pointer`
                       } transition-all`}
                     >
                       <div className="p-5 sm:p-6">
@@ -313,7 +314,10 @@ const GuaranteedFlipsPage = () => {
                                 </div>
                               </div>
                             ) : (
-                              <Unlock className="w-5 h-5 text-payload-neon" />
+                              <div className="flex items-center gap-2">
+                                <span className="font-mono text-xs text-payload-muted">VIEW PLAYS</span>
+                                <Unlock className="w-5 h-5 text-payload-neon" />
+                              </div>
                             )}
                           </div>
                         </div>
