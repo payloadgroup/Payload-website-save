@@ -1,13 +1,15 @@
 # Test Results for Payload Application
 
 ## Current Testing Focus
-Testing the PAYLOADS, MISSIONS, and MEMBER PROGRESS features:
+Testing the NEW FEATURES implemented:
 
-1. Payloads Card - Shows member's active business projects
-2. Censored Referrals auto-activated for all members
-3. HQ page "Start Project" functionality
-4. Missions/Projects modal with task list and progress bar
-5. Admin Member Progress page
+1. **Guaranteed Flips - Plays System**: Cards now open to new pages with plays/opportunities, admin CRUD, member join
+2. **Member Opportunity Submissions - Achieved Tab**: New "Achieved" tab in submissions section
+3. **Auto-Activate Guaranteed Flips**: Like Censored Referrals, auto-activated for all members
+4. **Payloads Card Update**: Shows active projects with deactivate option, removed task viewer
+5. **Admin Funding Progress Card & Page**: Track business registration and funding status
+6. **Cluster Syndicate Updates**: Show member counts per project, admin can enter $ values per member
+7. **Bank Card Update**: Display total capital from Cluster Syndicate values
 
 ## Test Credentials
 - Admin: admin@payload.com / admin123
