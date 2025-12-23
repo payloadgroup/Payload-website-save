@@ -7,7 +7,7 @@ import { toast } from 'sonner';
 import { 
   ArrowLeft, TrendingUp, Lock, Unlock, Building, Briefcase, Star, 
   ArrowRightLeft, Shield, Send, Paperclip, X, FileText, Image, 
-  Eye, Archive, Clock, CheckCircle, ChevronDown, ChevronUp, Settings
+  Eye, Archive, Clock, CheckCircle, ChevronDown, ChevronUp, Settings, Award
 } from 'lucide-react';
 import PayloadLogo from '@/components/PayloadLogo';
 
@@ -62,6 +62,7 @@ const GuaranteedFlipsPage = () => {
   const [loadingSubmissions, setLoadingSubmissions] = useState(true);
   const [expandedSubmission, setExpandedSubmission] = useState(null);
   const [showSettings, setShowSettings] = useState(false);
+  const [submissionTab, setSubmissionTab] = useState('active'); // 'active' or 'achieved'
 
   useEffect(() => {
     fetchAccessData();
