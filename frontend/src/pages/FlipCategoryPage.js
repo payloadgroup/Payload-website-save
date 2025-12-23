@@ -125,6 +125,46 @@ const FlipCategoryPage = () => {
         const statusMap = {};
         statuses.forEach(s => { statusMap[s.playId] = s.joined; });
         setJoinStatus(statusMap);
+        
+        // For arbitrage section, fetch crypto submission status for joined plays
+        if (section === 'arbitrage') {
+          const cryptoStatusPromises = statuses.filter(s => s.joined).map(async (s) => {
+            try {
+              const cryptoRes = await axios.get(`${API}/flips/plays/${s.playId}/crypto-submission/my-status`, {
+                headers: { Authorization: `Bearer ${token}` }
+              });
+              return { playId: s.playId, submitted: cryptoRes.data.submitted };
+            } catch {
+              return { playId: s.playId, submitted: false };
+            }
+          });
+          const cryptoStatuses = await Promise.all(cryptoStatusPromises);
+          const cryptoStatusMap = {};
+          cryptoStatuses.forEach(cs => { cryptoStatusMap[cs.playId] = cs.submitted; });
+          setCryptoSubmissionStatus(cryptoStatusMap);
+        }
+      }
+      
+      // For admin in arbitrage, fetch submission counts
+      if (isAdmin && section === 'arbitrage') {
+        const countPromises = res.data.map(async (play) => {
+          // Check if it's a "Crypto" play
+          if (play.title.toLowerCase().includes('crypto')) {
+            try {
+              const countRes = await axios.get(`${API}/flips/plays/${play.id}/crypto-submissions/count`, {
+                headers: { Authorization: `Bearer ${token}` }
+              });
+              return { playId: play.id, count: countRes.data.count };
+            } catch {
+              return { playId: play.id, count: 0 };
+            }
+          }
+          return { playId: play.id, count: 0 };
+        });
+        const counts = await Promise.all(countPromises);
+        const countMap = {};
+        counts.forEach(c => { countMap[c.playId] = c.count; });
+        setCryptoSubmissionCounts(countMap);
       }
     } catch (error) {
       if (error.response?.status === 403) {
