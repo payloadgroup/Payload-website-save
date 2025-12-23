@@ -67,7 +67,7 @@ class OpportunitySubmission(BaseModel):
     user_email: str
     content: str
     attachments: List[dict] = []
-    status: str = "pending"  # pending, reviewed, archived
+    status: str = "pending"  # pending, reviewed, achieved
     submitted_at: str
     reviewed_at: Optional[str] = None
 
