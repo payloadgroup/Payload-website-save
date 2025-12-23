@@ -335,7 +335,7 @@ const Dashboard = () => {
               <div className="flex items-start justify-between gap-2 mb-3"><DollarSign className="w-6 h-6 sm:w-8 sm:h-8 text-payload-alert" /><span className="font-mono text-[8px] sm:text-xs text-payload-muted uppercase">CAPITAL</span></div>
               <h3 className="font-rajdhani font-bold text-base sm:text-xl uppercase mb-1">BANK</h3>
               <p className="font-inter text-[10px] sm:text-xs text-payload-muted mb-2">Total cluster capital</p>
-              <div className="font-mono text-lg sm:text-2xl text-payload-alert">${bankTotal.toLocaleString()}</div>
+              <div className="font-mono text-lg sm:text-2xl text-payload-alert">${(bankTotal || 0).toLocaleString('en-AU', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</div>
             </motion.div>
 
             <motion.div data-testid="cluster-card" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }} onClick={() => setActiveModal('cluster')} className="bg-payload-surface border border-white/10 p-4 sm:p-6 rounded-sm hover:border-purple-400/50 transition-all cursor-pointer">
