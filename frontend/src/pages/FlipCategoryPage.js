@@ -535,13 +535,25 @@ const FlipCategoryPage = () => {
 
                         {/* Participant Count (Admin clickable) */}
                         {isAdmin ? (
-                          <button
-                            onClick={() => handleViewParticipants(play)}
-                            className="flex items-center gap-2 font-mono text-xs bg-white/10 px-3 py-1.5 rounded-sm hover:bg-white/20 transition-colors"
-                          >
-                            <Users className="w-4 h-4" />
-                            <span>{play.participant_count} MEMBER{play.participant_count !== 1 ? 'S' : ''}</span>
-                          </button>
+                          <div className="flex items-center gap-3">
+                            <button
+                              onClick={() => handleViewParticipants(play)}
+                              className="flex items-center gap-2 font-mono text-xs bg-white/10 px-3 py-1.5 rounded-sm hover:bg-white/20 transition-colors"
+                            >
+                              <Users className="w-4 h-4" />
+                              <span>{play.participant_count} MEMBER{play.participant_count !== 1 ? 'S' : ''}</span>
+                            </button>
+                            {/* For Crypto plays in arbitrage, show submission count */}
+                            {section === 'arbitrage' && play.title.toLowerCase().includes('crypto') && (
+                              <button
+                                onClick={() => handleViewCryptoSubmissions(play)}
+                                className="flex items-center gap-2 font-mono text-xs bg-payload-alert/20 text-payload-alert px-3 py-1.5 rounded-sm hover:bg-payload-alert/30 transition-colors"
+                              >
+                                <MessageSquare className="w-4 h-4" />
+                                <span>{cryptoSubmissionCounts[play.id] || 0} SUBMISSION{(cryptoSubmissionCounts[play.id] || 0) !== 1 ? 'S' : ''}</span>
+                              </button>
+                            )}
+                          </div>
                         ) : (
                           <div className="flex items-center gap-2 font-mono text-xs text-payload-muted">
                             <Users className="w-4 h-4" />
@@ -589,6 +601,89 @@ const FlipCategoryPage = () => {
                       </div>
                     </div>
                   </div>
+                  
+                  {/* Crypto Submission Form for Members (Arbitrage Section) */}
+                  {!isAdmin && section === 'arbitrage' && play.title.toLowerCase().includes('crypto') && joinStatus[play.id] && (
+                    <AnimatePresence>
+                      {!cryptoSubmissionStatus[play.id] && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: 'auto', opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          className="border-t border-white/10 bg-black/30"
+                        >
+                          <div className="p-5">
+                            <div className="flex items-center gap-2 mb-4">
+                              <MessageSquare className="w-4 h-4 text-payload-alert" />
+                              <span className="font-mono text-xs text-payload-alert uppercase">Complete Your Details</span>
+                            </div>
+                            <div className="space-y-3">
+                              <div>
+                                <label className="font-mono text-xs text-payload-muted block mb-1">NAME *</label>
+                                <input
+                                  type="text"
+                                  required
+                                  value={cryptoFormData[play.id]?.name || ''}
+                                  onChange={(e) => setCryptoFormData(prev => ({
+                                    ...prev,
+                                    [play.id]: { ...prev[play.id], name: e.target.value }
+                                  }))}
+                                  className="w-full bg-black border border-white/20 p-2 font-mono text-sm focus:border-payload-alert outline-none"
+                                  placeholder="Your full name"
+                                />
+                              </div>
+                              <div>
+                                <label className="font-mono text-xs text-payload-muted block mb-1">CONTACT NUMBER (Optional)</label>
+                                <input
+                                  type="tel"
+                                  value={cryptoFormData[play.id]?.contact_number || ''}
+                                  onChange={(e) => setCryptoFormData(prev => ({
+                                    ...prev,
+                                    [play.id]: { ...prev[play.id], contact_number: e.target.value }
+                                  }))}
+                                  className="w-full bg-black border border-white/20 p-2 font-mono text-sm focus:border-payload-alert outline-none"
+                                  placeholder="+1 234 567 8900"
+                                />
+                              </div>
+                              <div>
+                                <label className="font-mono text-xs text-payload-muted block mb-1">TELEGRAM HANDLE (Optional)</label>
+                                <input
+                                  type="text"
+                                  value={cryptoFormData[play.id]?.telegram_handle || ''}
+                                  onChange={(e) => setCryptoFormData(prev => ({
+                                    ...prev,
+                                    [play.id]: { ...prev[play.id], telegram_handle: e.target.value }
+                                  }))}
+                                  className="w-full bg-black border border-white/20 p-2 font-mono text-sm focus:border-payload-alert outline-none"
+                                  placeholder="@username"
+                                />
+                              </div>
+                              <button
+                                onClick={() => handleCryptoSubmission(play.id)}
+                                disabled={submittingCrypto === play.id}
+                                className="flex items-center justify-center gap-2 w-full bg-payload-alert text-black font-mono text-sm py-2 hover:bg-payload-alert/80 disabled:opacity-50"
+                              >
+                                <Send className="w-4 h-4" />
+                                {submittingCrypto === play.id ? 'SUBMITTING...' : 'SUBMIT DETAILS'}
+                              </button>
+                            </div>
+                          </div>
+                        </motion.div>
+                      )}
+                      {cryptoSubmissionStatus[play.id] && (
+                        <motion.div
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          className="border-t border-green-500/30 bg-green-500/10 p-4"
+                        >
+                          <div className="flex items-center gap-2 font-mono text-xs text-green-400">
+                            <Check className="w-4 h-4" />
+                            <span>Your details have been submitted. You will receive instructions soon.</span>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  )}
                 </motion.div>
               ))}
             </div>
